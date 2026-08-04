@@ -1,0 +1,39 @@
+<header
+  class="h-14 sticky top-0 z-30 flex items-center gap-4 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur px-4"
+>
+  <div class="flex items-center gap-2.5 font-semibold text-slate-900 dark:text-white">
+    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 text-white text-xs font-bold shadow-sm shadow-indigo-500/30">RD</span>
+    <span class="hidden sm:inline tracking-tight">Reporting Dashboard</span>
+  </div>
+
+  <div class="flex-1 max-w-xl mx-auto relative">
+    <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-slate-400">
+      <app-icon name="search" [size]="16" />
+    </span>
+    <input
+      type="text"
+      placeholder="Search categories, jobs, queries…"
+      [ngModel]="search.term()"
+      (ngModelChange)="search.setTerm($event)"
+      class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-1.5 pl-10 pr-9 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+    />
+    @if (search.term()) {
+      <button
+        type="button"
+        (click)="search.clear()"
+        class="absolute inset-y-0 right-2.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+      >
+        <app-icon name="x" [size]="14" />
+      </button>
+    }
+  </div>
+
+  <button
+    type="button"
+    (click)="theme.toggle()"
+    class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400"
+    [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+  >
+    <app-icon [name]="theme.isDark() ? 'sun' : 'sunrise'" [size]="17" />
+  </button>
+</header>
