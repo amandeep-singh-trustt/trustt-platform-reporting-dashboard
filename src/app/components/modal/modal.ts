@@ -6,10 +6,10 @@ import { Icon } from '../icon/icon';
   standalone: true,
   imports: [Icon],
   template: `
-    <div class="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/40 backdrop-blur-[1px] p-4 sm:p-8" (click)="close.emit()">
+    <div class="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/40 backdrop-blur-[1px] p-4 sm:p-8 animate-fade-in" (click)="close.emit()">
       <div
         (click)="$event.stopPropagation()"
-        class="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl my-4"
+        class="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl my-4 animate-scale-in"
         [class]="widthClass()"
       >
         <div class="flex items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 px-5 py-4">

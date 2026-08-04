@@ -31,13 +31,15 @@ import type { ReportingJob, ReportingCategory } from '../../types/reporting.type
       </div>
 
       @if (expanded()) {
-        <div class="overflow-hidden border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 px-4 py-3 transition-all duration-200">
+        <div class="overflow-hidden border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 px-4 py-3 animate-fade-in-down">
           @if (job().queries.length === 0) {
             <p class="text-sm text-slate-500 dark:text-slate-400">No queries</p>
           } @else {
             <div class="flex flex-col gap-2">
-              @for (query of job().queries; track query.id) {
-                <app-query-card [query]="query" [job]="job()" [category]="category()" />
+              @for (query of job().queries; track query.id; let i = $index) {
+                <div class="animate-fade-in-up" [style.animation-delay.ms]="(i % 8) * 25">
+                  <app-query-card [query]="query" [job]="job()" [category]="category()" />
+                </div>
               }
             </div>
           }

@@ -31,7 +31,7 @@
   <button
     type="button"
     (click)="theme.toggle()"
-    class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400"
+    class="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-transform hover:bg-slate-100 dark:hover:bg-slate-800 dark:text-slate-400 active:scale-90"
     [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
   >
     <app-icon [name]="theme.isDark() ? 'sun' : 'sunrise'" [size]="17" />

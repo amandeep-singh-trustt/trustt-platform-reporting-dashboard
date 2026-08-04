@@ -11,7 +11,7 @@ import type { SqlQuery, ReportingJob, ReportingCategory, QueryStatus } from '../
   template: `
     <div
       (click)="onOpen()"
-      class="group flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3 shadow-sm transition hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md"
+      class="group flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3 shadow-sm transition hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md active:scale-[0.99]"
     >
       <div class="min-w-0 flex-1">
         <div class="flex items-center gap-2">

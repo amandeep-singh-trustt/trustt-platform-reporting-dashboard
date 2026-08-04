@@ -16,7 +16,7 @@ import { categoryStyle } from '../../utils/category-style';
   template: `
     @if (category(); as cat) {
       <div class="flex flex-col gap-4">
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 animate-fade-in-down">
           <span class="flex items-center justify-center size-11 rounded-xl" [class]="style(cat.id).badge">
             <app-icon [name]="style(cat.id).icon" [size]="20" />
           </span>
@@ -50,8 +50,10 @@ import { categoryStyle } from '../../utils/category-style';
         </div>
 
         <div class="flex flex-col gap-3">
-          @for (job of filteredJobs(); track job.id) {
-            <app-job-accordion [job]="job" [category]="cat" />
+          @for (job of filteredJobs(); track job.id; let i = $index) {
+            <div class="animate-fade-in-up" [style.animation-delay.ms]="(i % 12) * 30">
+              <app-job-accordion [job]="job" [category]="cat" />
+            </div>
           } @empty {
             <div class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-10 text-slate-400 dark:text-slate-500">
               <app-icon name="inbox" [size]="24" />

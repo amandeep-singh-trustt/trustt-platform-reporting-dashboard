@@ -9,9 +9,9 @@ import { ViewDefinitionsService } from '../../services/view-definitions.service'
   imports: [Icon],
   template: `
     @if (selected.context(); as ctx) {
-      <div class="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px]" (click)="selected.close()"></div>
+      <div class="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] animate-fade-in" (click)="selected.close()"></div>
 
-      <div class="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-y-auto border-l border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 sm:w-[92vw] lg:w-[75vw] xl:max-w-5xl">
+      <div class="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-y-auto border-l border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 sm:w-[92vw] lg:w-[75vw] xl:max-w-5xl animate-slide-in-right">
         <div class="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-slate-200 bg-gradient-to-br from-indigo-50/90 to-white/90 p-5 backdrop-blur dark:border-slate-800 dark:from-indigo-500/10 dark:to-slate-900/90">
           <div class="min-w-0">
             <div class="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
