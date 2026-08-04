@@ -10,6 +10,13 @@ export interface SqlQuery {
   sqlPreview: string;
   explainPlan?: string;
   reviewReason?: string;
+  viewRefs?: string[];
+}
+
+export interface ViewDefinition {
+  name: string;
+  sourceFile: string | null;
+  definition: string | null;
 }
 
 export interface ReportingJob {

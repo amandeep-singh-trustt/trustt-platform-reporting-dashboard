@@ -1,6 +1,7 @@
 import { Component, HostListener, inject, signal } from '@angular/core';
 import { Icon } from '../icon/icon';
 import { SelectedQueryService } from '../../services/selected-query.service';
+import { ViewDefinitionsService } from '../../services/view-definitions.service';
 
 @Component({
   selector: 'app-query-drawer',
@@ -88,6 +89,35 @@ import { SelectedQueryService } from '../../services/selected-query.service';
             }
           </section>
 
+          @if (ctx.query.viewRefs?.length) {
+            <section>
+              <h3 class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">Referenced Views</h3>
+              <div class="flex flex-col gap-4">
+                @for (viewName of ctx.query.viewRefs; track viewName) {
+                  @let view = viewDefs.byName(viewName);
+                  <div class="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-900/50 px-3.5 py-2 border-b border-slate-200 dark:border-slate-800">
+                      <app-icon name="database" [size]="13" class="text-slate-400" />
+                      <span class="font-mono text-xs font-semibold text-slate-700 dark:text-slate-300">{{ viewName }}</span>
+                      @if (view?.sourceFile) {
+                        <span class="ml-auto text-[11px] text-slate-400 truncate max-w-[40%]" [title]="view!.sourceFile!">{{ view!.sourceFile }}</span>
+                      }
+                    </div>
+                    @if (view?.definition) {
+                      <pre class="max-h-64 overflow-auto bg-slate-900 dark:bg-black p-3.5 text-xs leading-relaxed text-slate-100 whitespace-pre font-mono">{{ view!.definition }}</pre>
+                      <div class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-400 dark:text-slate-500 border-t border-slate-200 dark:border-slate-800">
+                        <app-icon name="clock" [size]="12" />
+                        Explain plan not yet analyzed for this view
+                      </div>
+                    } @else {
+                      <p class="p-3.5 text-xs text-slate-400">Definition not found in migrations.</p>
+                    }
+                  </div>
+                }
+              </div>
+            </section>
+          }
+
           <section>
             <h3 class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">Performance Metrics</h3>
             <div class="flex flex-col items-center gap-2 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/40 p-7 text-center">
@@ -105,6 +135,7 @@ import { SelectedQueryService } from '../../services/selected-query.service';
 })
 export class QueryDrawer {
   readonly selected = inject(SelectedQueryService);
+  readonly viewDefs = inject(ViewDefinitionsService);
 
   readonly copied = signal(false);
 

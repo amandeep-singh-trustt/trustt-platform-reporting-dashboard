@@ -8,6 +8,7 @@ import { AddQueryModal } from './components/add-query-modal/add-query-modal';
 import { EditQueryModal } from './components/edit-query-modal/edit-query-modal';
 import { MoveJobModal } from './components/move-job-modal/move-job-modal';
 import { ReportingDataService } from './services/reporting-data.service';
+import { ViewDefinitionsService } from './services/view-definitions.service';
 import { ThemeService } from './services/theme.service';
 
 @Component({
@@ -18,10 +19,12 @@ import { ThemeService } from './services/theme.service';
 })
 export class App implements OnInit {
   private readonly data = inject(ReportingDataService);
+  private readonly viewDefs = inject(ViewDefinitionsService);
   private readonly theme = inject(ThemeService);
 
   ngOnInit(): void {
     this.theme.apply();
     this.data.load().subscribe();
+    this.viewDefs.load().subscribe();
   }
 }
