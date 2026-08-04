@@ -7,6 +7,7 @@ import { AddJobModal } from './components/add-job-modal/add-job-modal';
 import { AddQueryModal } from './components/add-query-modal/add-query-modal';
 import { EditQueryModal } from './components/edit-query-modal/edit-query-modal';
 import { MoveJobModal } from './components/move-job-modal/move-job-modal';
+import { RenameJobModal } from './components/rename-job-modal/rename-job-modal';
 import { ReportingDataService } from './services/reporting-data.service';
 import { DbObjectsService } from './services/db-objects.service';
 import { ThemeService } from './services/theme.service';
@@ -14,7 +15,7 @@ import { ThemeService } from './services/theme.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Navbar, Sidebar, QueryDrawer, AddJobModal, AddQueryModal, EditQueryModal, MoveJobModal],
+  imports: [RouterOutlet, Navbar, Sidebar, QueryDrawer, AddJobModal, AddQueryModal, EditQueryModal, MoveJobModal, RenameJobModal],
   templateUrl: './app.html',
 })
 export class App implements OnInit {

@@ -13,12 +13,17 @@ interface MoveJobState {
   job: ReportingJob;
 }
 
+interface RenameJobState {
+  job: ReportingJob;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UiStateService {
   readonly addJob = signal<AddJobState | null>(null);
   readonly addQuery = signal<AddQueryState | null>(null);
   readonly editQuery = signal<QueryContext | null>(null);
   readonly moveJob = signal<MoveJobState | null>(null);
+  readonly renameJob = signal<RenameJobState | null>(null);
 
   openAddJob(categoryId: string): void {
     this.addJob.set({ categoryId });
@@ -36,10 +41,15 @@ export class UiStateService {
     this.moveJob.set({ job });
   }
 
+  openRenameJob(job: ReportingJob): void {
+    this.renameJob.set({ job });
+  }
+
   closeAll(): void {
     this.addJob.set(null);
     this.addQuery.set(null);
     this.editQuery.set(null);
     this.moveJob.set(null);
+    this.renameJob.set(null);
   }
 }

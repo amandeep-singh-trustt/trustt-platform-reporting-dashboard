@@ -11,16 +11,30 @@ export interface QueryOverride {
   status?: QueryStatus;
 }
 
+export interface JobOverride {
+  name?: string;
+}
+
 export interface EditsState {
   newJobs: ReportingJob[];
   newQueriesByJob: Record<string, SqlQuery[]>;
   queryOverrides: Record<string, QueryOverride>;
+  jobOverrides: Record<string, JobOverride>;
   jobCategoryMoves: Record<string, string>;
   dbObjectOverrides: Record<string, Partial<DbObjectDefinition>>;
+  deletedQueryIds: string[];
 }
 
 function emptyState(): EditsState {
-  return { newJobs: [], newQueriesByJob: {}, queryOverrides: {}, jobCategoryMoves: {}, dbObjectOverrides: {} };
+  return {
+    newJobs: [],
+    newQueriesByJob: {},
+    queryOverrides: {},
+    jobOverrides: {},
+    jobCategoryMoves: {},
+    dbObjectOverrides: {},
+    deletedQueryIds: [],
+  };
 }
 
 function loadFromStorage(): EditsState {
@@ -41,7 +55,9 @@ export class EditsService {
   readonly queryOverrides = computed(() => this.state().queryOverrides);
   readonly newQueriesByJob = computed(() => this.state().newQueriesByJob);
   readonly jobCategoryMoves = computed(() => this.state().jobCategoryMoves);
+  readonly jobOverrides = computed(() => this.state().jobOverrides);
   readonly dbObjectOverrides = computed(() => this.state().dbObjectOverrides);
+  readonly deletedQueryIds = computed(() => this.state().deletedQueryIds);
 
   readonly editCount = computed(() => {
     const s = this.state();
@@ -50,7 +66,9 @@ export class EditsService {
       Object.keys(s.queryOverrides).length +
       Object.values(s.newQueriesByJob).reduce((n, arr) => n + arr.length, 0) +
       Object.keys(s.jobCategoryMoves).length +
-      Object.keys(s.dbObjectOverrides).length
+      Object.keys(s.jobOverrides).length +
+      Object.keys(s.dbObjectOverrides).length +
+      s.deletedQueryIds.length
     );
   });
 
@@ -75,11 +93,26 @@ export class EditsService {
     }));
   }
 
+  updateJob(jobId: string, patch: JobOverride): void {
+    this.mutate((s) => ({
+      ...s,
+      jobOverrides: { ...s.jobOverrides, [jobId]: { ...s.jobOverrides[jobId], ...patch } },
+    }));
+  }
+
   moveJob(jobId: string, categoryId: string): void {
     this.mutate((s) => ({
       ...s,
       jobCategoryMoves: { ...s.jobCategoryMoves, [jobId]: categoryId },
     }));
+  }
+
+  deleteQuery(queryId: string): void {
+    this.mutate((s) =>
+      s.deletedQueryIds.includes(queryId)
+        ? s
+        : { ...s, deletedQueryIds: [...s.deletedQueryIds, queryId] },
+    );
   }
 
   updateDbObject(name: string, patch: Partial<DbObjectDefinition>): void {

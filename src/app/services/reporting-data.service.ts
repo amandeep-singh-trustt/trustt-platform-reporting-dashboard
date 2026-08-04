@@ -19,7 +19,9 @@ export class ReportingDataService {
       newJobs: this.edits.newJobs(),
       newQueriesByJob: this.edits.newQueriesByJob(),
       queryOverrides: this.edits.queryOverrides(),
+      jobOverrides: this.edits.jobOverrides(),
       jobCategoryMoves: this.edits.jobCategoryMoves(),
+      deletedQueryIds: this.edits.deletedQueryIds(),
     });
   });
 

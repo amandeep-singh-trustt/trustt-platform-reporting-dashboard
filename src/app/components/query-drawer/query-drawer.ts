@@ -6,6 +6,9 @@ import type { DbObjectDefinition, DbObjectKind } from '../../types/reporting.typ
 
 import { NgTemplateOutlet } from '@angular/common';
 
+const WIDTH_STORAGE_KEY = 'aitdp-reporting-drawer-width';
+const MIN_WIDTH = 420;
+
 @Component({
   selector: 'app-query-drawer',
   standalone: true,
@@ -14,15 +17,27 @@ import { NgTemplateOutlet } from '@angular/common';
     @if (selected.context(); as ctx) {
       <div class="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] animate-fade-in" (click)="selected.close()"></div>
 
-      <div class="fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-y-auto border-l border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 sm:w-[92vw] lg:w-[75vw] xl:max-w-5xl animate-slide-in-right">
+      <div
+        class="fixed inset-y-0 right-0 z-50 flex max-w-[95vw] min-w-[22rem] flex-col overflow-y-auto border-l border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 animate-slide-in-right"
+        [style.width.px]="width()"
+        [class.select-none]="dragging()"
+      >
+        <div
+          (pointerdown)="startResize($event)"
+          title="Drag to resize"
+          class="group absolute inset-y-0 left-0 z-20 w-1.5 -translate-x-1/2 cursor-ew-resize touch-none"
+        >
+          <div class="mx-auto h-full w-px bg-transparent transition-colors group-hover:bg-indigo-400" [class.bg-indigo-500]="dragging()"></div>
+        </div>
+
         <div class="sticky top-0 z-10 flex items-start justify-between gap-3 border-b border-slate-200 bg-gradient-to-br from-indigo-50/90 to-white/90 p-5 backdrop-blur dark:border-slate-800 dark:from-indigo-500/10 dark:to-slate-900/90">
           <div class="min-w-0">
             <div class="flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
-              <span>{{ ctx.category.name }}</span>
-              <app-icon name="chevron-right" [size]="12" />
+              <span class="truncate max-w-[40%]">{{ ctx.category.name }}</span>
+              <app-icon name="chevron-right" [size]="12" class="shrink-0" />
               <span class="truncate">{{ ctx.job.name }}</span>
             </div>
-            <h2 class="mt-1 text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">{{ ctx.query.name }}</h2>
+            <h2 class="mt-1 text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 break-words">{{ ctx.query.name }}</h2>
           </div>
           <button
             type="button"
@@ -37,18 +52,18 @@ import { NgTemplateOutlet } from '@angular/common';
           <section>
             <h3 class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">Details</h3>
             <div class="grid grid-cols-1 gap-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 p-4 text-sm sm:grid-cols-2">
-              <div class="flex justify-between gap-4 sm:flex-col sm:justify-start sm:gap-0.5">
-                <span class="text-slate-500 dark:text-slate-400">SQL Identifier</span>
-                <span class="font-mono text-sm text-slate-900 dark:text-slate-100">{{ ctx.query.sqlIdentifier }}</span>
+              <div class="flex min-w-0 justify-between gap-4 sm:flex-col sm:justify-start sm:gap-0.5">
+                <span class="shrink-0 text-slate-500 dark:text-slate-400">SQL Identifier</span>
+                <span class="min-w-0 break-all font-mono text-sm text-slate-900 dark:text-slate-100">{{ ctx.query.sqlIdentifier }}</span>
               </div>
-              <div class="flex justify-between gap-4 sm:flex-col sm:justify-start sm:gap-0.5">
-                <span class="text-slate-500 dark:text-slate-400">DAO Class</span>
-                <span class="font-mono text-sm text-slate-900 dark:text-slate-100">{{ ctx.query.daoClass }}</span>
+              <div class="flex min-w-0 justify-between gap-4 sm:flex-col sm:justify-start sm:gap-0.5">
+                <span class="shrink-0 text-slate-500 dark:text-slate-400">DAO Class</span>
+                <span class="min-w-0 break-all font-mono text-sm text-slate-900 dark:text-slate-100">{{ ctx.query.daoClass }}</span>
               </div>
               @if (ctx.query.description) {
-                <div class="border-t border-slate-200 dark:border-slate-800 pt-2.5 sm:col-span-2">
+                <div class="min-w-0 border-t border-slate-200 dark:border-slate-800 pt-2.5 sm:col-span-2">
                   <span class="text-slate-500 dark:text-slate-400">Description</span>
-                  <p class="mt-1 text-slate-900 dark:text-slate-100">{{ ctx.query.description }}</p>
+                  <p class="mt-1 break-words text-slate-900 dark:text-slate-100">{{ ctx.query.description }}</p>
                 </div>
               }
             </div>
@@ -159,6 +174,42 @@ export class QueryDrawer {
   readonly dbObjects = inject(DbObjectsService);
 
   readonly copied = signal(false);
+  readonly width = signal(this.initialWidth());
+  readonly dragging = signal(false);
+
+  private dragStartX = 0;
+  private dragStartWidth = 0;
+
+  private initialWidth(): number {
+    const stored = Number(localStorage.getItem(WIDTH_STORAGE_KEY));
+    if (stored) return this.clamp(stored);
+    return this.clamp(Math.round(window.innerWidth * 0.75));
+  }
+
+  private clamp(px: number): number {
+    const max = Math.round(window.innerWidth * 0.95);
+    return Math.min(Math.max(px, MIN_WIDTH), max);
+  }
+
+  startResize(event: PointerEvent): void {
+    event.preventDefault();
+    this.dragging.set(true);
+    this.dragStartX = event.clientX;
+    this.dragStartWidth = this.width();
+
+    const onMove = (e: PointerEvent) => {
+      const delta = this.dragStartX - e.clientX;
+      this.width.set(this.clamp(this.dragStartWidth + delta));
+    };
+    const onUp = () => {
+      this.dragging.set(false);
+      localStorage.setItem(WIDTH_STORAGE_KEY, String(this.width()));
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+    };
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+  }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {

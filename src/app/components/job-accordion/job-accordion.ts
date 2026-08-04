@@ -22,6 +22,14 @@ import type { ReportingJob, ReportingCategory } from '../../types/reporting.type
         </button>
         <button
           type="button"
+          (click)="ui.openRenameJob(job())"
+          title="Rename job"
+          class="shrink-0 rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-300"
+        >
+          <app-icon name="pencil" [size]="15" />
+        </button>
+        <button
+          type="button"
           (click)="ui.openMoveJob(job())"
           title="Move to another category"
           class="shrink-0 rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-300"

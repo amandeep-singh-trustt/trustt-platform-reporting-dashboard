@@ -2,6 +2,7 @@ import { Component, inject, input } from '@angular/core';
 import { Icon } from '../icon/icon';
 import { SelectedQueryService } from '../../services/selected-query.service';
 import { UiStateService } from '../../services/ui-state.service';
+import { EditsService } from '../../services/edits.service';
 import type { SqlQuery, ReportingJob, ReportingCategory, QueryStatus } from '../../types/reporting.types';
 
 @Component({
@@ -38,6 +39,14 @@ import type { SqlQuery, ReportingJob, ReportingCategory, QueryStatus } from '../
         </button>
         <button
           type="button"
+          (click)="onDelete($event)"
+          class="text-slate-300 dark:text-slate-600 opacity-0 transition group-hover:opacity-100 hover:text-rose-500 dark:hover:text-rose-400"
+          aria-label="Delete query"
+        >
+          <app-icon name="trash" [size]="15" />
+        </button>
+        <button
+          type="button"
           (click)="onOpen($event)"
           class="text-slate-400 dark:text-slate-500 transition group-hover:text-slate-600 dark:group-hover:text-slate-300"
           aria-label="View details"
@@ -51,6 +60,7 @@ import type { SqlQuery, ReportingJob, ReportingCategory, QueryStatus } from '../
 export class QueryCard {
   private readonly selectedQuery = inject(SelectedQueryService);
   private readonly ui = inject(UiStateService);
+  private readonly edits = inject(EditsService);
 
   readonly query = input.required<SqlQuery>();
   readonly job = input.required<ReportingJob>();
@@ -64,6 +74,13 @@ export class QueryCard {
   onEdit(event: MouseEvent): void {
     event.stopPropagation();
     this.ui.openEditQuery({ query: this.query(), job: this.job(), category: this.category() });
+  }
+
+  onDelete(event: MouseEvent): void {
+    event.stopPropagation();
+    if (confirm(`Remove query "${this.query().name}"? This cannot be undone.`)) {
+      this.edits.deleteQuery(this.query().id);
+    }
   }
 
   statusClasses(): string {
