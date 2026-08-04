@@ -4,7 +4,6 @@ import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { Icon } from '../../components/icon/icon';
 import { JobAccordion } from '../../components/job-accordion/job-accordion';
-import { ReportTabs } from '../../components/report-tabs/report-tabs';
 import { ReportingDataService } from '../../services/reporting-data.service';
 import { SearchService } from '../../services/search.service';
 import type { ReportingJob } from '../../types/reporting.types';
@@ -13,11 +12,10 @@ import { categoryStyle } from '../../utils/category-style';
 @Component({
   selector: 'app-category-page',
   standalone: true,
-  imports: [Icon, JobAccordion, ReportTabs],
+  imports: [Icon, JobAccordion],
   template: `
-    <app-report-tabs />
     @if (category(); as cat) {
-      <div class="flex flex-col gap-4 mt-4">
+      <div class="flex flex-col gap-4">
         <div class="flex items-center gap-3">
           <span class="flex items-center justify-center size-11 rounded-xl" [class]="style(cat.id).badge">
             <app-icon [name]="style(cat.id).icon" [size]="20" />
