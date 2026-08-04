@@ -5,6 +5,7 @@ import { StatCard } from '../../components/stat-card/stat-card';
 import { Icon } from '../../components/icon/icon';
 import { ReportTabs } from '../../components/report-tabs/report-tabs';
 import { categoryStyle } from '../../utils/category-style';
+import { UiStateService } from '../../services/ui-state.service';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -12,9 +13,19 @@ import { categoryStyle } from '../../utils/category-style';
   imports: [RouterLink, StatCard, Icon, ReportTabs],
   template: `
     <div class="flex flex-col gap-6">
-      <div>
-        <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Dashboard</h1>
-        <p class="text-sm text-slate-500 dark:text-slate-400">Overview of reporting categories, jobs, and queries.</p>
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Dashboard</h1>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Overview of reporting categories, jobs, and queries.</p>
+        </div>
+        <button
+          type="button"
+          (click)="ui.openAddJob(data.categories()[0]?.id ?? '')"
+          class="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-500/30 hover:bg-indigo-500 transition-colors"
+        >
+          <app-icon name="plus" [size]="16" />
+          <span class="hidden sm:inline">Add job</span>
+        </button>
       </div>
 
       <app-report-tabs />
@@ -66,6 +77,7 @@ import { categoryStyle } from '../../utils/category-style';
 })
 export class DashboardPage {
   protected readonly data = inject(ReportingDataService);
+  protected readonly ui = inject(UiStateService);
   protected readonly style = categoryStyle;
 
   protected queryCount(category: { jobs: { queries: unknown[] }[] }): number {

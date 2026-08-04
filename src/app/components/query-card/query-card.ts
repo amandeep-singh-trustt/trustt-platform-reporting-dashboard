@@ -1,6 +1,7 @@
 import { Component, inject, input } from '@angular/core';
 import { Icon } from '../icon/icon';
 import { SelectedQueryService } from '../../services/selected-query.service';
+import { UiStateService } from '../../services/ui-state.service';
 import type { SqlQuery, ReportingJob, ReportingCategory, QueryStatus } from '../../types/reporting.types';
 
 @Component({
@@ -29,6 +30,14 @@ import type { SqlQuery, ReportingJob, ReportingCategory, QueryStatus } from '../
         </span>
         <button
           type="button"
+          (click)="onEdit($event)"
+          class="text-slate-300 dark:text-slate-600 opacity-0 transition group-hover:opacity-100 hover:text-slate-600 dark:hover:text-slate-300"
+          aria-label="Edit query"
+        >
+          <app-icon name="pencil" [size]="15" />
+        </button>
+        <button
+          type="button"
           (click)="onOpen($event)"
           class="text-slate-400 dark:text-slate-500 transition group-hover:text-slate-600 dark:group-hover:text-slate-300"
           aria-label="View details"
@@ -41,6 +50,7 @@ import type { SqlQuery, ReportingJob, ReportingCategory, QueryStatus } from '../
 })
 export class QueryCard {
   private readonly selectedQuery = inject(SelectedQueryService);
+  private readonly ui = inject(UiStateService);
 
   readonly query = input.required<SqlQuery>();
   readonly job = input.required<ReportingJob>();
@@ -49,6 +59,11 @@ export class QueryCard {
   onOpen(event?: MouseEvent): void {
     event?.stopPropagation();
     this.selectedQuery.open({ query: this.query(), job: this.job(), category: this.category() });
+  }
+
+  onEdit(event: MouseEvent): void {
+    event.stopPropagation();
+    this.ui.openEditQuery({ query: this.query(), job: this.job(), category: this.category() });
   }
 
   statusClasses(): string {
