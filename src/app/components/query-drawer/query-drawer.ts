@@ -1,12 +1,15 @@
 import { Component, HostListener, inject, signal } from '@angular/core';
 import { Icon } from '../icon/icon';
 import { SelectedQueryService } from '../../services/selected-query.service';
-import { ViewDefinitionsService } from '../../services/view-definitions.service';
+import { DbObjectsService } from '../../services/db-objects.service';
+import type { DbObjectDefinition, DbObjectKind } from '../../types/reporting.types';
+
+import { NgTemplateOutlet } from '@angular/common';
 
 @Component({
   selector: 'app-query-drawer',
   standalone: true,
-  imports: [Icon],
+  imports: [Icon, NgTemplateOutlet],
   template: `
     @if (selected.context(); as ctx) {
       <div class="fixed inset-0 z-40 bg-black/30 backdrop-blur-[1px] animate-fade-in" (click)="selected.close()"></div>
@@ -89,34 +92,52 @@ import { ViewDefinitionsService } from '../../services/view-definitions.service'
             }
           </section>
 
-          @if (ctx.query.viewRefs?.length) {
+          @if (referencedObjects(ctx.query.dbObjectRefs, 'view').length) {
             <section>
               <h3 class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">Referenced Views</h3>
               <div class="flex flex-col gap-4">
-                @for (viewName of ctx.query.viewRefs; track viewName) {
-                  @let view = viewDefs.byName(viewName);
-                  <div class="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-                    <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-900/50 px-3.5 py-2 border-b border-slate-200 dark:border-slate-800">
-                      <app-icon name="database" [size]="13" class="text-slate-400" />
-                      <span class="font-mono text-xs font-semibold text-slate-700 dark:text-slate-300">{{ viewName }}</span>
-                      @if (view?.sourceFile) {
-                        <span class="ml-auto text-[11px] text-slate-400 truncate max-w-[40%]" [title]="view!.sourceFile!">{{ view!.sourceFile }}</span>
-                      }
-                    </div>
-                    @if (view?.definition) {
-                      <pre class="max-h-64 overflow-auto bg-slate-900 dark:bg-black p-3.5 text-xs leading-relaxed text-slate-100 whitespace-pre font-mono">{{ view!.definition }}</pre>
-                      <div class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-400 dark:text-slate-500 border-t border-slate-200 dark:border-slate-800">
-                        <app-icon name="clock" [size]="12" />
-                        Explain plan not yet analyzed for this view
-                      </div>
-                    } @else {
-                      <p class="p-3.5 text-xs text-slate-400">Definition not found in migrations.</p>
-                    }
-                  </div>
+                @for (item of referencedObjects(ctx.query.dbObjectRefs, 'view'); track item.name) {
+                  <ng-container [ngTemplateOutlet]="dbObjectBlock" [ngTemplateOutletContext]="{ $implicit: item }" />
                 }
               </div>
             </section>
           }
+
+          @if (referencedObjects(ctx.query.dbObjectRefs, 'table').length) {
+            <section>
+              <h3 class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">Referenced Staging Tables</h3>
+              <div class="flex flex-col gap-4">
+                @for (item of referencedObjects(ctx.query.dbObjectRefs, 'table'); track item.name) {
+                  <ng-container [ngTemplateOutlet]="dbObjectBlock" [ngTemplateOutletContext]="{ $implicit: item }" />
+                }
+              </div>
+            </section>
+          }
+
+          <ng-template #dbObjectBlock let-item>
+            <div class="rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+              <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-900/50 px-3.5 py-2 border-b border-slate-200 dark:border-slate-800">
+                <app-icon name="database" [size]="13" class="text-slate-400" />
+                <span class="font-mono text-xs font-semibold text-slate-700 dark:text-slate-300">{{ item.name }}</span>
+                @if (item.def?.sourceFile) {
+                  <span class="ml-auto text-[11px] text-slate-400 truncate max-w-[40%]" [title]="item.def.sourceFile">{{ item.def.sourceFile }}</span>
+                }
+              </div>
+              @if (item.def?.definition) {
+                <pre class="max-h-64 overflow-auto bg-slate-900 dark:bg-black p-3.5 text-xs leading-relaxed text-slate-100 whitespace-pre font-mono">{{ item.def.definition }}</pre>
+                @if (item.def.explainPlan) {
+                  <pre class="max-h-64 overflow-auto bg-slate-900 dark:bg-black p-3.5 text-xs leading-relaxed text-emerald-300 whitespace-pre font-mono border-t border-slate-800">{{ item.def.explainPlan }}</pre>
+                } @else {
+                  <div class="flex items-center gap-2 px-3.5 py-2 text-xs text-slate-400 dark:text-slate-500 border-t border-slate-200 dark:border-slate-800">
+                    <app-icon name="clock" [size]="12" />
+                    Explain plan not yet analyzed
+                  </div>
+                }
+              } @else {
+                <p class="p-3.5 text-xs text-slate-400">Definition not found in migrations.</p>
+              }
+            </div>
+          </ng-template>
 
           <section>
             <h3 class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">Performance Metrics</h3>
@@ -135,7 +156,7 @@ import { ViewDefinitionsService } from '../../services/view-definitions.service'
 })
 export class QueryDrawer {
   readonly selected = inject(SelectedQueryService);
-  readonly viewDefs = inject(ViewDefinitionsService);
+  readonly dbObjects = inject(DbObjectsService);
 
   readonly copied = signal(false);
 
@@ -148,5 +169,12 @@ export class QueryDrawer {
     navigator.clipboard?.writeText(sql);
     this.copied.set(true);
     setTimeout(() => this.copied.set(false), 1500);
+  }
+
+  referencedObjects(refs: string[] | undefined, kind: DbObjectKind): { name: string; def: DbObjectDefinition | undefined }[] {
+    if (!refs?.length) return [];
+    return refs
+      .map((name) => ({ name, def: this.dbObjects.byName(name) }))
+      .filter((item) => (item.def?.kind ?? 'view') === kind);
   }
 }

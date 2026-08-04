@@ -6,9 +6,9 @@ const path = require('path');
 const CSV_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/cleaned/reporting-reports.csv';
 const EXPLAIN_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/output/reporting-reports-explain.csv';
 const REVIEW_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/output/reporting-reports-needs-review.csv';
-const VIEW_DEFS_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/output/view-definitions.json';
+const DB_OBJECT_DEFS_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/output/db-object-definitions.json';
 const OUT_PATH = path.join(__dirname, '..', 'public', 'assets', 'mock-data.json');
-const VIEW_DEFS_OUT_PATH = path.join(__dirname, '..', 'public', 'assets', 'view-definitions.json');
+const DB_OBJECT_DEFS_OUT_PATH = path.join(__dirname, '..', 'public', 'assets', 'db-object-definitions.json');
 
 function parseCsv(text) {
   const rows = [];
@@ -78,12 +78,12 @@ function loadReviewByKey(csvPath) {
 const explainByIndex = loadExplainByIndex(EXPLAIN_PATH);
 const reviewByKey = loadReviewByKey(REVIEW_PATH);
 
-const viewDefs = fs.existsSync(VIEW_DEFS_PATH) ? JSON.parse(fs.readFileSync(VIEW_DEFS_PATH, 'utf8')) : {};
-const viewNames = Object.keys(viewDefs);
+const dbObjectDefs = fs.existsSync(DB_OBJECT_DEFS_PATH) ? JSON.parse(fs.readFileSync(DB_OBJECT_DEFS_PATH, 'utf8')) : {};
+const dbObjectNames = Object.keys(dbObjectDefs);
 
-function viewRefsIn(sql) {
+function dbObjectRefsIn(sql) {
   const lower = (sql || '').toLowerCase();
-  return viewNames.filter((name) => new RegExp(`\\b${name}\\b`, 'i').test(lower));
+  return dbObjectNames.filter((name) => new RegExp(`\\b${name}\\b`, 'i').test(lower));
 }
 
 const raw = fs.readFileSync(CSV_PATH, 'utf8');
@@ -127,8 +127,8 @@ for (const [jobNameRaw, dao, method, sql] of rows) {
   };
   if (explainPlan) query.explainPlan = explainPlan;
   if (reviewReason) query.reviewReason = reviewReason;
-  const viewRefs = viewRefsIn(sql);
-  if (viewRefs.length) query.viewRefs = viewRefs;
+  const dbObjectRefs = dbObjectRefsIn(sql);
+  if (dbObjectRefs.length) query.dbObjectRefs = dbObjectRefs;
 
   job.queries.push(query);
 }
@@ -150,8 +150,8 @@ const output = {
 
 fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
 fs.writeFileSync(OUT_PATH, JSON.stringify(output, null, 2));
-fs.writeFileSync(VIEW_DEFS_OUT_PATH, JSON.stringify(viewDefs, null, 2));
+fs.writeFileSync(DB_OBJECT_DEFS_OUT_PATH, JSON.stringify(dbObjectDefs, null, 2));
 console.log(
   `wrote ${OUT_PATH}: ${categories.length} categories, ${totalJobs} jobs, ${totalQueries} queries, ` +
-    `${explainedCount} with explain plans, ${reviewByKey.size} needs-review, ${viewNames.length} view definitions`,
+    `${explainedCount} with explain plans, ${reviewByKey.size} needs-review, ${dbObjectNames.length} db object definitions`,
 );

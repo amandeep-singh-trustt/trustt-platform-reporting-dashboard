@@ -6,15 +6,29 @@ import { UiStateService } from '../../services/ui-state.service';
 import { EditsService } from '../../services/edits.service';
 import { ReportingDataService } from '../../services/reporting-data.service';
 import { makeJobId, makeQueryId } from '../../utils/ids';
+import type { DbObjectKind } from '../../types/reporting.types';
+
+interface ObjectRefDraft {
+  name: string;
+  kind: DbObjectKind;
+  definition: string;
+  explainPlan: string;
+}
 
 interface QueryDraft {
   name: string;
   description: string;
   sqlPreview: string;
+  explainPlan: string;
+  objectRefs: ObjectRefDraft[];
 }
 
 function emptyDraft(): QueryDraft {
-  return { name: '', description: '', sqlPreview: '' };
+  return { name: '', description: '', sqlPreview: '', explainPlan: '', objectRefs: [] };
+}
+
+function emptyObjectRef(): ObjectRefDraft {
+  return { name: '', kind: 'view', definition: '', explainPlan: '' };
 }
 
 @Component({
@@ -23,7 +37,7 @@ function emptyDraft(): QueryDraft {
   imports: [Modal, Icon, FormsModule],
   template: `
     @if (ui.addJob(); as state) {
-      <app-modal title="Add reporting job" width="lg" (close)="ui.closeAll()">
+      <app-modal title="Add reporting job" width="xl" (close)="ui.closeAll()">
         <div class="flex flex-col gap-4">
           <label class="flex flex-col gap-1">
             <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Job name *</span>
@@ -75,6 +89,56 @@ function emptyDraft(): QueryDraft {
                   placeholder="SQL text"
                   class="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 px-3 py-1.5 font-mono text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
                 ></textarea>
+                <textarea
+                  [(ngModel)]="q.explainPlan"
+                  rows="3"
+                  placeholder="Explain plan (optional)"
+                  class="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-900 dark:bg-black px-3 py-1.5 font-mono text-xs text-emerald-300 focus:outline-none"
+                ></textarea>
+
+                @if (q.objectRefs.length) {
+                  <div class="flex flex-col gap-2 rounded-lg border border-dashed border-slate-300 dark:border-slate-700 p-2.5">
+                    @for (ref of q.objectRefs; track $index) {
+                      <div class="flex flex-col gap-1.5 rounded-md bg-slate-50 dark:bg-slate-900/60 p-2">
+                        <div class="flex items-center gap-2">
+                          <input
+                            type="text"
+                            [(ngModel)]="ref.name"
+                            placeholder="View / table name"
+                            class="flex-1 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-2 py-1 text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none"
+                          />
+                          <select
+                            [(ngModel)]="ref.kind"
+                            class="rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-2 py-1 text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                          >
+                            <option value="view">View</option>
+                            <option value="table">Staging table</option>
+                          </select>
+                          <button type="button" (click)="removeObjectRef(q, $index)" class="text-xs text-rose-500 hover:text-rose-600">Remove</button>
+                        </div>
+                        <textarea
+                          [(ngModel)]="ref.definition"
+                          rows="2"
+                          placeholder="CREATE VIEW / CREATE TABLE definition"
+                          class="rounded-md border border-slate-200 dark:border-slate-800 bg-slate-900 dark:bg-black px-2 py-1 font-mono text-[11px] text-slate-100 focus:outline-none"
+                        ></textarea>
+                        <textarea
+                          [(ngModel)]="ref.explainPlan"
+                          rows="2"
+                          placeholder="Explain plan (optional)"
+                          class="rounded-md border border-slate-200 dark:border-slate-800 bg-slate-900 dark:bg-black px-2 py-1 font-mono text-[11px] text-emerald-300 focus:outline-none"
+                        ></textarea>
+                      </div>
+                    }
+                  </div>
+                }
+                <button
+                  type="button"
+                  (click)="addObjectRef(q)"
+                  class="inline-flex items-center gap-1.5 self-start text-xs font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                >
+                  <app-icon name="database" [size]="12" /> Add referenced view / staging table
+                </button>
               </div>
             }
             <button
@@ -128,6 +192,16 @@ export class AddJobModal {
     this.queries.update((q) => q.filter((_, i) => i !== index));
   }
 
+  addObjectRef(q: QueryDraft): void {
+    q.objectRefs.push(emptyObjectRef());
+    this.queries.update((qs) => [...qs]);
+  }
+
+  removeObjectRef(q: QueryDraft, index: number): void {
+    q.objectRefs = q.objectRefs.filter((_, i) => i !== index);
+    this.queries.update((qs) => [...qs]);
+  }
+
   save(defaultCategoryId: string): void {
     const name = this.jobName.trim();
     const categoryId = this.categoryId || defaultCategoryId;
@@ -146,15 +220,27 @@ export class AddJobModal {
       id: makeJobId(categoryId, name),
       name,
       categoryId,
-      queries: validQueries.map((q) => ({
-        id: makeQueryId(),
-        name: q.name.trim(),
-        description: q.description.trim(),
-        daoClass: '',
-        sqlIdentifier: q.name.trim(),
-        status: 'unverified',
-        sqlPreview: q.sqlPreview.trim(),
-      })),
+      queries: validQueries.map((q) => {
+        const validRefs = q.objectRefs.filter((r) => r.name.trim() && r.definition.trim());
+        for (const ref of validRefs) {
+          this.edits.updateDbObject(ref.name.trim(), {
+            kind: ref.kind,
+            definition: ref.definition.trim(),
+            explainPlan: ref.explainPlan.trim() || undefined,
+          });
+        }
+        return {
+          id: makeQueryId(),
+          name: q.name.trim(),
+          description: q.description.trim(),
+          daoClass: '',
+          sqlIdentifier: q.name.trim(),
+          status: q.explainPlan.trim() ? ('healthy' as const) : ('unverified' as const),
+          sqlPreview: q.sqlPreview.trim(),
+          explainPlan: q.explainPlan.trim() || undefined,
+          dbObjectRefs: validRefs.length ? validRefs.map((r) => r.name.trim()) : undefined,
+        };
+      }),
     });
 
     this.jobName = '';

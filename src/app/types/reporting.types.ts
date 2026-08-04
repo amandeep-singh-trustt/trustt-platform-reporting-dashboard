@@ -10,13 +10,17 @@ export interface SqlQuery {
   sqlPreview: string;
   explainPlan?: string;
   reviewReason?: string;
-  viewRefs?: string[];
+  dbObjectRefs?: string[];
 }
 
-export interface ViewDefinition {
+export type DbObjectKind = 'view' | 'table';
+
+export interface DbObjectDefinition {
   name: string;
+  kind: DbObjectKind;
   sourceFile: string | null;
   definition: string | null;
+  explainPlan?: string;
 }
 
 export interface ReportingJob {

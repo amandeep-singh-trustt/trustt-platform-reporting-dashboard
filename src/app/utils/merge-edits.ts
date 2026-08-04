@@ -1,7 +1,9 @@
 import type { EditsState } from '../services/edits.service';
 import type { ReportingCategory, ReportingJob, SqlQuery } from '../types/reporting.types';
 
-export function mergeEdits(baseCategories: ReportingCategory[], edits: EditsState): ReportingCategory[] {
+type CategoryEdits = Pick<EditsState, 'newJobs' | 'newQueriesByJob' | 'queryOverrides' | 'jobCategoryMoves'>;
+
+export function mergeEdits(baseCategories: ReportingCategory[], edits: CategoryEdits): ReportingCategory[] {
   const categoryShells = new Map<string, ReportingCategory>();
   for (const c of baseCategories) categoryShells.set(c.id, { id: c.id, name: c.name, jobs: [] });
 

@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import type { QueryStatus, ReportingJob, SqlQuery } from '../types/reporting.types';
+import type { DbObjectDefinition, QueryStatus, ReportingJob, SqlQuery } from '../types/reporting.types';
 
 const STORAGE_KEY = 'aitdp-reporting-edits';
 
@@ -16,10 +16,11 @@ export interface EditsState {
   newQueriesByJob: Record<string, SqlQuery[]>;
   queryOverrides: Record<string, QueryOverride>;
   jobCategoryMoves: Record<string, string>;
+  dbObjectOverrides: Record<string, Partial<DbObjectDefinition>>;
 }
 
 function emptyState(): EditsState {
-  return { newJobs: [], newQueriesByJob: {}, queryOverrides: {}, jobCategoryMoves: {} };
+  return { newJobs: [], newQueriesByJob: {}, queryOverrides: {}, jobCategoryMoves: {}, dbObjectOverrides: {} };
 }
 
 function loadFromStorage(): EditsState {
@@ -40,6 +41,7 @@ export class EditsService {
   readonly queryOverrides = computed(() => this.state().queryOverrides);
   readonly newQueriesByJob = computed(() => this.state().newQueriesByJob);
   readonly jobCategoryMoves = computed(() => this.state().jobCategoryMoves);
+  readonly dbObjectOverrides = computed(() => this.state().dbObjectOverrides);
 
   readonly editCount = computed(() => {
     const s = this.state();
@@ -47,7 +49,8 @@ export class EditsService {
       s.newJobs.length +
       Object.keys(s.queryOverrides).length +
       Object.values(s.newQueriesByJob).reduce((n, arr) => n + arr.length, 0) +
-      Object.keys(s.jobCategoryMoves).length
+      Object.keys(s.jobCategoryMoves).length +
+      Object.keys(s.dbObjectOverrides).length
     );
   });
 
@@ -76,6 +79,13 @@ export class EditsService {
     this.mutate((s) => ({
       ...s,
       jobCategoryMoves: { ...s.jobCategoryMoves, [jobId]: categoryId },
+    }));
+  }
+
+  updateDbObject(name: string, patch: Partial<DbObjectDefinition>): void {
+    this.mutate((s) => ({
+      ...s,
+      dbObjectOverrides: { ...s.dbObjectOverrides, [name]: { ...s.dbObjectOverrides[name], ...patch } },
     }));
   }
 

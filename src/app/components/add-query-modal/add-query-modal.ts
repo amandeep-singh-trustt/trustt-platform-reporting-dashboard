@@ -44,6 +44,16 @@ import { makeQueryId } from '../../utils/ids';
             ></textarea>
           </label>
 
+          <label class="flex flex-col gap-1">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Explain plan (optional)</span>
+            <textarea
+              [(ngModel)]="explainPlan"
+              rows="6"
+              placeholder="Paste EXPLAIN (ANALYZE) output…"
+              class="rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-900 dark:bg-black px-3 py-2 font-mono text-xs leading-relaxed text-emerald-300 focus:outline-none"
+            ></textarea>
+          </label>
+
           @if (error()) {
             <p class="text-sm text-rose-600 dark:text-rose-400">{{ error() }}</p>
           }
@@ -68,6 +78,7 @@ export class AddQueryModal {
   name = '';
   description = '';
   sqlPreview = '';
+  explainPlan = '';
   readonly error = signal('');
 
   save(jobId: string): void {
@@ -75,18 +86,21 @@ export class AddQueryModal {
       this.error.set('Query name and SQL are both required.');
       return;
     }
+    const explainPlan = this.explainPlan.trim();
     this.edits.addQueryToJob(jobId, {
       id: makeQueryId(),
       name: this.name.trim(),
       description: this.description.trim(),
       daoClass: '',
       sqlIdentifier: this.name.trim(),
-      status: 'unverified',
+      status: explainPlan ? 'healthy' : 'unverified',
       sqlPreview: this.sqlPreview.trim(),
+      explainPlan: explainPlan || undefined,
     });
     this.name = '';
     this.description = '';
     this.sqlPreview = '';
+    this.explainPlan = '';
     this.error.set('');
     this.ui.closeAll();
   }
