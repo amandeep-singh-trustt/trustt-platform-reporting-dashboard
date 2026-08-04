@@ -6,7 +6,7 @@ const path = require('path');
 const CSV_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/cleaned/reporting-reports.csv';
 const EXPLAIN_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/output/reporting-reports-explain.csv';
 const REVIEW_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/output/reporting-reports-needs-review.csv';
-const OUT_PATH = path.join(__dirname, '..', 'src', 'assets', 'mock-data.json');
+const OUT_PATH = path.join(__dirname, '..', 'public', 'assets', 'mock-data.json');
 
 function parseCsv(text) {
   const rows = [];
