@@ -65,18 +65,39 @@ import { SelectedQueryService } from '../../services/selected-query.service';
             <pre class="max-h-64 overflow-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-900 dark:bg-black p-3.5 text-xs leading-relaxed text-slate-100 whitespace-pre-wrap break-words font-mono">{{ ctx.query.sqlPreview || 'No SQL captured for this query.' }}</pre>
           </section>
 
-          @for (p of placeholders; track p.title) {
-            <section>
-              <h3 class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">{{ p.title }}</h3>
+          <section>
+            <h3 class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">Explain Plan</h3>
+            @if (ctx.query.explainPlan) {
+              <pre class="max-h-72 overflow-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-900 dark:bg-black p-3.5 text-xs leading-relaxed text-emerald-300 whitespace-pre-wrap break-words font-mono">{{ ctx.query.explainPlan }}</pre>
+            } @else if (ctx.query.reviewReason) {
+              <div class="flex items-start gap-2.5 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/10 p-3.5">
+                <app-icon name="lightbulb" [size]="16" class="mt-0.5 shrink-0 text-amber-500" />
+                <div class="text-sm">
+                  <p class="font-semibold text-amber-800 dark:text-amber-400">Needs manual review</p>
+                  <p class="mt-0.5 text-xs text-amber-700/80 dark:text-amber-400/70">{{ ctx.query.reviewReason }}</p>
+                </div>
+              </div>
+            } @else {
               <div class="flex flex-col items-center gap-2 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/40 p-7 text-center">
                 <span class="flex items-center justify-center size-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500">
-                  <app-icon [name]="p.icon" [size]="18" />
+                  <app-icon name="clock" [size]="18" />
                 </span>
-                <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Coming in Phase 2</p>
-                <p class="text-xs text-slate-500 dark:text-slate-400">{{ p.subtitle }}</p>
+                <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Not yet analyzed</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">This query hasn't been run through the EXPLAIN pipeline yet.</p>
               </div>
-            </section>
-          }
+            }
+          </section>
+
+          <section>
+            <h3 class="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400 dark:text-slate-500">Performance Metrics</h3>
+            <div class="flex flex-col items-center gap-2 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/40 p-7 text-center">
+              <span class="flex items-center justify-center size-10 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500">
+                <app-icon name="gauge" [size]="18" />
+              </span>
+              <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">Coming in Phase 2</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Latency and throughput metrics will appear here.</p>
+            </div>
+          </section>
         </div>
       </div>
     }
@@ -86,19 +107,6 @@ export class QueryDrawer {
   readonly selected = inject(SelectedQueryService);
 
   readonly copied = signal(false);
-
-  readonly placeholders = [
-    {
-      icon: 'activity',
-      title: 'Explain Plan',
-      subtitle: 'EXPLAIN ANALYZE pipeline is running against QA4 — plan will populate here once complete.',
-    },
-    {
-      icon: 'gauge',
-      title: 'Performance Metrics',
-      subtitle: 'Latency and throughput metrics will appear here.',
-    },
-  ];
 
   @HostListener('document:keydown.escape')
   onEscape(): void {

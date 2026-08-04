@@ -8,6 +8,8 @@ export interface SqlQuery {
   sqlIdentifier: string;
   status: QueryStatus;
   sqlPreview: string;
+  explainPlan?: string;
+  reviewReason?: string;
 }
 
 export interface ReportingJob {

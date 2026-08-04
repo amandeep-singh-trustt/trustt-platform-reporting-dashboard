@@ -25,7 +25,7 @@ import type { SqlQuery, ReportingJob, ReportingCategory, QueryStatus } from '../
       <div class="flex shrink-0 items-center gap-3">
         <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" [class]="statusClasses()">
           <span class="h-1.5 w-1.5 rounded-full" [class]="statusDotClasses()"></span>
-          {{ query().status }}
+          {{ statusLabel() }}
         </span>
         <button
           type="button"
@@ -57,6 +57,16 @@ export class QueryCard {
       healthy: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400',
       'needs-review': 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400',
       slow: 'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-400',
+    };
+    return map[this.query().status];
+  }
+
+  statusLabel(): string {
+    const map: Record<QueryStatus, string> = {
+      unverified: 'Pending',
+      healthy: 'Analyzed',
+      'needs-review': 'Needs review',
+      slow: 'Slow',
     };
     return map[this.query().status];
   }

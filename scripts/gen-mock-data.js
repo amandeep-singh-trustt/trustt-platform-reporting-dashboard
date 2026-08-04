@@ -1,9 +1,11 @@
 #!/usr/bin/env node
-// ponytail: one-shot CSV->JSON generator, run manually when the source CSV changes. Not wired into build.
+// ponytail: one-shot CSV->JSON generator, run manually when the source CSV or explain output changes. Not wired into build.
 const fs = require('fs');
 const path = require('path');
 
 const CSV_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/cleaned/reporting-reports.csv';
+const EXPLAIN_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/output/reporting-reports-explain.csv';
+const REVIEW_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/output/reporting-reports-needs-review.csv';
 const OUT_PATH = path.join(__dirname, '..', 'src', 'assets', 'mock-data.json');
 
 function parseCsv(text) {
@@ -43,6 +45,37 @@ function slugify(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
+// --- explain / needs-review lookups (optional — pipeline may not have run yet) ---
+
+function loadExplainByIndex(csvPath) {
+  const map = new Map();
+  if (!fs.existsSync(csvPath)) return map;
+  const rows = parseCsv(fs.readFileSync(csvPath, 'utf8')).filter((r) => r.length >= 2);
+  for (let i = 1; i < rows.length; i += 2) {
+    const label = rows[i][0] || '';
+    const m = /^Query (\d+)$/.exec(label);
+    if (!m) continue;
+    const planRow = rows[i + 1];
+    if (!planRow || planRow[0] !== 'Explain Plan') continue;
+    map.set(Number(m[1]), planRow[1]);
+  }
+  return map;
+}
+
+function loadReviewByKey(csvPath) {
+  const map = new Map();
+  if (!fs.existsSync(csvPath)) return map;
+  const rows = parseCsv(fs.readFileSync(csvPath, 'utf8')).filter((r) => r.length >= 4);
+  for (let i = 1; i < rows.length; i++) {
+    const [dao, method, , reason] = rows[i];
+    map.set(`${dao}||${method}`, reason);
+  }
+  return map;
+}
+
+const explainByIndex = loadExplainByIndex(EXPLAIN_PATH);
+const reviewByKey = loadReviewByKey(REVIEW_PATH);
+
 const raw = fs.readFileSync(CSV_PATH, 'utf8');
 const rows = parseCsv(raw).filter((r) => r.length >= 4 && r[0] && r[0] !== 'reports');
 
@@ -68,15 +101,24 @@ for (const [jobNameRaw, dao, method, sql] of rows) {
 
   const methodName = (method || '').split('#').pop().trim();
   queryCounter++;
-  job.queries.push({
+
+  const explainPlan = explainByIndex.get(queryCounter) || null;
+  const reviewReason = reviewByKey.get(`${dao}||${method}`) || null;
+  const status = explainPlan ? 'healthy' : reviewReason ? 'needs-review' : 'unverified';
+
+  const query = {
     id: `q-${queryCounter}`,
     name: methodName || `Query ${job.queries.length + 1}`,
     description: dao ? `via ${dao.split('.').pop()}` : '',
     daoClass: dao || '',
     sqlIdentifier: methodName,
-    status: 'unverified',
+    status,
     sqlPreview: (sql || '').trim(),
-  });
+  };
+  if (explainPlan) query.explainPlan = explainPlan;
+  if (reviewReason) query.reviewReason = reviewReason;
+
+  job.queries.push(query);
 }
 
 const categories = Array.from(categoriesByKey.values());
@@ -86,6 +128,7 @@ for (const cat of CATEGORY_RULES.concat([DEFAULT_CATEGORY])) {
 
 const totalJobs = categories.reduce((n, c) => n + c.jobs.length, 0);
 const totalQueries = categories.reduce((n, c) => n + c.jobs.reduce((m, j) => m + j.queries.length, 0), 0);
+const explainedCount = explainByIndex.size;
 
 const output = {
   generatedAt: '2026-08-04T00:00:00Z',
@@ -95,4 +138,7 @@ const output = {
 
 fs.mkdirSync(path.dirname(OUT_PATH), { recursive: true });
 fs.writeFileSync(OUT_PATH, JSON.stringify(output, null, 2));
-console.log(`wrote ${OUT_PATH}: ${categories.length} categories, ${totalJobs} jobs, ${totalQueries} queries`);
+console.log(
+  `wrote ${OUT_PATH}: ${categories.length} categories, ${totalJobs} jobs, ${totalQueries} queries, ` +
+    `${explainedCount} with explain plans, ${reviewByKey.size} needs-review`,
+);
