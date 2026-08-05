@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { Icon } from '../../components/icon/icon';
-import { GroupCard } from '../../components/group-card/group-card';
+import { RepoSection } from '../../components/repo-section/repo-section';
 import { OltpDataService } from '../../services/oltp-data.service';
 import { SearchService } from '../../services/search.service';
 import { OrderService } from '../../services/order.service';
@@ -15,7 +15,7 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
 @Component({
   selector: 'app-oltp-module-page',
   standalone: true,
-  imports: [Icon, GroupCard, DragReorderDirective, FlipGroupDirective],
+  imports: [Icon, RepoSection, DragReorderDirective, FlipGroupDirective],
   template: `
     @if (moduleSummary(); as mod) {
       <div class="flex flex-col gap-4">
@@ -53,13 +53,13 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
         </div>
 
         @if (!oltp.isModuleLoaded(moduleId())) {
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="flex flex-col gap-3">
             @for (i of [1, 2, 3, 4, 5, 6]; track i) {
-              <div class="h-24 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
+              <div class="h-14 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-xl"></div>
             }
           </div>
         } @else {
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" appFlipGroup>
+          <div class="flex flex-col gap-3" appFlipGroup>
             @for (group of filteredGroups(); track group.id; let i = $index) {
               <div
                 class="animate-fade-in-up"
@@ -68,15 +68,17 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
                 [appDragReorder]="i"
                 (hoverReorder)="onReorder($event)"
               >
-                <app-group-card
+                <app-repo-section
                   [name]="group.name"
                   [subtitle]="group.daoClass"
                   [queries]="group.queries"
-                  [routerLink]="['/oltp', moduleId(), group.id]"
+                  [pseudoJobId]="group.id"
+                  [pseudoCategoryId]="moduleId()"
+                  [pseudoCategoryName]="mod.name"
                 />
               </div>
             } @empty {
-              <div class="col-span-full flex flex-col items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-10 text-slate-400 dark:text-slate-500">
+              <div class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-10 text-slate-400 dark:text-slate-500">
                 <app-icon name="inbox" [size]="24" />
                 <p class="text-sm">No DAO classes match your filter</p>
               </div>

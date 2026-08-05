@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { Icon } from '../../components/icon/icon';
-import { GroupCard } from '../../components/group-card/group-card';
+import { RepoSection } from '../../components/repo-section/repo-section';
 import { ReportingDataService } from '../../services/reporting-data.service';
 import { SearchService } from '../../services/search.service';
 import { UiStateService } from '../../services/ui-state.service';
@@ -17,7 +17,7 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
 @Component({
   selector: 'app-category-page',
   standalone: true,
-  imports: [Icon, GroupCard, DragReorderDirective, FlipGroupDirective],
+  imports: [Icon, RepoSection, DragReorderDirective, FlipGroupDirective],
   template: `
     @if (category(); as cat) {
       <div class="flex flex-col gap-4">
@@ -54,27 +54,31 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
           </button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" appFlipGroup>
+        <div class="flex flex-col gap-3" appFlipGroup>
           @for (job of filteredJobs(); track job.id; let i = $index) {
             <div
-              class="animate-fade-in-up transition-shadow"
+              class="animate-fade-in-up"
               [style.animation-delay.ms]="(i % 12) * 30"
               [attr.data-flip-key]="job.id"
               [appDragReorder]="i"
               (hoverReorder)="onReorder(cat.id, $event)"
             >
-              <app-group-card
+              <app-repo-section
                 [name]="job.name"
                 [queries]="job.queries"
-                [routerLink]="['/category', cat.id, 'job', job.id]"
                 [canRename]="true"
                 [canMove]="true"
+                [canAddQuery]="true"
+                [pseudoJobId]="job.id"
+                [pseudoCategoryId]="cat.id"
+                [pseudoCategoryName]="cat.name"
                 (rename)="ui.openRenameJob(job)"
                 (move)="ui.openMoveJob(job)"
+                (addQuery)="ui.openAddQuery(job)"
               />
             </div>
           } @empty {
-            <div class="col-span-full flex flex-col items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-10 text-slate-400 dark:text-slate-500">
+            <div class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-10 text-slate-400 dark:text-slate-500">
               <app-icon name="inbox" [size]="24" />
               <p class="text-sm">No reporting jobs match your filters</p>
             </div>

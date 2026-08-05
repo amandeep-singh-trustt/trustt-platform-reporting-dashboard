@@ -2,7 +2,6 @@ import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Navbar } from './layout/navbar/navbar';
 import { Sidebar } from './layout/sidebar/sidebar';
-import { QueryDrawer } from './components/query-drawer/query-drawer';
 import { AddJobModal } from './components/add-job-modal/add-job-modal';
 import { AddQueryModal } from './components/add-query-modal/add-query-modal';
 import { EditQueryModal } from './components/edit-query-modal/edit-query-modal';
@@ -16,7 +15,7 @@ import { ThemeService } from './services/theme.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Navbar, Sidebar, QueryDrawer, AddJobModal, AddQueryModal, EditQueryModal, MoveJobModal, RenameJobModal],
+  imports: [RouterOutlet, Navbar, Sidebar, AddJobModal, AddQueryModal, EditQueryModal, MoveJobModal, RenameJobModal],
   templateUrl: './app.html',
 })
 export class App implements OnInit {
