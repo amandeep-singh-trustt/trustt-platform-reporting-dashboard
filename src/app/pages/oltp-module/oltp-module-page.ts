@@ -6,12 +6,15 @@ import { Icon } from '../../components/icon/icon';
 import { GroupCard } from '../../components/group-card/group-card';
 import { OltpDataService } from '../../services/oltp-data.service';
 import { SearchService } from '../../services/search.service';
+import { OrderService } from '../../services/order.service';
+import { DragReorderDirective } from '../../directives/drag-reorder.directive';
 import type { OltpDaoGroup } from '../../types/reporting.types';
+import { applyOrder, reorderIds } from '../../utils/apply-order';
 
 @Component({
   selector: 'app-oltp-module-page',
   standalone: true,
-  imports: [Icon, GroupCard],
+  imports: [Icon, GroupCard, DragReorderDirective],
   template: `
     @if (moduleSummary(); as mod) {
       <div class="flex flex-col gap-4">
@@ -57,7 +60,12 @@ import type { OltpDaoGroup } from '../../types/reporting.types';
         } @else {
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             @for (group of filteredGroups(); track group.id; let i = $index) {
-              <div class="animate-fade-in-up" [style.animation-delay.ms]="(i % 15) * 20">
+              <div
+                class="animate-fade-in-up"
+                [style.animation-delay.ms]="(i % 15) * 20"
+                [appDragReorder]="i"
+                (reordered)="onReorder($event)"
+              >
                 <app-group-card
                   [name]="group.name"
                   [subtitle]="group.daoClass"
@@ -86,6 +94,7 @@ export class OltpModulePage {
   private readonly route = inject(ActivatedRoute);
   protected readonly oltp = inject(OltpDataService);
   private readonly search = inject(SearchService);
+  private readonly order = inject(OrderService);
 
   readonly moduleId = toSignal(
     this.route.paramMap.pipe(map((params) => params.get('moduleId') ?? '')),
@@ -99,6 +108,11 @@ export class OltpModulePage {
 
   toggleSort(): void {
     this.sortAsc.update((v) => !v);
+    this.order.clearOrder(this.orderKey());
+  }
+
+  private orderKey(): string {
+    return `oltp-module:${this.moduleId()}`;
   }
 
   readonly filteredGroups = computed<OltpDaoGroup[]>(() => {
@@ -121,8 +135,14 @@ export class OltpModulePage {
     });
 
     const sorted = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
-    return this.sortAsc() ? sorted : sorted.reverse();
+    const result = this.sortAsc() ? sorted : sorted.reverse();
+    return applyOrder(result, (g) => g.id, this.order.getOrder(this.orderKey()));
   });
+
+  onReorder(event: { from: number; to: number }): void {
+    const ids = this.filteredGroups().map((g) => g.id);
+    this.order.setOrder(this.orderKey(), reorderIds(ids, event.from, event.to));
+  }
 
   constructor() {
     effect(() => {

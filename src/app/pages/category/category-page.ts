@@ -7,13 +7,16 @@ import { GroupCard } from '../../components/group-card/group-card';
 import { ReportingDataService } from '../../services/reporting-data.service';
 import { SearchService } from '../../services/search.service';
 import { UiStateService } from '../../services/ui-state.service';
+import { OrderService } from '../../services/order.service';
+import { DragReorderDirective } from '../../directives/drag-reorder.directive';
 import type { ReportingJob } from '../../types/reporting.types';
 import { categoryStyle } from '../../utils/category-style';
+import { applyOrder, reorderIds } from '../../utils/apply-order';
 
 @Component({
   selector: 'app-category-page',
   standalone: true,
-  imports: [Icon, GroupCard],
+  imports: [Icon, GroupCard, DragReorderDirective],
   template: `
     @if (category(); as cat) {
       <div class="flex flex-col gap-4">
@@ -52,7 +55,12 @@ import { categoryStyle } from '../../utils/category-style';
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           @for (job of filteredJobs(); track job.id; let i = $index) {
-            <div class="animate-fade-in-up" [style.animation-delay.ms]="(i % 12) * 30">
+            <div
+              class="animate-fade-in-up transition-shadow"
+              [style.animation-delay.ms]="(i % 12) * 30"
+              [appDragReorder]="i"
+              (reordered)="onReorder(cat.id, $event)"
+            >
               <app-group-card
                 [name]="job.name"
                 [queries]="job.queries"
@@ -84,6 +92,7 @@ export class CategoryPage {
   private readonly data = inject(ReportingDataService);
   readonly search = inject(SearchService);
   readonly ui = inject(UiStateService);
+  private readonly order = inject(OrderService);
 
   private readonly categoryIdSignal = toSignal(
     this.route.paramMap.pipe(map((params) => params.get('categoryId') ?? '')),
@@ -98,10 +107,17 @@ export class CategoryPage {
 
   toggleSort(): void {
     this.sortAsc.update((v) => !v);
+    const cat = this.category();
+    if (cat) this.order.clearOrder(this.orderKey(cat.id));
+  }
+
+  private orderKey(categoryId: string): string {
+    return `category:${categoryId}`;
   }
 
   readonly filteredJobs = computed<ReportingJob[]>(() => {
-    const jobs = this.category()?.jobs ?? [];
+    const cat = this.category();
+    const jobs = cat?.jobs ?? [];
     const nameFilter = this.jobNameFilter().trim().toLowerCase();
     const globalTerm = this.search.term().trim().toLowerCase();
 
@@ -120,6 +136,12 @@ export class CategoryPage {
     });
 
     const sorted = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
-    return this.sortAsc() ? sorted : sorted.reverse();
+    const result = this.sortAsc() ? sorted : sorted.reverse();
+    return cat ? applyOrder(result, (j) => j.id, this.order.getOrder(this.orderKey(cat.id))) : result;
   });
+
+  onReorder(categoryId: string, event: { from: number; to: number }): void {
+    const ids = this.filteredJobs().map((j) => j.id);
+    this.order.setOrder(this.orderKey(categoryId), reorderIds(ids, event.from, event.to));
+  }
 }

@@ -10,6 +10,7 @@ import type { QueryStatus, SqlQuery } from '../../types/reporting.types';
   template: `
     <a
       [routerLink]="routerLink()"
+      draggable="false"
       class="group relative flex flex-col gap-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm p-4 transition-all hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98]"
     >
       <div class="flex items-start justify-between gap-2">

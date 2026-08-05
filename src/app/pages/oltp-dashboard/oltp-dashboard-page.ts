@@ -3,13 +3,18 @@ import { RouterLink } from '@angular/router';
 import { Icon } from '../../components/icon/icon';
 import { StatCard } from '../../components/stat-card/stat-card';
 import { OltpDataService } from '../../services/oltp-data.service';
+import { OrderService } from '../../services/order.service';
+import { DragReorderDirective } from '../../directives/drag-reorder.directive';
+import { applyOrder, reorderIds } from '../../utils/apply-order';
+import type { OltpModuleSummary } from '../../types/reporting.types';
 
 const ACCENTS: Array<'indigo' | 'violet' | 'emerald' | 'amber'> = ['indigo', 'violet', 'emerald', 'amber'];
+const ORDER_KEY = 'oltp-dashboard:modules';
 
 @Component({
   selector: 'app-oltp-dashboard-page',
   standalone: true,
-  imports: [RouterLink, Icon, StatCard],
+  imports: [RouterLink, Icon, StatCard, DragReorderDirective],
   template: `
     <div class="flex flex-col gap-6">
       <div class="animate-fade-in-down">
@@ -42,9 +47,11 @@ const ACCENTS: Array<'indigo' | 'violet' | 'emerald' | 'amber'> = ['indigo', 'vi
         <div class="flex flex-col gap-3">
           <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">Modules</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            @for (mod of oltp.modules(); track mod.id; let i = $index) {
+            @for (mod of orderedModules(); track mod.id; let i = $index) {
               <a
                 [routerLink]="['/oltp', mod.id]"
+                [appDragReorder]="i"
+                (reordered)="onReorder($event)"
                 class="group relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm p-5 flex flex-col gap-3 transition-all hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] animate-fade-in-up"
                 [style.animation-delay.ms]="i * 40"
               >
@@ -75,10 +82,20 @@ const ACCENTS: Array<'indigo' | 'violet' | 'emerald' | 'amber'> = ['indigo', 'vi
 })
 export class OltpDashboardPage {
   protected readonly oltp = inject(OltpDataService);
+  private readonly order = inject(OrderService);
 
   protected readonly totalGroups = computed(() => this.oltp.modules().reduce((n, m) => n + m.daoGroupCount, 0));
   protected readonly totalQueries = computed(() => this.oltp.modules().reduce((n, m) => n + m.queryCount, 0));
   protected readonly totalExplained = computed(() => this.oltp.modules().reduce((n, m) => n + m.explainedCount, 0));
+
+  protected readonly orderedModules = computed<OltpModuleSummary[]>(() =>
+    applyOrder(this.oltp.modules(), (m) => m.id, this.order.getOrder(ORDER_KEY)),
+  );
+
+  protected onReorder(event: { from: number; to: number }): void {
+    const ids = this.orderedModules().map((m) => m.id);
+    this.order.setOrder(ORDER_KEY, reorderIds(ids, event.from, event.to));
+  }
 
   private static readonly BADGES: Record<string, string> = {
     indigo: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400',
