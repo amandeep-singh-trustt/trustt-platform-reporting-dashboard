@@ -1,0 +1,117 @@
+{
+  "generatedAt": "2026-08-04T00:00:00Z",
+  "modules": [
+    {
+      "id": "accounting",
+      "name": "Accounting",
+      "daoGroupCount": 190,
+      "queryCount": 949,
+      "explainedCount": 930,
+      "needsReviewCount": 19
+    },
+    {
+      "id": "actor",
+      "name": "Actor",
+      "daoGroupCount": 170,
+      "queryCount": 1063,
+      "explainedCount": 996,
+      "needsReviewCount": 67
+    },
+    {
+      "id": "approval",
+      "name": "Approval",
+      "daoGroupCount": 2,
+      "queryCount": 25,
+      "explainedCount": 25,
+      "needsReviewCount": 0
+    },
+    {
+      "id": "authorization",
+      "name": "Authorization",
+      "daoGroupCount": 8,
+      "queryCount": 50,
+      "explainedCount": 50,
+      "needsReviewCount": 0
+    },
+    {
+      "id": "batch",
+      "name": "Batch",
+      "daoGroupCount": 11,
+      "queryCount": 34,
+      "explainedCount": 22,
+      "needsReviewCount": 12
+    },
+    {
+      "id": "bpmn",
+      "name": "BPMN",
+      "daoGroupCount": 1,
+      "queryCount": 1,
+      "explainedCount": 0,
+      "needsReviewCount": 1
+    },
+    {
+      "id": "bre",
+      "name": "BRE",
+      "daoGroupCount": 10,
+      "queryCount": 20,
+      "explainedCount": 20,
+      "needsReviewCount": 0
+    },
+    {
+      "id": "dms",
+      "name": "DMS",
+      "daoGroupCount": 2,
+      "queryCount": 11,
+      "explainedCount": 11,
+      "needsReviewCount": 0
+    },
+    {
+      "id": "gateway",
+      "name": "Gateway",
+      "daoGroupCount": 3,
+      "queryCount": 4,
+      "explainedCount": 3,
+      "needsReviewCount": 1
+    },
+    {
+      "id": "los",
+      "name": "LOS",
+      "daoGroupCount": 139,
+      "queryCount": 1140,
+      "explainedCount": 1088,
+      "needsReviewCount": 54
+    },
+    {
+      "id": "masterdata",
+      "name": "Masterdata",
+      "daoGroupCount": 16,
+      "queryCount": 46,
+      "explainedCount": 45,
+      "needsReviewCount": 1
+    },
+    {
+      "id": "notifications",
+      "name": "Notifications",
+      "daoGroupCount": 8,
+      "queryCount": 12,
+      "explainedCount": 12,
+      "needsReviewCount": 0
+    },
+    {
+      "id": "payments",
+      "name": "Payments",
+      "daoGroupCount": 83,
+      "queryCount": 602,
+      "explainedCount": 562,
+      "needsReviewCount": 41
+    },
+    {
+      "id": "task",
+      "name": "Task",
+      "daoGroupCount": 19,
+      "queryCount": 95,
+      "explainedCount": 90,
+      "needsReviewCount": 5
+    }
+  ]
+}

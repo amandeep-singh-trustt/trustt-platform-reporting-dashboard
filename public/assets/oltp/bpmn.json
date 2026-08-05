@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-08-04T00:00:00Z",
+  "module": {
+    "id": "bpmn",
+    "name": "BPMN"
+  },
+  "summary": {
+    "id": "bpmn",
+    "name": "BPMN",
+    "daoGroupCount": 1,
+    "queryCount": 1,
+    "explainedCount": 0,
+    "needsReviewCount": 1
+  },
+  "daoGroups": [
+    {
+      "id": "bpmnrequestlogentityrepository-ddd153",
+      "name": "BpmnRequestLogEntityRepository",
+      "daoClass": "in.novopay.bpmn.entity.BpmnRequestLogEntityRepository",
+      "moduleId": "bpmn",
+      "queries": [
+        {
+          "id": "bpmn-q-1",
+          "name": "findOneByInstanceId",
+          "description": "via BpmnRequestLogEntityRepository",
+          "daoClass": "in.novopay.bpmn.entity.BpmnRequestLogEntityRepository",
+          "sqlIdentifier": "findOneByInstanceId",
+          "status": "needs-review",
+          "sqlPreview": "select b from BpmnRequestLogEntity b where b.instanceId = ?1;",
+          "reviewReason": "could not resolve column 'b.instanceId' (table/alias/column unknown)"
+        }
+      ]
+    }
+  ]
+}

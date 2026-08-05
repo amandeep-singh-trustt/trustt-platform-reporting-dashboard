@@ -1,0 +1,605 @@
+{
+  "generatedAt": "2026-08-04T00:00:00Z",
+  "module": {
+    "id": "masterdata",
+    "name": "Masterdata"
+  },
+  "summary": {
+    "id": "masterdata",
+    "name": "Masterdata",
+    "daoGroupCount": 16,
+    "queryCount": 46,
+    "explainedCount": 45,
+    "needsReviewCount": 1
+  },
+  "daoGroups": [
+    {
+      "id": "apymatrixconfigurationrepository-f68d9a",
+      "name": "ApyMatrixConfigurationRepository",
+      "daoClass": "in.novopay.masterdata.apy.datamodel.repository.ApyMatrixConfigurationRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-46",
+          "name": "findOneByAgeAndGuaranteedAmountAndFrequency",
+          "description": "via ApyMatrixConfigurationRepository",
+          "daoClass": "in.novopay.masterdata.apy.datamodel.repository.ApyMatrixConfigurationRepository",
+          "sqlIdentifier": "findOneByAgeAndGuaranteedAmountAndFrequency",
+          "status": "healthy",
+          "sqlPreview": "select * from apy_matrix_configuration where age=?1 and guaranteed_pension_amount =?2 and instalment_frequency = ?3 And is_deleted=false;",
+          "explainPlan": "Index Scan using apy_matrix_configuration_age_guaranteed_pension_amount_instalme on apy_matrix_configuration  (cost=40.05..68.73 rows=1 width=43) (actual time=1.162..1.168 rows=1 loops=1)\n  Index Cond: ((age = 22) AND ((guaranteed_pension_amount)::text = '1000'::text) AND ((instalment_frequency)::text = 'HALFYEARLY'::text))\n  Storage Filter: (NOT is_deleted)\nPlanning Time: 0.123 ms\nExecution Time: 1.242 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "bankdocumentmasterrepository-44edfc",
+      "name": "BankDocumentMasterRepository",
+      "daoClass": "in.novopay.masterdata.fts.datamodel.repository.BankDocumentMasterRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-38",
+          "name": "findAllByDocName",
+          "description": "via BankDocumentMasterRepository",
+          "daoClass": "in.novopay.masterdata.fts.datamodel.repository.BankDocumentMasterRepository",
+          "sqlIdentifier": "findAllByDocName",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM bank_document_master WHERE doc_name IN ?1 AND is_deleted != TRUE;",
+          "explainPlan": "Seq Scan on bank_document_master  (cost=40.00..861.79 rows=5 width=69) (actual time=0.659..0.662 rows=5 loops=1)\n  Storage Filter: ((NOT is_deleted) AND ((doc_name)::text = ANY ('{\"BSBDA & Form 60\",\"Group Certification Form\",\"Aadhaar Image\"}'::text[])))\nPlanning Time: 0.092 ms\nExecution Time: 0.735 ms\nPeak Memory Usage: 14 kB"
+        }
+      ]
+    },
+    {
+      "id": "bankmasterrepository-f11a3f",
+      "name": "BankMasterRepository",
+      "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BankMasterRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-31",
+          "name": "findOneById",
+          "description": "via BankMasterRepository",
+          "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BankMasterRepository",
+          "sqlIdentifier": "findOneById",
+          "status": "healthy",
+          "sqlPreview": "select * from bank_master where id = ?1;",
+          "explainPlan": "Index Scan using bank_master_pkey on bank_master  (cost=20.08..21.32 rows=1 width=100) (actual time=0.804..0.805 rows=1 loops=1)\n  Index Cond: (id = 212)\nPlanning Time: 0.088 ms\nExecution Time: 0.873 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "masterdata-q-32",
+          "name": "findOneByBankCode",
+          "description": "via BankMasterRepository",
+          "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BankMasterRepository",
+          "sqlIdentifier": "findOneByBankCode",
+          "status": "healthy",
+          "sqlPreview": "select * from bank_master where bank_code=?1;",
+          "explainPlan": "Index Scan using bank_master_bank_code_idx on bank_master  (cost=40.04..68.63 rows=1 width=100) (actual time=1.297..1.300 rows=1 loops=1)\n  Index Cond: ((bank_code)::text = 'TIRCMAILAE'::text)\nPlanning Time: 0.076 ms\nExecution Time: 1.367 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "branchmasterrepository-ef303b",
+      "name": "BranchMasterRepository",
+      "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BranchMasterRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-21",
+          "name": "getBranchDetailsFromIfsc",
+          "description": "via BranchMasterRepository",
+          "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BranchMasterRepository",
+          "sqlIdentifier": "getBranchDetailsFromIfsc",
+          "status": "healthy",
+          "sqlPreview": "select bk.id bank_id, bk.name as bank_name, bk.bank_code as bank_code, br.branch as branch_name, br.address, br.city, br.district, br.state, br.ifsc_code as ifsc from branch_master br left join bank_master bk on bk.id=br.bank_master_id where br.ifsc_code in ?1;",
+          "explainPlan": "YB Batched Nested Loop Left Join  (cost=60.27..91.60 rows=3 width=163) (actual time=2.124..2.143 rows=3 loops=1)\n  Join Filter: (bk.id = br.bank_master_id)\n  ->  Index Scan using branch_master_ifsc_code_key on branch_master br  (cost=40.11..69.77 rows=3 width=123) (actual time=1.250..1.257 rows=3 loops=1)\n        Index Cond: ((ifsc_code)::text = ANY ('{ALLA0AU1524,AUBL0002311,CBIN0282631}'::text[]))\n  ->  Index Scan using bank_master_pkey on bank_master bk  (cost=20.15..21.72 rows=3 width=48) (actual time=0.778..0.782 rows=3 loops=1)\n        Index Cond: (id = ANY (ARRAY[br.bank_master_id, $1, $2, ..., $1023]))\nPlanning Time: 25.532 ms\nExecution Time: 2.459 ms\nPeak Memory Usage: 545 kB"
+        },
+        {
+          "id": "masterdata-q-22",
+          "name": "getDistrictListByBankMasterIdAndState",
+          "description": "via BranchMasterRepository",
+          "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BranchMasterRepository",
+          "sqlIdentifier": "getDistrictListByBankMasterIdAndState",
+          "status": "healthy",
+          "sqlPreview": "select distinct(district) from branch_master where bank_master_id=?1 and state=?2 order by district;",
+          "explainPlan": "Sort  (cost=11484.72..11488.93 rows=1683 width=9) (actual time=158.134..158.149 rows=142 loops=1)\n  Sort Key: district\n  Sort Method: quicksort  Memory: 32kB\n  ->  HashAggregate  (cost=11377.71..11394.54 rows=1683 width=9) (actual time=157.946..158.009 rows=142 loops=1)\n        Group Key: district\n        ->  Seq Scan on branch_master  (cost=40.00..11372.25 rows=2186 width=9) (actual time=74.045..156.636 rows=2086 loops=1)\n              Storage Filter: ((bank_master_id = 4) AND ((state)::text = 'UTTAR PRADESH'::text))\nPlanning Time: 0.140 ms\nExecution Time: 158.293 ms\nPeak Memory Usage: 161 kB"
+        },
+        {
+          "id": "masterdata-q-23",
+          "name": "getCityListByBankMasterIdAndStateAndDistrict",
+          "description": "via BranchMasterRepository",
+          "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BranchMasterRepository",
+          "sqlIdentifier": "getCityListByBankMasterIdAndStateAndDistrict",
+          "status": "healthy",
+          "sqlPreview": "select distinct(city) from branch_master where bank_master_id=?1 and state=?2 and district=?3 order by city;",
+          "explainPlan": "Unique  (cost=12485.19..12485.19 rows=1 width=9) (actual time=187.328..187.341 rows=10 loops=1)\n  ->  Sort  (cost=12485.19..12485.19 rows=1 width=9) (actual time=187.310..187.312 rows=20 loops=1)\n        Sort Key: city\n        Sort Method: quicksort  Memory: 25kB\n        ->  Seq Scan on branch_master  (cost=40.00..12485.18 rows=1 width=9) (actual time=187.273..187.283 rows=20 loops=1)\n              Storage Filter: ((bank_master_id = 4) AND ((state)::text = 'UTTAR PRADESH'::text) AND ((district)::text = 'BARABANKI'::text))\nPlanning Time: 0.172 ms\nExecution Time: 187.431 ms\nPeak Memory Usage: 67 kB"
+        },
+        {
+          "id": "masterdata-q-24",
+          "name": "getIfscCodesCount",
+          "description": "via BranchMasterRepository",
+          "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BranchMasterRepository",
+          "sqlIdentifier": "getIfscCodesCount",
+          "status": "healthy",
+          "sqlPreview": "select count(*) from branch_master;",
+          "explainPlan": "Finalize Aggregate  (cost=9685.41..9685.42 rows=1 width=8) (actual time=90.293..90.293 rows=1 loops=1)\n  ->  Index Only Scan using branch_master_ifsc_code_key on branch_master  (cost=27.03..9386.56 rows=119539 width=0) (actual time=90.281..90.284 rows=1 loops=1)\n        Heap Fetches: 0\n        Partial Aggregate: true\nPlanning Time: 0.070 ms\nExecution Time: 90.412 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "masterdata-q-25",
+          "name": "getAllIfscCodes",
+          "description": "via BranchMasterRepository",
+          "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BranchMasterRepository",
+          "sqlIdentifier": "getAllIfscCodes",
+          "status": "healthy",
+          "sqlPreview": "select ifsc_code from branch_master where ifsc_code like %?1%;",
+          "explainPlan": "Index Only Scan using branch_master_ifsc_code_key on branch_master  (cost=20.19..6001.33 rows=12 width=12) (actual time=124.922..124.925 rows=1 loops=1)\n  Storage Filter: ((ifsc_code)::text ~~ '%ALLA0AU1524%'::text)\n  Heap Fetches: 0\nPlanning Time: 1.328 ms\nExecution Time: 125.019 ms\nPeak Memory Usage: 0 kB"
+        },
+        {
+          "id": "masterdata-q-26",
+          "name": "getAllIfscCodes",
+          "description": "via BranchMasterRepository",
+          "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BranchMasterRepository",
+          "sqlIdentifier": "getAllIfscCodes",
+          "status": "healthy",
+          "sqlPreview": "select ifsc_code from branch_master where ifsc_code like %?1% limit ?2 offset ?3;",
+          "explainPlan": "Limit  (cost=5004.47..6001.33 rows=2 width=12) (actual time=129.030..129.030 rows=0 loops=1)\n  ->  Index Only Scan using branch_master_ifsc_code_key on branch_master  (cost=20.19..6001.33 rows=12 width=12) (actual time=129.024..129.028 rows=1 loops=1)\n        Storage Filter: ((ifsc_code)::text ~~ '%ALLA0AU1524%'::text)\n        Heap Fetches: 0\nPlanning Time: 1.124 ms\nExecution Time: 129.114 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "masterdata-q-27",
+          "name": "getStateListByBankMaster",
+          "description": "via BranchMasterRepository",
+          "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BranchMasterRepository",
+          "sqlIdentifier": "getStateListByBankMaster",
+          "status": "healthy",
+          "sqlPreview": "select distinct(state) from branch_master where bank_master_id=?1 and 1=1 order by state;",
+          "explainPlan": "Sort  (cost=10901.48..10901.64 rows=64 width=10) (actual time=153.288..153.291 rows=47 loops=1)\n  Sort Key: state\n  Sort Method: quicksort  Memory: 27kB\n  ->  HashAggregate  (cost=10898.92..10899.56 rows=64 width=10) (actual time=153.235..153.247 rows=47 loops=1)\n        Group Key: state\n        ->  Seq Scan on branch_master  (cost=40.00..10843.95 rows=21991 width=10) (actual time=6.232..141.107 rows=22398 loops=1)\n              Storage Filter: (bank_master_id = 4)\nPlanning Time: 0.116 ms\nExecution Time: 153.405 ms\nPeak Memory Usage: 52 kB"
+        },
+        {
+          "id": "masterdata-q-28",
+          "name": "getBranchDetailsFromBankMasterIdAndIfscCode",
+          "description": "via BranchMasterRepository",
+          "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BranchMasterRepository",
+          "sqlIdentifier": "getBranchDetailsFromBankMasterIdAndIfscCode",
+          "status": "healthy",
+          "sqlPreview": "select * from branch_master where bank_master_id=?1 and ifsc_code=?2;",
+          "explainPlan": "Index Scan using branch_master_ifsc_code_key on branch_master  (cost=40.04..68.84 rows=1 width=561) (actual time=1.528..1.528 rows=0 loops=1)\n  Index Cond: ((ifsc_code)::text = 'ALLA0AU1524'::text)\n  Storage Filter: (bank_master_id = 4)\nPlanning Time: 0.104 ms\nExecution Time: 1.608 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "masterdata-q-29",
+          "name": "getBranchDetailsFromBranchCode",
+          "description": "via BranchMasterRepository",
+          "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BranchMasterRepository",
+          "sqlIdentifier": "getBranchDetailsFromBranchCode",
+          "status": "healthy",
+          "sqlPreview": "select * from branch_master where branch_code = ?1;",
+          "explainPlan": "Seq Scan on branch_master  (cost=40.00..33073.31 rows=118200 width=561) (actual time=2.736..286.306 rows=118087 loops=1)\n  Storage Filter: ((branch_code)::text = ''::text)\nPlanning Time: 0.076 ms\nExecution Time: 317.278 ms\nPeak Memory Usage: 15 kB"
+        },
+        {
+          "id": "masterdata-q-30",
+          "name": "getBranchDetailsFromBranchCodeIn",
+          "description": "via BranchMasterRepository",
+          "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.BranchMasterRepository",
+          "sqlIdentifier": "getBranchDetailsFromBranchCodeIn",
+          "status": "healthy",
+          "sqlPreview": "select * from branch_master where branch_code IN ?1;",
+          "explainPlan": "Seq Scan on branch_master  (cost=40.00..33421.00 rows=119539 width=561) (actual time=2.734..271.570 rows=118087 loops=1)\n  Storage Filter: ((branch_code)::text = ANY ('{\"\",\"\",\"\"}'::text[]))\nPlanning Time: 0.086 ms\nExecution Time: 299.986 ms\nPeak Memory Usage: 15 kB"
+        }
+      ]
+    },
+    {
+      "id": "codemasterdetailsrepository-d379b1",
+      "name": "CodeMasterDetailsRepository",
+      "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterDetailsRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-2",
+          "name": "findAllByCodeMasterIdAndLocale",
+          "description": "via CodeMasterDetailsRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterDetailsRepository",
+          "sqlIdentifier": "findAllByCodeMasterIdAndLocale",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM code_master_details WHERE code_master_id = ?1 AND locale = ?2 AND status = 'ACTIVE' AND is_deleted = false ORDER BY position ASC;",
+          "explainPlan": "Index Scan using idx_masterdata_code_master_details_cmid_locale on code_master_details  (cost=40.16..69.97 rows=3 width=96) (actual time=1.313..1.322 rows=5 loops=1)\n  Index Cond: ((code_master_id = 212) AND ((locale)::text = 'en-in'::text) AND ((status)::text = 'ACTIVE'::text) AND (is_deleted = false))\n  Storage Index Filter: (NOT is_deleted)\nPlanning Time: 0.249 ms\nExecution Time: 1.428 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "masterdata-q-3",
+          "name": "findOneById",
+          "description": "via CodeMasterDetailsRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterDetailsRepository",
+          "sqlIdentifier": "findOneById",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM code_master_details WHERE id = ?1 AND is_deleted = false;",
+          "explainPlan": "Index Scan using code_master_details_pkey on code_master_details  (cost=20.13..21.39 rows=1 width=96) (actual time=0.780..0.782 rows=1 loops=1)\n  Index Cond: (id = 4443)\n  Storage Filter: (NOT is_deleted)\nPlanning Time: 0.188 ms\nExecution Time: 0.866 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "masterdata-q-4",
+          "name": "findByCodeMasterIdAndCode",
+          "description": "via CodeMasterDetailsRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterDetailsRepository",
+          "sqlIdentifier": "findByCodeMasterIdAndCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM code_master_details WHERE code_master_id = ?1 AND code = ?2 AND is_deleted = false;",
+          "explainPlan": "Index Scan using idx_masterdata_code_master_details_cmid_locale on code_master_details  (cost=40.16..69.75 rows=1 width=96) (actual time=1.376..1.376 rows=0 loops=1)\n  Index Cond: ((code_master_id = 212) AND (is_deleted = false))\n  Storage Index Filter: (NOT is_deleted)\n  Storage Filter: ((code)::text = 'HOTEL_BUSINESS'::text)\nPlanning Time: 0.211 ms\nExecution Time: 1.491 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "masterdata-q-5",
+          "name": "findAllDeletedByCodeMasterId",
+          "description": "via CodeMasterDetailsRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterDetailsRepository",
+          "sqlIdentifier": "findAllDeletedByCodeMasterId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM code_master_details WHERE code_master_id = ?1 AND is_deleted = true ORDER BY position;",
+          "explainPlan": "Sort  (cost=69.14..69.14 rows=1 width=96) (actual time=1.509..1.509 rows=4 loops=1)\n  Sort Key: \"position\"\n  Sort Method: quicksort  Memory: 25kB\n  ->  Index Scan using idx_masterdata_code_master_details_cmid_locale on code_master_details  (cost=40.05..69.13 rows=1 width=96) (actual time=1.491..1.499 rows=4 loops=1)\n        Index Cond: ((code_master_id = 212) AND (is_deleted = true))\n        Storage Index Filter: is_deleted\nPlanning Time: 0.180 ms\nExecution Time: 1.586 ms\nPeak Memory Usage: 36 kB"
+        },
+        {
+          "id": "masterdata-q-6",
+          "name": "findOneByCodeAndLocaleAndCodeMasterId",
+          "description": "via CodeMasterDetailsRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterDetailsRepository",
+          "sqlIdentifier": "findOneByCodeAndLocaleAndCodeMasterId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * from code_master_details WHERE code_master_id = ?1 AND code = ?2 AND locale = ?3 AND status = 'ACTIVE' AND is_deleted = false;",
+          "explainPlan": "Index Scan using idx_masterdata_code_master_details_cmid_locale on code_master_details  (cost=40.16..69.75 rows=1 width=96) (actual time=1.490..1.490 rows=0 loops=1)\n  Index Cond: ((code_master_id = 212) AND ((locale)::text = 'en-in'::text) AND ((status)::text = 'ACTIVE'::text) AND (is_deleted = false))\n  Storage Index Filter: (NOT is_deleted)\n  Storage Filter: ((code)::text = 'HOTEL_BUSINESS'::text)\nPlanning Time: 0.218 ms\nExecution Time: 1.579 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "masterdata-q-7",
+          "name": "findByIdAndCodeMasterId",
+          "description": "via CodeMasterDetailsRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterDetailsRepository",
+          "sqlIdentifier": "findByIdAndCodeMasterId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM code_master_details WHERE id = ?1 AND code_master_id = ?2 AND is_deleted = false;",
+          "explainPlan": "Index Scan using code_master_details_pkey on code_master_details  (cost=20.13..21.39 rows=1 width=96) (actual time=0.819..0.819 rows=0 loops=1)\n  Index Cond: (id = 4443)\n  Storage Filter: ((NOT is_deleted) AND (code_master_id = 212))\nPlanning Time: 0.224 ms\nExecution Time: 0.888 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "masterdata-q-8",
+          "name": "findAllByCodeMasterIdWithDeleted",
+          "description": "via CodeMasterDetailsRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterDetailsRepository",
+          "sqlIdentifier": "findAllByCodeMasterIdWithDeleted",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM code_master_details WHERE code_master_id = ?1 ORDER BY position;",
+          "explainPlan": "Sort  (cost=69.73..69.74 rows=3 width=96) (actual time=1.339..1.340 rows=9 loops=1)\n  Sort Key: \"position\"\n  Sort Method: quicksort  Memory: 26kB\n  ->  Index Scan using idx_masterdata_code_master_details_cmid_locale on code_master_details  (cost=40.16..69.71 rows=3 width=96) (actual time=1.316..1.328 rows=9 loops=1)\n        Index Cond: (code_master_id = 212)\nPlanning Time: 0.139 ms\nExecution Time: 1.416 ms\nPeak Memory Usage: 36 kB"
+        },
+        {
+          "id": "masterdata-q-9",
+          "name": "findOneByCodeMasterIdAndCodeWithDeleted",
+          "description": "via CodeMasterDetailsRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterDetailsRepository",
+          "sqlIdentifier": "findOneByCodeMasterIdAndCodeWithDeleted",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM code_master_details WHERE code_master_id = ?1 AND code = ?2;",
+          "explainPlan": "Index Scan using idx_masterdata_code_master_details_cmid_locale on code_master_details  (cost=40.16..69.48 rows=1 width=96) (actual time=1.470..1.470 rows=0 loops=1)\n  Index Cond: (code_master_id = 212)\n  Storage Filter: ((code)::text = 'HOTEL_BUSINESS'::text)\nPlanning Time: 0.170 ms\nExecution Time: 1.548 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "masterdata-q-10",
+          "name": "findOneByCodeMasterIdAndLocaleAndValueAndNotForCode",
+          "description": "via CodeMasterDetailsRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterDetailsRepository",
+          "sqlIdentifier": "findOneByCodeMasterIdAndLocaleAndValueAndNotForCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM code_master_details WHERE code_master_id = ?1 AND locale = ?2 AND value = ?3 AND is_deleted = false AND code != ?4;",
+          "explainPlan": "Index Scan using idx_masterdata_code_master_details_cmid_locale on code_master_details  (cost=40.16..69.76 rows=1 width=96) (actual time=1.397..1.397 rows=0 loops=1)\n  Index Cond: ((code_master_id = 212) AND ((locale)::text = 'en-in'::text) AND (is_deleted = false))\n  Storage Index Filter: (NOT is_deleted)\n  Storage Filter: (((code)::text <> 'HOTEL_BUSINESS'::text) AND ((value)::text = 'SMALL BUSINESS'::text))\nPlanning Time: 0.243 ms\nExecution Time: 1.509 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "codemastergrouprepository-e819ad",
+      "name": "CodeMasterGroupRepository",
+      "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterGroupRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-1",
+          "name": "getIncrementalMasterDataByGroupAndLocale",
+          "description": "via CodeMasterGroupRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterGroupRepository",
+          "sqlIdentifier": "getIncrementalMasterDataByGroupAndLocale",
+          "status": "healthy",
+          "sqlPreview": "SELECT cm.data_type,cm.data_sub_type,cm.description,cm.is_deleted AS master_deleted,cmd.code,cmd.locale,cmd.value,cmd.is_deleted AS details_deleted,cmd.created_on,cmd.updated_on FROM code_master cm JOIN code_master_group cmg ON cm.id=cmg.code_master_id JOIN code_master_details cmd ON cm.id=cmd.code_master_id WHERE cmg.group_name=?1 AND cmd.locale=?2 ORDER BY cm.data_type,cm.data_sub_type,cmd.position ASC;",
+          "explainPlan": "Sort  (cost=2427.54..2433.14 rows=2240 width=116) (actual time=41.806..41.973 rows=2927 loops=1)\n  Sort Key: cm.data_type, cm.data_sub_type, cmd.\"position\"\n  Sort Method: quicksort  Memory: 744kB\n  ->  YB Batched Nested Loop Join  (cost=277.15..2302.89 rows=2240 width=116) (actual time=17.045..35.735 rows=2927 loops=1)\n        Join Filter: (cm.id = cmd.code_master_id)\n        ->  Hash Join  (cost=180.90..1271.14 rows=344 width=73) (actual time=5.330..6.756 rows=343 loops=1)\n              Hash Cond: (cm.id = cmg.code_master_id)\n              ->  Seq Scan on code_master cm  (cost=40.00..1118.37 rows=1687 width=65) (actual time=1.812..2.628 rows=1687 loops=1)\n              ->  Hash  (cost=136.60..136.60 rows=344 width=8) (actual time=3.496..3.496 rows=344 loops=1)\n                    Buckets: 1024  Batches: 1  Memory Usage: 22kB\n                    ->  Index Scan using idx_code_master_group_code_master_group_name on code_master_group cmg  (cost=51.29..136.60 rows=344 width=8) (actual time=3.159..3.353 rows=344 loops=1)\n                          Index Cond: ((group_name)::text = 'LOGIN'::text)\n        ->  Index Scan using idx_masterdata_code_master_details_cmid_locale on code_master_details cmd  (cost=96.25..1022.29 rows=2252 width=67) (actual time=9.910..25.398 rows=2882 loops=1)\n              Index Cond: ((code_master_id = ANY (ARRAY[cmg.code_master_id, $1, $2, ..., $1023])) AND ((locale)::text = 'en-in'::text))\nPlanning Time: 17.816 ms\nExecution Time: 43.397 ms\nPeak Memory Usage: 2683 kB"
+        }
+      ]
+    },
+    {
+      "id": "codemasterrepository-bc098b",
+      "name": "CodeMasterRepository",
+      "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-11",
+          "name": "findOneByDataTypeAndDataSubType",
+          "description": "via CodeMasterRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterRepository",
+          "sqlIdentifier": "findOneByDataTypeAndDataSubType",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM code_master WHERE data_type = ?1 AND data_sub_type = ?2 AND is_deleted = false;",
+          "explainPlan": "Seq Scan on code_master  (cost=40.00..997.90 rows=1 width=114) (actual time=3.471..3.473 rows=1 loops=1)\n  Storage Filter: ((NOT is_deleted) AND ((data_type)::text = 'PAYMENT_MODE'::text) AND ((data_sub_type)::text = 'LOAN_REPAYMENT'::text))\nPlanning Time: 0.105 ms\nExecution Time: 3.540 ms\nPeak Memory Usage: 15 kB"
+        },
+        {
+          "id": "masterdata-q-12",
+          "name": "findOneByDataType",
+          "description": "via CodeMasterRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterRepository",
+          "sqlIdentifier": "findOneByDataType",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM code_master WHERE data_type = ?1 AND is_deleted != true;",
+          "explainPlan": "Seq Scan on code_master  (cost=40.00..981.30 rows=3 width=114) (actual time=3.402..3.406 rows=3 loops=1)\n  Storage Filter: ((NOT is_deleted) AND ((data_type)::text = 'PAYMENT_MODE'::text))\nPlanning Time: 0.089 ms\nExecution Time: 3.488 ms\nPeak Memory Usage: 15 kB"
+        },
+        {
+          "id": "masterdata-q-13",
+          "name": "findDeletedOneByDataTypeAndDataSubType",
+          "description": "via CodeMasterRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterRepository",
+          "sqlIdentifier": "findDeletedOneByDataTypeAndDataSubType",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM code_master WHERE data_type = ?1 AND data_sub_type = ?2 AND is_deleted = true;",
+          "explainPlan": "Seq Scan on code_master  (cost=40.00..997.90 rows=1 width=114) (actual time=3.586..3.586 rows=0 loops=1)\n  Storage Filter: (is_deleted AND ((data_type)::text = 'PAYMENT_MODE'::text) AND ((data_sub_type)::text = 'LOAN_REPAYMENT'::text))\nPlanning Time: 0.115 ms\nExecution Time: 3.663 ms\nPeak Memory Usage: 15 kB"
+        },
+        {
+          "id": "masterdata-q-14",
+          "name": "getMasterDataForDataTypeAndSubType",
+          "description": "via CodeMasterRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterRepository",
+          "sqlIdentifier": "getMasterDataForDataTypeAndSubType",
+          "status": "healthy",
+          "sqlPreview": "SELECT cm.id as cm_id, cm.data_type, cm.data_sub_type, cm.editable, cm.description, cmd.id as cmd_id, cmd.position, cmd.code, cmd.locale, cmd.value, cmd.status, cm.created_by, cm.created_on, cm.updated_by, cm.updated_on, cm.approved_by, cm.approved_on FROM code_master cm JOIN code_master_details cmd ON cm.id = cmd.code_master_id WHERE CONCAT(data_type, '|', data_sub_type) IN ?1 AND cmd.is_deleted is false ORDER by cmd.code_master_id,cmd.position ASC;",
+          "explainPlan": "ERROR: syntax error at or near \";\"\nLINE 1: ...leted is false ORDER by cmd.code_master_id,cmd.position ASC;\n                                                                      ^\n"
+        },
+        {
+          "id": "masterdata-q-15",
+          "name": "findOneById",
+          "description": "via CodeMasterRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterRepository",
+          "sqlIdentifier": "findOneById",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM code_master WHERE id = ?1 AND is_deleted != true;",
+          "explainPlan": "Index Scan using code_master_pkey on code_master  (cost=20.13..21.38 rows=1 width=114) (actual time=1.032..1.034 rows=1 loops=1)\n  Index Cond: (id = 212)\n  Storage Filter: (NOT is_deleted)\nPlanning Time: 0.124 ms\nExecution Time: 1.164 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "masterdata-q-16",
+          "name": "getIncrementalMasterDataByDataTypeAndLocale",
+          "description": "via CodeMasterRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterRepository",
+          "sqlIdentifier": "getIncrementalMasterDataByDataTypeAndLocale",
+          "status": "healthy",
+          "sqlPreview": "SELECT data_type,data_sub_type,description,cm.is_deleted AS master_deleted,cmd.code,cmd.locale,cmd.value,cmd.is_deleted AS details_deleted ,cm.created_on, cm.updated_on FROM code_master cm JOIN code_master_details cmd ON cm.id=cmd.code_master_id WHERE data_type=?1 AND locale=?2 ORDER by cmd.code_master_id,cmd.position ASC;",
+          "explainPlan": "Sort  (cost=1043.36..1043.41 rows=20 width=124) (actual time=5.381..5.383 rows=12 loops=1)\n  Sort Key: cmd.code_master_id, cmd.\"position\"\n  Sort Method: quicksort  Memory: 26kB\n  ->  YB Batched Nested Loop Join  (cost=81.10..1042.92 rows=20 width=124) (actual time=5.307..5.355 rows=12 loops=1)\n        Join Filter: (cm.id = cmd.code_master_id)\n        ->  Seq Scan on code_master cm  (cost=40.00..968.50 rows=3 width=81) (actual time=3.637..3.643 rows=3 loops=1)\n              Storage Filter: ((data_type)::text = 'PAYMENT_MODE'::text)\n        ->  Index Scan using idx_masterdata_code_master_details_cmid_locale on code_master_details cmd  (cost=41.10..74.42 rows=20 width=51) (actual time=1.550..1.573 rows=12 loops=1)\n              Index Cond: ((code_master_id = ANY (ARRAY[cm.id, $1, $2, ..., $1023])) AND ((locale)::text = 'en-in'::text))\nPlanning Time: 1.172 ms\nExecution Time: 5.707 ms\nPeak Memory Usage: 544 kB"
+        },
+        {
+          "id": "masterdata-q-17",
+          "name": "getIncrementalMasterDataByDataSubTypeAndLocale",
+          "description": "via CodeMasterRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterRepository",
+          "sqlIdentifier": "getIncrementalMasterDataByDataSubTypeAndLocale",
+          "status": "healthy",
+          "sqlPreview": "SELECT data_type,data_sub_type,description,cm.is_deleted AS master_deleted,cmd.code,cmd.locale,cmd.value,cmd.is_deleted AS details_deleted ,cm.created_on, cm.updated_on FROM code_master cm JOIN code_master_details cmd ON cm.id=cmd.code_master_id WHERE data_sub_type=?1 AND locale=?2 ORDER by cmd.code_master_id,cmd.position ASC;",
+          "explainPlan": "Sort  (cost=1048.14..1048.22 rows=33 width=124) (actual time=5.178..5.180 rows=25 loops=1)\n  Sort Key: cmd.code_master_id, cmd.\"position\"\n  Sort Method: quicksort  Memory: 30kB\n  ->  YB Batched Nested Loop Join  (cost=81.81..1047.31 rows=33 width=124) (actual time=5.066..5.138 rows=25 loops=1)\n        Join Filter: (cm.id = cmd.code_master_id)\n        ->  Seq Scan on code_master cm  (cost=40.00..968.67 rows=5 width=81) (actual time=3.279..3.284 rows=5 loops=1)\n              Storage Filter: ((data_sub_type)::text = 'LOAN_REPAYMENT'::text)\n        ->  Index Scan using idx_masterdata_code_master_details_cmid_locale on code_master_details cmd  (cost=41.81..78.63 rows=33 width=51) (actual time=1.698..1.734 rows=25 loops=1)\n              Index Cond: ((code_master_id = ANY (ARRAY[cm.id, $1, $2, ..., $1023])) AND ((locale)::text = 'en-in'::text))\nPlanning Time: 0.826 ms\nExecution Time: 5.437 ms\nPeak Memory Usage: 544 kB"
+        },
+        {
+          "id": "masterdata-q-18",
+          "name": "getIncrementalMasterDataByDataTypeAndDataSubTypeAndLocale",
+          "description": "via CodeMasterRepository",
+          "daoClass": "in.novopay.masterdata.codemanagement.dao.CodeMasterRepository",
+          "sqlIdentifier": "getIncrementalMasterDataByDataTypeAndDataSubTypeAndLocale",
+          "status": "healthy",
+          "sqlPreview": "SELECT data_type,data_sub_type,description,cm.is_deleted AS master_deleted,cmd.code,cmd.locale,cmd.value,cmd.is_deleted AS details_deleted,cm.created_on,cm.updated_on FROM code_master cm JOIN code_master_details cmd ON cm.id=cmd.code_master_id WHERE data_type=?1 AND data_sub_type=?2 AND locale=?3 ORDER by cmd.code_master_id,cmd.position ASC;",
+          "explainPlan": "Sort  (cost=1055.74..1055.76 rows=7 width=124) (actual time=4.295..4.295 rows=9 loops=1)\n  Sort Key: cmd.code_master_id, cmd.\"position\"\n  Sort Method: quicksort  Memory: 26kB\n  ->  YB Batched Nested Loop Join  (cost=80.38..1055.64 rows=7 width=124) (actual time=4.252..4.278 rows=9 loops=1)\n        Join Filter: (cm.id = cmd.code_master_id)\n        ->  Seq Scan on code_master cm  (cost=40.00..985.20 rows=1 width=81) (actual time=2.973..2.976 rows=1 loops=1)\n              Storage Filter: (((data_type)::text = 'PAYMENT_MODE'::text) AND ((data_sub_type)::text = 'LOAN_REPAYMENT'::text))\n        ->  Index Scan using idx_masterdata_code_master_details_cmid_locale on code_master_details cmd  (cost=40.38..70.44 rows=7 width=51) (actual time=1.199..1.211 rows=9 loops=1)\n              Index Cond: ((code_master_id = ANY (ARRAY[cm.id, $1, $2, ..., $1023])) AND ((locale)::text = 'en-in'::text))\nPlanning Time: 0.986 ms\nExecution Time: 4.543 ms\nPeak Memory Usage: 544 kB"
+        }
+      ]
+    },
+    {
+      "id": "configurationgrouprowmapper-153900",
+      "name": "ConfigurationGroupRowMapper",
+      "daoClass": "in.novopay.masterdata.configuration.dao.ConfigurationGroupRowMapper",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-37",
+          "name": "Field ConfigurationGroupRowMapper.SELECT_QUERY",
+          "description": "via ConfigurationGroupRowMapper",
+          "daoClass": "in.novopay.masterdata.configuration.dao.ConfigurationGroupRowMapper",
+          "sqlIdentifier": "Field ConfigurationGroupRowMapper.SELECT_QUERY",
+          "status": "healthy",
+          "sqlPreview": "SELECT c.id AS id,c.prop_key AS prop_key, c.prop_value AS prop_value,c.service AS service,cg.group_name AS group_name FROM configuration c JOIN configuration_group cg ON c.id = cg.configuration_id WHERE  cg.is_deleted = FALSE AND LOWER(cg.group_name) = ?1;",
+          "explainPlan": "Nested Loop  (cost=60.09..887.22 rows=1 width=108) (actual time=1.378..34.529 rows=69 loops=1)\n  ->  Seq Scan on configuration_group cg  (cost=40.00..865.86 rows=1 width=20) (actual time=0.855..0.929 rows=69 loops=1)\n        Storage Filter: ((NOT is_deleted) AND (lower((group_name)::text) = 'origination'::text))\n  ->  Index Scan using configuration_pkey on configuration c  (cost=20.09..21.34 rows=1 width=96) (actual time=0.470..0.470 rows=1 loops=69)\n        Index Cond: (id = cg.configuration_id)\nPlanning Time: 21.324 ms\nExecution Time: 34.675 ms\nPeak Memory Usage: 24 kB"
+        }
+      ]
+    },
+    {
+      "id": "districttodistrictmappingrepository-efc88c",
+      "name": "DistrictToDistrictMappingRepository",
+      "daoClass": "in.novopay.masterdata.statepsl.datamodel.repository.DistrictToDistrictMappingRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-39",
+          "name": "findBankDistrictByDistrict",
+          "description": "via DistrictToDistrictMappingRepository",
+          "daoClass": "in.novopay.masterdata.statepsl.datamodel.repository.DistrictToDistrictMappingRepository",
+          "sqlIdentifier": "findBankDistrictByDistrict",
+          "status": "healthy",
+          "sqlPreview": "select bank_district from district_to_district_mapping where district=?1 And is_deleted=false;",
+          "explainPlan": "Index Scan using district_to_district__district on district_to_district_mapping  (cost=40.04..68.56 rows=1 width=9) (actual time=1.218..1.221 rows=1 loops=1)\n  Index Cond: ((district)::text = 'RATNAGIRI'::text)\n  Storage Filter: (NOT is_deleted)\nPlanning Time: 0.086 ms\nExecution Time: 1.298 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "holidayrepository-29a7db",
+      "name": "HolidayRepository",
+      "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.HolidayRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-20",
+          "name": "getBankHoliday",
+          "description": "via HolidayRepository",
+          "daoClass": "in.novopay.masterdata.bankmaster.datamodel.repository.HolidayRepository",
+          "sqlIdentifier": "getBankHoliday",
+          "status": "healthy",
+          "sqlPreview": "select * from holidays where date=?1 and partner_code=?2;",
+          "explainPlan": "Index Scan using holidays_date_key on holidays  (cost=40.03..68.57 rows=1 width=56) (actual time=1.362..1.369 rows=1 loops=1)\n  Index Cond: (date = '2019-08-12 00:00:00'::timestamp without time zone)\n  Storage Filter: ((partner_code)::text = 'EQUITAS'::text)\nPlanning Time: 0.134 ms\nExecution Time: 1.451 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "issuingauthoritymasterrepository-49376f",
+      "name": "IssuingAuthorityMasterRepository",
+      "daoClass": "in.novopay.masterdata.issuingauthority.datamodel.repository.IssuingAuthorityMasterRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-40",
+          "name": "findAllByIsDeleted",
+          "description": "via IssuingAuthorityMasterRepository",
+          "daoClass": "in.novopay.masterdata.issuingauthority.datamodel.repository.IssuingAuthorityMasterRepository",
+          "sqlIdentifier": "findAllByIsDeleted",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM issuing_authority_master WHERE is_deleted = :isDeleted;",
+          "explainPlan": "Seq Scan on issuing_authority_master  (cost=40.00..862.25 rows=6 width=150) (actual time=0.684..0.688 rows=6 loops=1)\n  Storage Filter: (NOT is_deleted)\nPlanning Time: 0.049 ms\nExecution Time: 0.746 ms\nPeak Memory Usage: 0 kB"
+        },
+        {
+          "id": "masterdata-q-41",
+          "name": "findByDocumentName",
+          "description": "via IssuingAuthorityMasterRepository",
+          "daoClass": "in.novopay.masterdata.issuingauthority.datamodel.repository.IssuingAuthorityMasterRepository",
+          "sqlIdentifier": "findByDocumentName",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM issuing_authority_master WHERE document_name = :documentName AND is_deleted = false;",
+          "explainPlan": "Seq Scan on issuing_authority_master  (cost=40.00..861.56 rows=1 width=150) (actual time=0.794..0.796 rows=1 loops=1)\n  Storage Filter: ((NOT is_deleted) AND ((document_name)::text = 'AADHAAR card'::text))\nPlanning Time: 0.065 ms\nExecution Time: 0.854 ms\nPeak Memory Usage: 14 kB"
+        },
+        {
+          "id": "masterdata-q-42",
+          "name": "findByKycDocumentNameIn",
+          "description": "via IssuingAuthorityMasterRepository",
+          "daoClass": "in.novopay.masterdata.issuingauthority.datamodel.repository.IssuingAuthorityMasterRepository",
+          "sqlIdentifier": "findByKycDocumentNameIn",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM issuing_authority_master WHERE kyc_document_name IN (:kycDocumentNames) AND is_deleted = false;",
+          "explainPlan": "Seq Scan on issuing_authority_master  (cost=40.00..861.86 rows=3 width=150) (actual time=0.774..0.776 rows=3 loops=1)\n  Storage Filter: ((NOT is_deleted) AND ((kyc_document_name)::text = ANY ('{AADHAAR,NREGA,VOTER_ID}'::text[])))\nPlanning Time: 0.072 ms\nExecution Time: 0.858 ms\nPeak Memory Usage: 14 kB"
+        }
+      ]
+    },
+    {
+      "id": "plpmatrixrepository-1b3f4d",
+      "name": "PLPMatrixRepository",
+      "daoClass": "in.novopay.masterdata.plp.datamodel.repository.PLPMatrixRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-33",
+          "name": "findByVintageStateCodeAndDisbAmount",
+          "description": "via PLPMatrixRepository",
+          "daoClass": "in.novopay.masterdata.plp.datamodel.repository.PLPMatrixRepository",
+          "sqlIdentifier": "findByVintageStateCodeAndDisbAmount",
+          "status": "needs-review",
+          "sqlPreview": "SELECT * FROM plp_matrix WHERE vintage = ?1 AND state_code = ?2 AND CAST(?3 AS BIGINT) BETWEEN CAST(min_disb_value AS BIGINT) AND CAST(max_disb_value AS BIGINT);",
+          "reviewReason": "no preceding column/operator found for placeholder '?3'"
+        }
+      ]
+    },
+    {
+      "id": "productconfigurationrepository-4389f0",
+      "name": "ProductConfigurationRepository",
+      "daoClass": "in.novopay.masterdata.productconfiguration.dao.ProductConfigurationRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-44",
+          "name": "findByProdCode",
+          "description": "via ProductConfigurationRepository",
+          "daoClass": "in.novopay.masterdata.productconfiguration.dao.ProductConfigurationRepository",
+          "sqlIdentifier": "findByProdCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM product_configuration WHERE product_code = ?1 AND is_deleted is FALSE;",
+          "explainPlan": "Index Scan using product_configuration_code_prop_key_idx on product_configuration  (cost=40.13..69.35 rows=2 width=62) (actual time=1.103..1.109 rows=3 loops=1)\n  Index Cond: ((product_code)::text = 'JLGDL'::text)\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.113 ms\nExecution Time: 1.190 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "masterdata-q-45",
+          "name": "findByProductCodeAndPropKeyList",
+          "description": "via ProductConfigurationRepository",
+          "daoClass": "in.novopay.masterdata.productconfiguration.dao.ProductConfigurationRepository",
+          "sqlIdentifier": "findByProductCodeAndPropKeyList",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM product_configuration WHERE product_code = ?1 AND prop_key IN ?2 AND is_deleted is FALSE;",
+          "explainPlan": "Index Scan using product_configuration_code_prop_key_idx on product_configuration  (cost=40.04..68.90 rows=1 width=62) (actual time=1.182..1.187 rows=3 loops=1)\n  Index Cond: (((product_code)::text = 'JLGDL'::text) AND ((prop_key)::text = ANY ('{group_member_count,max_time,min_time}'::text[])))\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.167 ms\nExecution Time: 1.264 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "productdocumentmasterrepository-2bb755",
+      "name": "ProductDocumentMasterRepository",
+      "daoClass": "in.novopay.masterdata.configuration.dao.ProductDocumentMasterRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-34",
+          "name": "findAllDetailsWithCustomerTypeBYProductContext",
+          "description": "via ProductDocumentMasterRepository",
+          "daoClass": "in.novopay.masterdata.configuration.dao.ProductDocumentMasterRepository",
+          "sqlIdentifier": "findAllDetailsWithCustomerTypeBYProductContext",
+          "status": "healthy",
+          "sqlPreview": "SELECT pdm.document_type, pdcm.product_document_master_id, pdcm.customer_type, pdm.is_esign_required FROM product_document_master pdm JOIN product_document_master_mapping pdcm ON pdm.id = pdcm.product_document_master_id where pdm.product_context =?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=82.72..158.47 rows=14 width=37) (actual time=3.327..3.357 rows=13 loops=1)\n  Join Filter: (pdm.id = pdcm.product_document_master_id)\n  ->  Index Scan using product_document_master_product_context on product_document_master pdm  (cost=41.51..77.88 rows=43 width=29) (actual time=1.413..1.454 rows=43 loops=1)\n        Index Cond: ((product_context)::text = 'LOAN_JLG'::text)\n  ->  Index Scan using product_document_master_mapping_master_id_idx on product_document_master_mapping pdcm  (cost=41.21..80.56 rows=36 width=16) (actual time=1.760..1.771 rows=13 loops=1)\n        Index Cond: (product_document_master_id = ANY (ARRAY[pdm.id, $1, $2, ..., $1023]))\nPlanning Time: 11.122 ms\nExecution Time: 3.626 ms\nPeak Memory Usage: 569 kB"
+        },
+        {
+          "id": "masterdata-q-35",
+          "name": "findRelevantDetailsByProductContext",
+          "description": "via ProductDocumentMasterRepository",
+          "daoClass": "in.novopay.masterdata.configuration.dao.ProductDocumentMasterRepository",
+          "sqlIdentifier": "findRelevantDetailsByProductContext",
+          "status": "healthy",
+          "sqlPreview": "SELECT document_category, document_type, MAX(version) AS version, document_sub_category FROM product_document_master WHERE product_context = ?1 and is_deleted = FALSE AND (validity_start_date IS NULL OR CURRENT_DATE >= DATE(validity_start_date)) AND (validity_end_date IS NULL OR CURRENT_DATE <= DATE(validity_end_date)) GROUP BY document_category, document_type, document_Sub_Category;",
+          "explainPlan": "GroupAggregate  (cost=80.78..81.07 rows=12 width=50) (actual time=1.501..1.530 rows=41 loops=1)\n  Group Key: document_category, document_type, document_sub_category\n  ->  Sort  (cost=80.78..80.81 rows=14 width=50) (actual time=1.495..1.498 rows=41 loops=1)\n        Sort Key: document_category, document_type, document_sub_category\n        Sort Method: quicksort  Memory: 29kB\n        ->  Index Scan using product_document_master_product_context on product_document_master  (cost=41.51..80.51 rows=14 width=50) (actual time=1.339..1.402 rows=41 loops=1)\n              Index Cond: ((product_context)::text = 'LOAN_JLG'::text)\n              Storage Filter: (NOT is_deleted)\n              Filter: (((validity_start_date IS NULL) OR (CURRENT_DATE >= date(validity_start_date))) AND ((validity_end_date IS NULL) OR (CURRENT_DATE <= date(validity_end_date))))\nPlanning Time: 1.054 ms\nExecution Time: 1.651 ms\nPeak Memory Usage: 84 kB"
+        },
+        {
+          "id": "masterdata-q-36",
+          "name": "findRelevantDetailsByProductContextBasedOnDocumentCategoryAndDocumentSubCategory",
+          "description": "via ProductDocumentMasterRepository",
+          "daoClass": "in.novopay.masterdata.configuration.dao.ProductDocumentMasterRepository",
+          "sqlIdentifier": "findRelevantDetailsByProductContextBasedOnDocumentCategoryAndDocumentSubCategory",
+          "status": "healthy",
+          "sqlPreview": "SELECT document_category, document_type, MAX(version) AS version, document_sub_category FROM product_document_master WHERE product_context = ?1 and document_category =?2 and document_sub_category =?3 and is_deleted = FALSE AND (validity_start_date IS NULL OR CURRENT_DATE >= DATE(validity_start_date)) AND (validity_end_date IS NULL OR CURRENT_DATE <= DATE(validity_end_date)) GROUP BY document_category, document_type, document_sub_category;",
+          "explainPlan": "GroupAggregate  (cost=77.21..77.23 rows=1 width=50) (actual time=1.493..1.493 rows=0 loops=1)\n  Group Key: document_category, document_type, document_sub_category\n  ->  Sort  (cost=77.21..77.21 rows=1 width=50) (actual time=1.491..1.492 rows=0 loops=1)\n        Sort Key: document_type\n        Sort Method: quicksort  Memory: 25kB\n        ->  Index Scan using product_document_master_product_context on product_document_master  (cost=41.51..77.20 rows=1 width=50) (actual time=1.483..1.483 rows=0 loops=1)\n              Index Cond: ((product_context)::text = 'LOAN_JLG'::text)\n              Storage Filter: ((NOT is_deleted) AND ((document_category)::text = 'INDIVIDUAL_COMBINED'::text) AND ((document_sub_category)::text = 'Mixed'::text))\n              Filter: (((validity_start_date IS NULL) OR (CURRENT_DATE >= date(validity_start_date))) AND ((validity_end_date IS NULL) OR (CURRENT_DATE <= date(validity_end_date))))\nPlanning Time: 0.165 ms\nExecution Time: 1.590 ms\nPeak Memory Usage: 84 kB"
+        }
+      ]
+    },
+    {
+      "id": "pslmasterrepository-12514a",
+      "name": "PSLMasterRepository",
+      "daoClass": "in.novopay.masterdata.psl_master.PSLMasterRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-19",
+          "name": "findByProductCodeAndActivityAndSubActivity",
+          "description": "via PSLMasterRepository",
+          "daoClass": "in.novopay.masterdata.psl_master.PSLMasterRepository",
+          "sqlIdentifier": "findByProductCodeAndActivityAndSubActivity",
+          "status": "healthy",
+          "sqlPreview": "select * from psl_master where product_code=?1 AND activity=?2 AND sub_activity=?3;",
+          "explainPlan": "Index Scan using psl_master_product_code_activity_idx on psl_master  (cost=40.06..69.01 rows=1 width=215) (actual time=1.522..1.525 rows=1 loops=1)\n  Index Cond: (((product_code)::text = 'LOAN_JLG'::text) AND ((activity)::text = 'Agriculture'::text) AND ((sub_activity)::text = 'ANIMAL HUSBANDRY /  DAIRY'::text))\nPlanning Time: 0.172 ms\nExecution Time: 1.643 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "sliapkversionconfigurationrepository-b8da47",
+      "name": "SliApkVersionConfigurationRepository",
+      "daoClass": "in.novopay.masterdata.sliapkversion.datamodel.repository.SliApkVersionConfigurationRepository",
+      "moduleId": "masterdata",
+      "queries": [
+        {
+          "id": "masterdata-q-43",
+          "name": "getLatestVersionDetails",
+          "description": "via SliApkVersionConfigurationRepository",
+          "daoClass": "in.novopay.masterdata.sliapkversion.datamodel.repository.SliApkVersionConfigurationRepository",
+          "sqlIdentifier": "getLatestVersionDetails",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM sli_apk_version_configuration ORDER BY id DESC LIMIT 1;",
+          "explainPlan": "Limit  (cost=973.78..973.78 rows=1 width=915) (actual time=0.559..0.559 rows=0 loops=1)\n  ->  Sort  (cost=973.78..976.28 rows=1000 width=915) (actual time=0.558..0.558 rows=0 loops=1)\n        Sort Key: id DESC\n        Sort Method: quicksort  Memory: 25kB\n        ->  Seq Scan on sli_apk_version_configuration  (cost=40.00..968.78 rows=1000 width=915) (actual time=0.550..0.550 rows=0 loops=1)\nPlanning Time: 9.401 ms\nExecution Time: 0.650 ms\nPeak Memory Usage: 36 kB"
+        }
+      ]
+    }
+  ]
+}

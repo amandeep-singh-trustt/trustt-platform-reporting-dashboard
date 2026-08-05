@@ -1,0 +1,201 @@
+{
+  "generatedAt": "2026-08-04T00:00:00Z",
+  "module": {
+    "id": "notifications",
+    "name": "Notifications"
+  },
+  "summary": {
+    "id": "notifications",
+    "name": "Notifications",
+    "daoGroupCount": 8,
+    "queryCount": 12,
+    "explainedCount": 12,
+    "needsReviewCount": 0
+  },
+  "daoGroups": [
+    {
+      "id": "appnotificationlogrepository-ffb722",
+      "name": "AppNotificationLogRepository",
+      "daoClass": "in.novopay.notifications.alerts.repository.AppNotificationLogRepository",
+      "moduleId": "notifications",
+      "queries": [
+        {
+          "id": "notifications-q-10",
+          "name": "getNotificationsByUserId",
+          "description": "via AppNotificationLogRepository",
+          "daoClass": "in.novopay.notifications.alerts.repository.AppNotificationLogRepository",
+          "sqlIdentifier": "getNotificationsByUserId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM app_notification_log WHERE user_id = :userId AND is_deleted IS FALSE order by created_on desc;",
+          "explainPlan": "Index Scan using app_notification_log_user_id_idx on app_notification_log  (cost=40.19..73.86 rows=5 width=277) (actual time=1.212..1.225 rows=8 loops=1)\n  Index Cond: ((user_id)::text = '44'::text)\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.120 ms\nExecution Time: 1.304 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "notifications-q-11",
+          "name": "findOldestNotificationLogsByUserId",
+          "description": "via AppNotificationLogRepository",
+          "daoClass": "in.novopay.notifications.alerts.repository.AppNotificationLogRepository",
+          "sqlIdentifier": "findOldestNotificationLogsByUserId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM app_notification_log WHERE user_id = :userId AND is_deleted = false ORDER BY id ASC LIMIT :numberOfRecords;",
+          "explainPlan": "Limit  (cost=73.96..73.97 rows=5 width=277) (actual time=1.318..1.321 rows=8 loops=1)\n  ->  Sort  (cost=73.96..73.97 rows=5 width=277) (actual time=1.317..1.318 rows=8 loops=1)\n        Sort Key: id\n        Sort Method: quicksort  Memory: 27kB\n        ->  Index Scan using app_notification_log_user_id_idx on app_notification_log  (cost=40.19..73.90 rows=5 width=277) (actual time=1.290..1.305 rows=8 loops=1)\n              Index Cond: ((user_id)::text = '44'::text)\n              Storage Filter: (NOT is_deleted)\nPlanning Time: 0.140 ms\nExecution Time: 1.408 ms\nPeak Memory Usage: 52 kB"
+        },
+        {
+          "id": "notifications-q-12",
+          "name": "getNotificationsCount",
+          "description": "via AppNotificationLogRepository",
+          "daoClass": "in.novopay.notifications.alerts.repository.AppNotificationLogRepository",
+          "sqlIdentifier": "getNotificationsCount",
+          "status": "healthy",
+          "sqlPreview": "SELECT COUNT(1) FROM app_notification_log WHERE user_id = ?1 AND is_deleted IS FALSE;",
+          "explainPlan": "Aggregate  (cost=72.57..72.58 rows=1 width=8) (actual time=1.205..1.205 rows=1 loops=1)\n  ->  Index Scan using app_notification_log_user_id_idx on app_notification_log  (cost=40.19..72.55 rows=5 width=0) (actual time=1.185..1.196 rows=8 loops=1)\n        Index Cond: ((user_id)::text = '44'::text)\n        Filter: (is_deleted IS FALSE)\nPlanning Time: 0.112 ms\nExecution Time: 1.308 ms\nPeak Memory Usage: 25 kB"
+        }
+      ]
+    },
+    {
+      "id": "apptemplaterepository-9f9e3b",
+      "name": "AppTemplateRepository",
+      "daoClass": "in.novopay.notifications.repository.AppTemplateRepository",
+      "moduleId": "notifications",
+      "queries": [
+        {
+          "id": "notifications-q-7",
+          "name": "findByNotificationCode",
+          "description": "via AppTemplateRepository",
+          "daoClass": "in.novopay.notifications.repository.AppTemplateRepository",
+          "sqlIdentifier": "findByNotificationCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM app_template WHERE notification_code = ?1 AND is_deleted IS FALSE;",
+          "explainPlan": "Index Scan using app_template_notification_code_key on app_template  (cost=40.04..68.66 rows=1 width=104) (actual time=1.079..1.082 rows=1 loops=1)\n  Index Cond: ((notification_code)::text = 'APP_LOS-GEN-0023'::text)\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.097 ms\nExecution Time: 1.168 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "codenotificationcodemappingrepository-e31173",
+      "name": "CodeNotificationCodeMappingRepository",
+      "daoClass": "in.novopay.notifications.dao.CodeNotificationCodeMappingRepository",
+      "moduleId": "notifications",
+      "queries": [
+        {
+          "id": "notifications-q-3",
+          "name": "getEntityByCode",
+          "description": "via CodeNotificationCodeMappingRepository",
+          "daoClass": "in.novopay.notifications.dao.CodeNotificationCodeMappingRepository",
+          "sqlIdentifier": "getEntityByCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT * from code__notification_code__mapping WHERE code=?1;",
+          "explainPlan": "Index Scan using code__notification_code__mapping_code_key on code__notification_code__mapping  (cost=40.03..68.69 rows=1 width=65) (actual time=1.191..1.193 rows=1 loops=1)\n  Index Cond: ((code)::text = 'COL-3123'::text)\nPlanning Time: 0.109 ms\nExecution Time: 1.260 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "emailtemplaterepository-e9e3ec",
+      "name": "EmailTemplateRepository",
+      "daoClass": "in.novopay.notifications.email.repository.EmailTemplateRepository",
+      "moduleId": "notifications",
+      "queries": [
+        {
+          "id": "notifications-q-8",
+          "name": "findByTemplateCode",
+          "description": "via EmailTemplateRepository",
+          "daoClass": "in.novopay.notifications.email.repository.EmailTemplateRepository",
+          "sqlIdentifier": "findByTemplateCode",
+          "status": "healthy",
+          "sqlPreview": "select * from email_template where template_code=?1;",
+          "explainPlan": "Seq Scan on email_template  (cost=40.00..863.97 rows=1 width=79) (actual time=0.770..0.772 rows=1 loops=1)\n  Storage Filter: ((template_code)::text = 'COLL-CN-GEN-RECPT-EMAIL-SO'::text)\nPlanning Time: 0.063 ms\nExecution Time: 0.830 ms\nPeak Memory Usage: 0 kB"
+        }
+      ]
+    },
+    {
+      "id": "notificationmessagerepository-5de041",
+      "name": "NotificationMessageRepository",
+      "daoClass": "in.novopay.notifications.dao.NotificationMessageRepository",
+      "moduleId": "notifications",
+      "queries": [
+        {
+          "id": "notifications-q-1",
+          "name": "getEntityByCodeAndLocale",
+          "description": "via NotificationMessageRepository",
+          "daoClass": "in.novopay.notifications.dao.NotificationMessageRepository",
+          "sqlIdentifier": "getEntityByCodeAndLocale",
+          "status": "healthy",
+          "sqlPreview": "SELECT * from notification_message WHERE code=?1 AND locale=?2;",
+          "explainPlan": "Index Scan using notification_message_locale_code_key on notification_message  (cost=40.04..68.73 rows=1 width=125) (actual time=1.252..1.255 rows=1 loops=1)\n  Index Cond: (((locale)::text = 'en-in'::text) AND ((code)::text = ''::text))\nPlanning Time: 0.119 ms\nExecution Time: 1.350 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "notifications-q-2",
+          "name": "findNotificationMessageByResponseCodeAndLocale",
+          "description": "via NotificationMessageRepository",
+          "daoClass": "in.novopay.notifications.dao.NotificationMessageRepository",
+          "sqlIdentifier": "findNotificationMessageByResponseCodeAndLocale",
+          "status": "healthy",
+          "sqlPreview": "SELECT nm.message from code__notification_code__mapping r join notification_message nm on r.notification_code=nm.code WHERE r.code=?1 AND nm.locale=?2;",
+          "explainPlan": "Nested Loop  (cost=80.08..137.30 rows=1 width=66) (actual time=2.246..2.250 rows=1 loops=1)\n  ->  Index Scan using code__notification_code__mapping_code_key on code__notification_code__mapping r  (cost=40.03..68.62 rows=1 width=10) (actual time=0.995..0.998 rows=1 loops=1)\n        Index Cond: ((code)::text = 'COL-3123'::text)\n  ->  Index Scan using notification_message_locale_code_key on notification_message nm  (cost=40.04..68.67 rows=1 width=79) (actual time=1.246..1.246 rows=1 loops=1)\n        Index Cond: (((locale)::text = 'en-in'::text) AND ((code)::text = (r.notification_code)::text))\nPlanning Time: 0.358 ms\nExecution Time: 2.346 ms\nPeak Memory Usage: 24 kB"
+        }
+      ]
+    },
+    {
+      "id": "otpconfigrepository-d99bf6",
+      "name": "OTPConfigRepository",
+      "daoClass": "in.novopay.notifications.otp.repository.OTPConfigRepository",
+      "moduleId": "notifications",
+      "queries": [
+        {
+          "id": "notifications-q-9",
+          "name": "findOneByScenario",
+          "description": "via OTPConfigRepository",
+          "daoClass": "in.novopay.notifications.otp.repository.OTPConfigRepository",
+          "sqlIdentifier": "findOneByScenario",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM otp_config WHERE scenario = ?1 AND is_deleted = false;",
+          "explainPlan": "Seq Scan on otp_config  (cost=40.00..861.37 rows=1 width=93) (actual time=0.609..0.610 rows=1 loops=1)\n  Storage Filter: ((NOT is_deleted) AND ((scenario)::text = 'verifyMobileNumber'::text))\nPlanning Time: 0.077 ms\nExecution Time: 0.680 ms\nPeak Memory Usage: 15 kB"
+        }
+      ]
+    },
+    {
+      "id": "smslogrepository-d870fa",
+      "name": "SmsLogRepository",
+      "daoClass": "in.novopay.notifications.sms.repository.SmsLogRepository",
+      "moduleId": "notifications",
+      "queries": [
+        {
+          "id": "notifications-q-4",
+          "name": "findByMsisdnForOTP",
+          "description": "via SmsLogRepository",
+          "daoClass": "in.novopay.notifications.sms.repository.SmsLogRepository",
+          "sqlIdentifier": "findByMsisdnForOTP",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM sms_log WHERE msisdn=?1 AND message LIKE '%OTP%' ORDER BY sent_on DESC;",
+          "explainPlan": "Sort  (cost=32491.14..32491.35 rows=84 width=255) (actual time=757.586..757.586 rows=2 loops=1)\n  Sort Key: sent_on DESC\n  Sort Method: quicksort  Memory: 26kB\n  ->  Seq Scan on sms_log  (cost=40.00..32488.46 rows=84 width=255) (actual time=757.569..757.573 rows=2 loops=1)\n        Storage Filter: (((message)::text ~~ '%OTP%'::text) AND ((msisdn)::text = '6669657074'::text))\nPlanning Time: 0.190 ms\nExecution Time: 757.673 ms\nPeak Memory Usage: 36 kB"
+        }
+      ]
+    },
+    {
+      "id": "userfcmdetailsrepository-0c1282",
+      "name": "UserFCMDetailsRepository",
+      "daoClass": "in.novopay.notifications.repository.UserFCMDetailsRepository",
+      "moduleId": "notifications",
+      "queries": [
+        {
+          "id": "notifications-q-5",
+          "name": "findAllByUserIdList",
+          "description": "via UserFCMDetailsRepository",
+          "daoClass": "in.novopay.notifications.repository.UserFCMDetailsRepository",
+          "sqlIdentifier": "findAllByUserIdList",
+          "status": "healthy",
+          "sqlPreview": "SELECT fcm_token FROM user_fcm_details WHERE user_id IN (?1);",
+          "explainPlan": "Index Scan using user_fcm_details_user_id_idx on user_fcm_details  (cost=40.17..70.11 rows=5 width=148) (actual time=1.190..1.194 rows=3 loops=1)\n  Index Cond: (user_id = ANY ('{38,29315,29315}'::bigint[]))\nPlanning Time: 1.248 ms\nExecution Time: 1.279 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "notifications-q-6",
+          "name": "findOneByUserId",
+          "description": "via UserFCMDetailsRepository",
+          "daoClass": "in.novopay.notifications.repository.UserFCMDetailsRepository",
+          "sqlIdentifier": "findOneByUserId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM user_fcm_details WHERE user_id = ?1 AND channel_code = ?2 AND is_deleted = false;",
+          "explainPlan": "Index Scan using user_fcm_details_user_id_idx on user_fcm_details  (cost=40.03..68.69 rows=1 width=173) (actual time=1.117..1.119 rows=1 loops=1)\n  Index Cond: (user_id = 38)\n  Storage Filter: ((NOT is_deleted) AND ((channel_code)::text = 'ANDROID'::text))\nPlanning Time: 0.135 ms\nExecution Time: 1.197 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    }
+  ]
+}

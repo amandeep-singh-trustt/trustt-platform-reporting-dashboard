@@ -1,0 +1,81 @@
+{
+  "generatedAt": "2026-08-04T00:00:00Z",
+  "module": {
+    "id": "gateway",
+    "name": "Gateway"
+  },
+  "summary": {
+    "id": "gateway",
+    "name": "Gateway",
+    "daoGroupCount": 3,
+    "queryCount": 4,
+    "explainedCount": 3,
+    "needsReviewCount": 1
+  },
+  "daoGroups": [
+    {
+      "id": "apiratelimiterfilter-572807",
+      "name": "APIRateLimiterFilter",
+      "daoClass": "in.novopay.apigateway.filter.APIRateLimiterFilter",
+      "moduleId": "gateway",
+      "queries": [
+        {
+          "id": "gateway-q-1",
+          "name": "Field APIRateLimiterFilter.SELECT_QUERY",
+          "description": "via APIRateLimiterFilter",
+          "daoClass": "in.novopay.apigateway.filter.APIRateLimiterFilter",
+          "sqlIdentifier": "Field APIRateLimiterFilter.SELECT_QUERY",
+          "status": "needs-review",
+          "sqlPreview": "select api_rate_limit, duration_in_seconds from api_master where name = ?;",
+          "reviewReason": "could not resolve column 'name' (table/alias/column unknown)"
+        }
+      ]
+    },
+    {
+      "id": "apiusecasemappingrepository-d92880",
+      "name": "APIUsecaseMappingRepository",
+      "daoClass": "in.novopay.apigateway.repository.APIUsecaseMappingRepository",
+      "moduleId": "gateway",
+      "queries": [
+        {
+          "id": "gateway-q-2",
+          "name": "findOneByApiNameAndFunctionCodeAndFunctionSubCode",
+          "description": "via APIUsecaseMappingRepository",
+          "daoClass": "in.novopay.apigateway.repository.APIUsecaseMappingRepository",
+          "sqlIdentifier": "findOneByApiNameAndFunctionCodeAndFunctionSubCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM api_usecase_mapping WHERE api_name = ?1 AND function_code = ?2 AND function_sub_code = ?3;",
+          "explainPlan": "Index Scan using api_usecase_mapping_function_code_api_name_function_sub_cod_key on api_usecase_mapping  (cost=40.06..68.66 rows=1 width=65) (actual time=1.120..1.123 rows=1 loops=1)\n  Index Cond: (((function_code)::text = 'VALIDATE'::text) AND ((api_name)::text = 'loanDisbursementCancellation'::text) AND ((function_sub_code)::text = 'DEFAULT'::text))\nPlanning Time: 0.131 ms\nExecution Time: 1.222 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "sessionrepository-ff6c63",
+      "name": "SessionRepository",
+      "daoClass": "in.novopay.apigateway.repository.SessionRepository",
+      "moduleId": "gateway",
+      "queries": [
+        {
+          "id": "gateway-q-3",
+          "name": "findOneByUserId",
+          "description": "via SessionRepository",
+          "daoClass": "in.novopay.apigateway.repository.SessionRepository",
+          "sqlIdentifier": "findOneByUserId",
+          "status": "healthy",
+          "sqlPreview": "select * from session where user_id=?1 and 1=1;",
+          "explainPlan": "Index Scan using unique_user_id_idx on session  (cost=40.03..68.57 rows=1 width=70) (actual time=1.024..1.027 rows=1 loops=1)\n  Index Cond: (user_id = 46)\nPlanning Time: 0.113 ms\nExecution Time: 1.114 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "gateway-q-4",
+          "name": "findOneByToken",
+          "description": "via SessionRepository",
+          "daoClass": "in.novopay.apigateway.repository.SessionRepository",
+          "sqlIdentifier": "findOneByToken",
+          "status": "healthy",
+          "sqlPreview": "select * from session where token = ?1 and 1=1;",
+          "explainPlan": "Index Scan using session_token on session  (cost=40.06..68.60 rows=1 width=70) (actual time=1.282..1.287 rows=1 loops=1)\n  Index Cond: ((token)::text = 'f362b212-35f2-4aba-95db-72687b028c45'::text)\nPlanning Time: 0.104 ms\nExecution Time: 1.366 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    }
+  ]
+}

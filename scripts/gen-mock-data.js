@@ -2,6 +2,7 @@
 // ponytail: one-shot CSV->JSON generator, run manually when the source CSV or explain output changes. Not wired into build.
 const fs = require('fs');
 const path = require('path');
+const { parseCsv, loadExplainByIndex, loadReviewByKey } = require('./lib/pipeline-csv');
 
 const CSV_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/cleaned/reporting-reports.csv';
 const EXPLAIN_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/output/reporting-reports-explain.csv';
@@ -9,27 +10,6 @@ const REVIEW_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/output
 const DB_OBJECT_DEFS_PATH = '/home/disk2/workspace/amandeep/oltp_queries/pipeline/output/db-object-definitions.json';
 const OUT_PATH = path.join(__dirname, '..', 'public', 'assets', 'mock-data.json');
 const DB_OBJECT_DEFS_OUT_PATH = path.join(__dirname, '..', 'public', 'assets', 'db-object-definitions.json');
-
-function parseCsv(text) {
-  const rows = [];
-  let field = '', row = [], inQuotes = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (inQuotes) {
-      if (c === '"') {
-        if (text[i + 1] === '"') { field += '"'; i++; } else { inQuotes = false; }
-      } else field += c;
-    } else {
-      if (c === '"') inQuotes = true;
-      else if (c === ',') { row.push(field); field = ''; }
-      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
-      else if (c === '\r') { /* skip */ }
-      else field += c;
-    }
-  }
-  if (field.length || row.length) { row.push(field); rows.push(row); }
-  return rows;
-}
 
 const CATEGORY_RULES = [
   { key: 'eod-bod', name: 'EOD/BOD Reports', match: /\b(ALM|GL BALANCE|GL TRANSACTIONS|trial balance|Audit Monthly|End to End Tat)\b/i },
@@ -45,34 +25,6 @@ function categoryFor(jobName) {
 
 function slugify(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-}
-
-// --- explain / needs-review lookups (optional — pipeline may not have run yet) ---
-
-function loadExplainByIndex(csvPath) {
-  const map = new Map();
-  if (!fs.existsSync(csvPath)) return map;
-  const rows = parseCsv(fs.readFileSync(csvPath, 'utf8')).filter((r) => r.length >= 2);
-  for (let i = 1; i < rows.length; i += 2) {
-    const label = rows[i][0] || '';
-    const m = /^Query (\d+)$/.exec(label);
-    if (!m) continue;
-    const planRow = rows[i + 1];
-    if (!planRow || planRow[0] !== 'Explain Plan') continue;
-    map.set(Number(m[1]), planRow[1]);
-  }
-  return map;
-}
-
-function loadReviewByKey(csvPath) {
-  const map = new Map();
-  if (!fs.existsSync(csvPath)) return map;
-  const rows = parseCsv(fs.readFileSync(csvPath, 'utf8')).filter((r) => r.length >= 4);
-  for (let i = 1; i < rows.length; i++) {
-    const [dao, method, , reason] = rows[i];
-    map.set(`${dao}||${method}`, reason);
-  }
-  return map;
 }
 
 const explainByIndex = loadExplainByIndex(EXPLAIN_PATH);

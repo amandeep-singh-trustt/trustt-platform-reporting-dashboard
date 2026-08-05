@@ -53,3 +53,32 @@ export interface QueryContext {
   job: ReportingJob;
   category: ReportingCategory;
 }
+
+export interface OltpDaoGroup {
+  id: string;
+  name: string;
+  daoClass: string;
+  moduleId: string;
+  queries: SqlQuery[];
+}
+
+export interface OltpModuleSummary {
+  id: string;
+  name: string;
+  daoGroupCount: number;
+  queryCount: number;
+  explainedCount: number;
+  needsReviewCount: number;
+}
+
+export interface OltpModule {
+  generatedAt: string;
+  module: { id: string; name: string };
+  summary: OltpModuleSummary;
+  daoGroups: OltpDaoGroup[];
+}
+
+export interface OltpIndex {
+  generatedAt: string;
+  modules: OltpModuleSummary[];
+}

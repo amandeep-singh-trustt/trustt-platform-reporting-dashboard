@@ -6,13 +6,13 @@
   [class.w-16]="layout.sidebarCollapsed()"
 >
   <nav class="flex-1 px-2.5 py-4 space-y-1">
-    @for (item of navItems; track item.path) {
+    @for (item of navItems(); track item.path) {
       <a
         [routerLink]="item.path"
         (click)="$event.stopPropagation()"
         routerLinkActive
         #rla="routerLinkActive"
-        [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+        [routerLinkActiveOptions]="{ exact: item.path === '/' || item.path === '/oltp' }"
         [title]="layout.sidebarCollapsed() ? item.label : ''"
         class="relative flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors cursor-pointer"
         [class]="rla.isActive
@@ -32,7 +32,7 @@
 
   @if (!layout.sidebarCollapsed()) {
     <div class="border-t border-slate-200 dark:border-slate-800 px-4 py-3 text-xs text-slate-400">
-      AiTDP Reporting · Phase 1
+      AiTDP Queries · Phase 1
     </div>
   }
 </aside>

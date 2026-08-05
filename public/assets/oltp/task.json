@@ -1,0 +1,1119 @@
+{
+  "generatedAt": "2026-08-04T00:00:00Z",
+  "module": {
+    "id": "task",
+    "name": "Task"
+  },
+  "summary": {
+    "id": "task",
+    "name": "Task",
+    "daoGroupCount": 19,
+    "queryCount": 95,
+    "explainedCount": 90,
+    "needsReviewCount": 5
+  },
+  "daoGroups": [
+    {
+      "id": "entityfieldrepository-77e47b",
+      "name": "EntityFieldRepository",
+      "daoClass": "in.novopay.task.defn.datamodel.repository.EntityFieldRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-10",
+          "name": "findByEntityId",
+          "description": "via EntityFieldRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.EntityFieldRepository",
+          "sqlIdentifier": "findByEntityId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM entity_field WHERE entity_id = ?1 AND is_deleted IS FALSE;",
+          "explainPlan": "Index Scan using entity_field_entity_id on entity_field  (cost=40.02..68.45 rows=2 width=511) (actual time=1.796..1.797 rows=0 loops=1)\n  Index Cond: (entity_id = 0)\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.263 ms\nExecution Time: 1.976 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "lostasklistcountrowmapper-c21bf5",
+      "name": "LosTaskListCountRowMapper",
+      "daoClass": "in.novopay.task.mfi.repository.LosTaskListCountRowMapper",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-2",
+          "name": "Field LosTaskListCountRowMapper.SELECT_QUERY",
+          "description": "via LosTaskListCountRowMapper",
+          "daoClass": "in.novopay.task.mfi.repository.LosTaskListCountRowMapper",
+          "sqlIdentifier": "Field LosTaskListCountRowMapper.SELECT_QUERY",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(t.id) as task_count FROM task t;",
+          "explainPlan": "Finalize Aggregate  (cost=27526.14..27526.15 rows=1 width=8) (actual time=411.042..411.043 rows=1 loops=1)\n  ->  Seq Scan on task t  (cost=40.00..26990.99 rows=214060 width=8) (actual time=411.030..411.033 rows=1 loops=1)\n        Partial Aggregate: true\nPlanning Time: 0.091 ms\nExecution Time: 411.159 ms\nPeak Memory Usage: 24 kB"
+        }
+      ]
+    },
+    {
+      "id": "notifyusersforpendingtasksjobprocessor-6f1464",
+      "name": "NotifyUsersForPendingTasksJobProcessor",
+      "daoClass": "in.novopay.batch.job.NotifyUsersForPendingTasksJobProcessor",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-95",
+          "name": "Field NotifyUsersForPendingTasksJobProcessor.PARTITIONER_DATA_QUERY",
+          "description": "via NotifyUsersForPendingTasksJobProcessor",
+          "daoClass": "in.novopay.batch.job.NotifyUsersForPendingTasksJobProcessor",
+          "sqlIdentifier": "Field NotifyUsersForPendingTasksJobProcessor.PARTITIONER_DATA_QUERY",
+          "status": "healthy",
+          "sqlPreview": "select id from task where task_type_id in (select task_type_id from task_escalation_notification_details where is_deleted IS FALSE) and current_status = 'ASSIGNED' and is_deleted IS FALSE;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=949.08..2015.98 rows=2155 width=8) (actual time=6.347..6.554 rows=119 loops=1)\n  Join Filter: (task.task_type_id = task_escalation_notification_details.task_type_id)\n  ->  HashAggregate  (cost=861.43..861.50 rows=7 width=8) (actual time=0.858..0.859 rows=7 loops=1)\n        Group Key: task_escalation_notification_details.task_type_id\n        ->  Seq Scan on task_escalation_notification_details  (cost=40.00..861.41 rows=7 width=8) (actual time=0.846..0.849 rows=7 loops=1)\n              Filter: (is_deleted IS FALSE)\n  ->  Index Scan using idx_task_task_type_id_identifier on task  (cost=87.66..1154.29 rows=2155 width=16) (actual time=5.413..5.515 rows=119 loops=1)\n        Index Cond: (task_type_id = ANY (ARRAY[task_escalation_notification_details.task_type_id, $1, $2, ..., $1023]))\n        Storage Filter: ((current_status)::text = 'ASSIGNED'::text)\nPlanning Time: 0.900 ms\nExecution Time: 6.815 ms\nPeak Memory Usage: 516 kB"
+        }
+      ]
+    },
+    {
+      "id": "taskactivityrepository-b32a96",
+      "name": "TaskActivityRepository",
+      "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskActivityRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-88",
+          "name": "findAllByTaskIdAndActivityType",
+          "description": "via TaskActivityRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskActivityRepository",
+          "sqlIdentifier": "findAllByTaskIdAndActivityType",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_activity WHERE task_id IN (?1) AND activity_type = ?2 ORDER BY activity_time ASC;",
+          "explainPlan": "Sort  (cost=43071.12..43071.13 rows=4 width=448) (actual time=770.703..770.703 rows=3 loops=1)\n  Sort Key: activity_time\n  Sort Method: quicksort  Memory: 25kB\n  ->  Seq Scan on task_activity  (cost=40.00..43071.08 rows=4 width=448) (actual time=770.685..770.689 rows=3 loops=1)\n        Storage Filter: (((activity_type)::text = 'Assigned'::text) AND (task_id = ANY ('{1854,7123,9403}'::bigint[])))\nPlanning Time: 0.113 ms\nExecution Time: 770.783 ms\nPeak Memory Usage: 36 kB"
+        },
+        {
+          "id": "task-q-89",
+          "name": "findAllByTaskId",
+          "description": "via TaskActivityRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskActivityRepository",
+          "sqlIdentifier": "findAllByTaskId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_activity WHERE task_id = ?1 ORDER BY activity_time ASC;",
+          "explainPlan": "Sort  (cost=37487.17..37487.18 rows=3 width=448) (actual time=629.501..629.501 rows=5 loops=1)\n  Sort Key: activity_time\n  Sort Method: quicksort  Memory: 25kB\n  ->  Seq Scan on task_activity  (cost=40.00..37487.15 rows=3 width=448) (actual time=629.481..629.485 rows=5 loops=1)\n        Storage Filter: (task_id = 1854)\nPlanning Time: 0.074 ms\nExecution Time: 629.577 ms\nPeak Memory Usage: 36 kB"
+        },
+        {
+          "id": "task-q-90",
+          "name": "findByTaskIdAndActivityType",
+          "description": "via TaskActivityRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskActivityRepository",
+          "sqlIdentifier": "findByTaskIdAndActivityType",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_activity ta WHERE task_id = ?1 AND activity_type IN ?2 limit 1;",
+          "explainPlan": "Limit  (cost=40.00..21555.16 rows=1 width=448) (actual time=0.681..0.681 rows=1 loops=1)\n  ->  Seq Scan on task_activity ta  (cost=40.00..43070.32 rows=2 width=448) (actual time=0.679..0.679 rows=1 loops=1)\n        Storage Filter: ((task_id = 1854) AND ((activity_type)::text = ANY ('{Assigned,Complete,Complete}'::text[])))\nPlanning Time: 0.077 ms\nExecution Time: 0.740 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-91",
+          "name": "findByTaskIdAndActivityType",
+          "description": "via TaskActivityRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskActivityRepository",
+          "sqlIdentifier": "findByTaskIdAndActivityType",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_activity ta WHERE task_id = ?1 AND activity_type = ?2 limit 1;",
+          "explainPlan": "Limit  (cost=40.00..42449.55 rows=1 width=448) (actual time=0.808..0.809 rows=1 loops=1)\n  ->  Seq Scan on task_activity ta  (cost=40.00..42449.55 rows=1 width=448) (actual time=0.807..0.807 rows=1 loops=1)\n        Storage Filter: ((task_id = 1854) AND ((activity_type)::text = 'Assigned'::text))\nPlanning Time: 0.087 ms\nExecution Time: 0.874 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "taskattributesrepository-dcef73",
+      "name": "TaskAttributesRepository",
+      "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskAttributesRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-39",
+          "name": "findOneByTaskIdAndKey",
+          "description": "via TaskAttributesRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskAttributesRepository",
+          "sqlIdentifier": "findOneByTaskIdAndKey",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_attributes WHERE prop_key = ?1 AND task_id = ?2 AND is_deleted IS FALSE;",
+          "explainPlan": "Index Scan using task_attributes_task_id on task_attributes  (cost=40.54..71.74 rows=1 width=69) (actual time=2.364..2.368 rows=1 loops=1)\n  Index Cond: (task_id = 3798950)\n  Storage Filter: ((prop_key)::text = 'STAGE_2'::text)\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.128 ms\nExecution Time: 2.466 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-40",
+          "name": "getTaskAttributesByKeyAndId",
+          "description": "via TaskAttributesRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskAttributesRepository",
+          "sqlIdentifier": "getTaskAttributesByKeyAndId",
+          "status": "healthy",
+          "sqlPreview": "SELECT prop_key, prop_value FROM task_attributes WHERE prop_key in ?1 AND task_id = ?2 AND is_deleted IS FALSE;",
+          "explainPlan": "Index Scan using task_attributes_task_id on task_attributes  (cost=40.54..71.80 rows=2 width=52) (actual time=1.446..1.452 rows=4 loops=1)\n  Index Cond: (task_id = 3798950)\n  Storage Filter: ((prop_key)::text = ANY ('{STAGE_2,FORECLOSURE_FINAL_SUBMISSION_TASK_APPROVE_ID,CUSTOMER_NAME}'::text[]))\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.208 ms\nExecution Time: 1.547 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "taskdelegationapiexecutionrepository-bc1885",
+      "name": "TaskDelegationAPIExecutionRepository",
+      "daoClass": "in.novopay.task.mfi.delegation.repo.TaskDelegationAPIExecutionRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-8",
+          "name": "getApiListForTaskCodes",
+          "description": "via TaskDelegationAPIExecutionRepository",
+          "daoClass": "in.novopay.task.mfi.delegation.repo.TaskDelegationAPIExecutionRepository",
+          "sqlIdentifier": "getApiListForTaskCodes",
+          "status": "healthy",
+          "sqlPreview": "select * from task_delegation_api_execution where task_code in ?1 and is_deleted is false;",
+          "explainPlan": "Seq Scan on task_delegation_api_execution  (cost=40.00..861.91 rows=3 width=87) (actual time=0.969..0.974 rows=3 loops=1)\n  Storage Filter: ((task_code)::text = ANY ('{COLL_CALL_BACK,COLL_SUPERVISOR_REVIEW_ZH,COLL_RAISE_LEGAL_ACTION}'::text[]))\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 1.740 ms\nExecution Time: 1.094 ms\nPeak Memory Usage: 14 kB"
+        }
+      ]
+    },
+    {
+      "id": "taskdelegationdetailsrepository-41130a",
+      "name": "TaskDelegationDetailsRepository",
+      "daoClass": "in.novopay.task.mfi.delegation.repo.TaskDelegationDetailsRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-3",
+          "name": "findByTaskDelegationId",
+          "description": "via TaskDelegationDetailsRepository",
+          "daoClass": "in.novopay.task.mfi.delegation.repo.TaskDelegationDetailsRepository",
+          "sqlIdentifier": "findByTaskDelegationId",
+          "status": "healthy",
+          "sqlPreview": "SELECT tdd.task_id as task_id,tdd.to_employee_id as to_employee_id FROM task_delegation_details tdd inner join task t on tdd.task_id = t.id and t.is_deleted IS FALSE and t.current_status = 'ASSIGNED' WHERE task_delegation_id = ?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=60.39..1231.54 rows=45 width=16) (actual time=14.837..15.413 rows=236 loops=1)\n  Join Filter: (tdd.task_id = t.id)\n  ->  Seq Scan on task_delegation_details tdd  (cost=40.00..1024.65 rows=242 width=16) (actual time=5.844..5.918 rows=242 loops=1)\n        Storage Filter: (task_delegation_id = 17856)\n  ->  Index Scan using task_pkey on task t  (cost=20.39..70.76 rows=45 width=8) (actual time=8.625..8.886 rows=236 loops=1)\n        Index Cond: (id = ANY (ARRAY[tdd.task_id, $1, $2, ..., $1023]))\n        Storage Filter: ((current_status)::text = 'ASSIGNED'::text)\n        Filter: (is_deleted IS FALSE)\nPlanning Time: 2.780 ms\nExecution Time: 15.800 ms\nPeak Memory Usage: 587 kB"
+        },
+        {
+          "id": "task-q-4",
+          "name": "findAllByTaskDelegationId",
+          "description": "via TaskDelegationDetailsRepository",
+          "daoClass": "in.novopay.task.mfi.delegation.repo.TaskDelegationDetailsRepository",
+          "sqlIdentifier": "findAllByTaskDelegationId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_delegation_details WHERE task_delegation_id = ?1;",
+          "explainPlan": "Seq Scan on task_delegation_details  (cost=40.00..1107.55 rows=242 width=368) (actual time=5.544..5.804 rows=242 loops=1)\n  Storage Filter: (task_delegation_id = 17856)\nPlanning Time: 0.093 ms\nExecution Time: 5.953 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-5",
+          "name": "findByStatus",
+          "description": "via TaskDelegationDetailsRepository",
+          "daoClass": "in.novopay.task.mfi.delegation.repo.TaskDelegationDetailsRepository",
+          "sqlIdentifier": "findByStatus",
+          "status": "needs-review",
+          "sqlPreview": "SELECT * FROM task_delegation_details tdd JOIN task_delegation td ON tdd.task_delegation_id = td.id WHERE status = ?1;",
+          "reviewReason": "could not resolve column 'status' (table/alias/column unknown)"
+        },
+        {
+          "id": "task-q-6",
+          "name": "findByLoanAppIds",
+          "description": "via TaskDelegationDetailsRepository",
+          "daoClass": "in.novopay.task.mfi.delegation.repo.TaskDelegationDetailsRepository",
+          "sqlIdentifier": "findByLoanAppIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_delegation_details WHERE loan_app_id IN ?1;",
+          "explainPlan": "Seq Scan on task_delegation_details  (cost=40.00..1036.97 rows=36 width=368) (actual time=4.956..4.998 rows=36 loops=1)\n  Storage Filter: (loan_app_id = ANY ('{24018,665,4268}'::bigint[]))\nPlanning Time: 1.598 ms\nExecution Time: 5.100 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-7",
+          "name": "findByGroupIds",
+          "description": "via TaskDelegationDetailsRepository",
+          "daoClass": "in.novopay.task.mfi.delegation.repo.TaskDelegationDetailsRepository",
+          "sqlIdentifier": "findByGroupIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_delegation_details WHERE group_id IN ?1;",
+          "explainPlan": "Seq Scan on task_delegation_details  (cost=40.00..1075.09 rows=143 width=368) (actual time=6.090..6.253 rows=143 loops=1)\n  Storage Filter: (group_id = ANY ('{6196,112,114}'::bigint[]))\nPlanning Time: 0.095 ms\nExecution Time: 6.358 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "taskdelegationrepository-87f95e",
+      "name": "TaskDelegationRepository",
+      "daoClass": "in.novopay.task.mfi.delegation.repo.TaskDelegationRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-9",
+          "name": "getByTaskStatus",
+          "description": "via TaskDelegationRepository",
+          "daoClass": "in.novopay.task.mfi.delegation.repo.TaskDelegationRepository",
+          "sqlIdentifier": "getByTaskStatus",
+          "status": "healthy",
+          "sqlPreview": "SELECT tdd.task_id FROM task_delegation td JOIN task_delegation_details tdd ON td.id = tdd.task_delegation_id WHERE td.task_status = ?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=60.38..1808.78 rows=443 width=8) (actual time=6.015..16.148 rows=229 loops=1)\n  Join Filter: (td.id = tdd.task_delegation_id)\n  ->  Seq Scan on task_delegation_details tdd  (cost=40.00..1081.21 rows=2255 width=16) (actual time=1.747..3.347 rows=2255 loops=1)\n  ->  Index Scan using task_delegation_pkey on task_delegation td  (cost=20.38..192.09 rows=55 width=8) (actual time=3.142..3.166 rows=25 loops=3)\n        Index Cond: (id = ANY (ARRAY[tdd.task_delegation_id, $1, $2, ..., $1023]))\n        Storage Filter: ((task_status)::text = 'PENDING'::text)\nPlanning Time: 0.759 ms\nExecution Time: 16.515 ms\nPeak Memory Usage: 815 kB"
+        }
+      ]
+    },
+    {
+      "id": "taskescalationnotificationdetailsrepository-4256db",
+      "name": "TaskEscalationNotificationDetailsRepository",
+      "daoClass": "in.novopay.task.defn.datamodel.repository.TaskEscalationNotificationDetailsRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-33",
+          "name": "findOneByTaskTypeId",
+          "description": "via TaskEscalationNotificationDetailsRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskEscalationNotificationDetailsRepository",
+          "sqlIdentifier": "findOneByTaskTypeId",
+          "status": "healthy",
+          "sqlPreview": "select * from task_escalation_notification_details where task_type_id = ?1;",
+          "explainPlan": "Seq Scan on task_escalation_notification_details  (cost=40.00..861.51 rows=1 width=80) (actual time=0.797..0.798 rows=1 loops=1)\n  Storage Filter: (task_type_id = 78)\nPlanning Time: 0.071 ms\nExecution Time: 0.864 ms\nPeak Memory Usage: 15 kB"
+        }
+      ]
+    },
+    {
+      "id": "taskextensionrepository-06a46e",
+      "name": "TaskExtensionRepository",
+      "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskExtensionRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-41",
+          "name": "findByTaskIdIn",
+          "description": "via TaskExtensionRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskExtensionRepository",
+          "sqlIdentifier": "findByTaskIdIn",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_extension WHERE task_id IN ?1;",
+          "explainPlan": "Index Scan using task_extension_task_idx on task_extension  (cost=40.10..70.10 rows=3 width=204) (actual time=1.384..1.389 rows=3 loops=1)\n  Index Cond: (task_id = ANY ('{4443,163448,3540950}'::bigint[]))\nPlanning Time: 0.172 ms\nExecution Time: 1.462 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-42",
+          "name": "findBySourcingUserIdAndVtcIdInAndTaskStatusIn",
+          "description": "via TaskExtensionRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskExtensionRepository",
+          "sqlIdentifier": "findBySourcingUserIdAndVtcIdInAndTaskStatusIn",
+          "status": "healthy",
+          "sqlPreview": "SELECT te.* FROM task_extension te INNER JOIN task t ON t.id = te.task_id WHERE te.sourcing_user_id = ?1 AND te.vtc_id IN ?2 AND t.current_status IN ?3 AND t.is_deleted IS FALSE;",
+          "explainPlan": "Hash Join  (cost=18062.06..22230.05 rows=1533 width=204) (actual time=304.330..304.330 rows=0 loops=1)\n  Hash Cond: (t.id = te.task_id)\n  ->  Index Only Scan using task_office_id_current_status_idx on task t  (cost=28.59..3731.05 rows=120054 width=8) (actual time=2.019..2.019 rows=1 loops=1)\n        Index Cond: ((current_status = ANY ('{ASSIGNED,ASSIGNED,ASSIGNED}'::text[])) AND (is_deleted = false))\n        Filter: (is_deleted IS FALSE)\n        Heap Fetches: 0\n  ->  Hash  (cost=17999.29..17999.29 rows=2734 width=204) (actual time=302.297..302.297 rows=0 loops=1)\n        Buckets: 4096  Batches: 1  Memory Usage: 32kB\n        ->  Seq Scan on task_extension te  (cost=40.00..17999.29 rows=2734 width=204) (actual time=302.294..302.294 rows=0 loops=1)\n              Storage Filter: (((sourcing_user_id)::text = '252'::text) AND (vtc_id = ANY ('{43521,43526,43521}'::bigint[])))\nPlanning Time: 0.953 ms\nExecution Time: 304.443 ms\nPeak Memory Usage: 165 kB"
+        },
+        {
+          "id": "task-q-43",
+          "name": "findOneByTaskId",
+          "description": "via TaskExtensionRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskExtensionRepository",
+          "sqlIdentifier": "findOneByTaskId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_extension WHERE task_id = ?1;",
+          "explainPlan": "Index Scan using task_extension_task_idx on task_extension  (cost=40.03..68.91 rows=1 width=204) (actual time=1.226..1.228 rows=1 loops=1)\n  Index Cond: (task_id = 4443)\nPlanning Time: 0.150 ms\nExecution Time: 1.299 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-44",
+          "name": "findAllTaskForGroupIdAndTaskCode",
+          "description": "via TaskExtensionRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskExtensionRepository",
+          "sqlIdentifier": "findAllTaskForGroupIdAndTaskCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT te.* FROM task_extension te INNER JOIN task t ON te.task_id = t.id INNER JOIN task_type_version ttv ON ttv.id = t.task_type_version_id INNER JOIN task_type tt ON tt.task_type_version_id = ttv.id WHERE te.group_id = ?1 AND tt.task_code IN ?2 AND t.is_deleted IS FALSE and t.current_status = 'ASSIGNED';",
+          "explainPlan": "Nested Loop  (cost=120.58..187.80 rows=1 width=204) (actual time=3.741..3.741 rows=0 loops=1)\n  ->  Nested Loop  (cost=100.57..166.56 rows=1 width=220) (actual time=3.741..3.741 rows=0 loops=1)\n        Join Filter: (t.task_type_version_id = tt.task_type_version_id)\n        Rows Removed by Join Filter: 24\n        ->  Index Scan using task_type_task_code_key on task_type tt  (cost=40.14..69.21 rows=3 width=8) (actual time=1.267..1.271 rows=3 loops=1)\n              Index Cond: ((task_code)::text = ANY ('{ETB_SCHEDULED_BET,DO_GROUP_COLLECTION,TRANSACTION_REVERSAL_CHECKER}'::text[]))\n        ->  Materialize  (cost=60.43..97.26 rows=2 width=212) (actual time=0.808..0.818 rows=8 loops=3)\n              ->  YB Batched Nested Loop Join  (cost=60.43..97.25 rows=2 width=212) (actual time=2.416..2.439 rows=8 loops=1)\n                    Join Filter: (te.task_id = t.id)\n                    ->  Index Scan using task_extension_group_id_idx on task_extension te  (cost=40.40..73.73 rows=12 width=204) (actual time=1.221..1.259 rows=27 loops=1)\n                          Index Cond: (group_id = 409198)\n                    ->  Index Scan using task_pkey on task t  (cost=20.03..23.47 rows=2 width=16) (actual time=1.060..1.069 rows=8 loops=1)\n                          Index Cond: (id = ANY (ARRAY[te.task_id, $1, $2, ..., $1023]))\n                          Storage Filter: ((current_status)::text = 'ASSIGNED'::text)\n                          Filter: (is_deleted IS FALSE)\n  ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.01..21.23 rows=1 width=8) (never executed)\n        Index Cond: (id = t.task_type_version_id)\nPlanning Time: 2.012 ms\nExecution Time: 4.009 ms\nPeak Memory Usage: 625 kB"
+        },
+        {
+          "id": "task-q-45",
+          "name": "findAllTaskOfCollectionVisitForTaskId",
+          "description": "via TaskExtensionRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskExtensionRepository",
+          "sqlIdentifier": "findAllTaskOfCollectionVisitForTaskId",
+          "status": "healthy",
+          "sqlPreview": "SELECT te.* FROM task_extension te INNER JOIN task t ON te.task_id = t.id INNER JOIN task_type_version ttv ON ttv.id = t.task_type_version_id INNER JOIN task_type tt ON tt.task_type_version_id = ttv.id WHERE te.loan_account_number = (select loan_account_number from task_extension te2 where te2.task_id = ?1) AND tt.task_code IN ?2 AND t.is_deleted IS FALSE AND t.current_status = 'ASSIGNED';",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=286.18..1340.67 rows=1 width=204) (actual time=12.386..12.386 rows=0 loops=1)\n  Join Filter: (t.id = te.task_id)\n  InitPlan 1 (returns $0)\n    ->  Index Scan using task_extension_task_idx on task_extension te2  (cost=40.03..68.68 rows=1 width=10) (actual time=1.256..1.258 rows=1 loops=1)\n          Index Cond: (task_id = 4443)\n  ->  YB Batched Nested Loop Join  (cost=143.13..809.34 rows=984 width=8) (actual time=6.577..6.965 rows=177 loops=1)\n        Join Filter: (ttv.id = t.task_type_version_id)\n        ->  YB Batched Nested Loop Join  (cost=60.16..90.90 rows=3 width=16) (actual time=1.895..1.904 rows=3 loops=1)\n              Join Filter: (ttv.id = tt.task_type_version_id)\n              ->  Index Scan using task_type_task_code_key on task_type tt  (cost=40.14..69.21 rows=3 width=8) (actual time=1.293..1.298 rows=3 loops=1)\n                    Index Cond: ((task_code)::text = ANY ('{ETB_SCHEDULED_BET,DO_GROUP_COLLECTION,TRANSACTION_REVERSAL_CHECKER}'::text[]))\n              ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.02..21.57 rows=3 width=8) (actual time=0.520..0.523 rows=3 loops=1)\n                    Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $2, $3, ..., $1024]))\n        ->  Index Scan using task_task_type_version_id_current_status_idx on task t  (cost=82.97..718.39 rows=1380 width=16) (actual time=4.577..4.782 rows=177 loops=1)\n              Index Cond: ((task_type_version_id = ANY (ARRAY[tt.task_type_version_id, $1026, $1027, ..., $2048])) AND ((current_status)::text = 'ASSIGNED'::text))\n              Filter: (is_deleted IS FALSE)\n  ->  Index Scan using task_extension_task_idx on task_extension te  (cost=74.38..462.64 rows=1 width=204) (actual time=5.179..5.179 rows=0 loops=1)\n        Index Cond: (task_id = ANY (ARRAY[t.id, $2050, $2051, ..., $3072]))\n        Storage Filter: ((loan_account_number)::text = ($0)::text)\nPlanning Time: 3.185 ms\nExecution Time: 12.937 ms\nPeak Memory Usage: 1637 kB"
+        },
+        {
+          "id": "task-q-46",
+          "name": "findByVtcIdIn",
+          "description": "via TaskExtensionRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskExtensionRepository",
+          "sqlIdentifier": "findByVtcIdIn",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_extension WHERE vtc_id IN ?1;",
+          "explainPlan": "Seq Scan on task_extension  (cost=40.00..61953.42 rows=177947 width=204) (actual time=4.650..393.704 rows=95544 loops=1)\n  Storage Filter: (vtc_id = ANY ('{43521,43526,43521}'::bigint[]))\nPlanning Time: 0.128 ms\nExecution Time: 416.925 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "taskfieldtyperepository-0ae87b",
+      "name": "TaskFieldTypeRepository",
+      "daoClass": "in.novopay.task.defn.datamodel.repository.TaskFieldTypeRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-34",
+          "name": "findOneByName",
+          "description": "via TaskFieldTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskFieldTypeRepository",
+          "sqlIdentifier": "findOneByName",
+          "status": "needs-review",
+          "sqlPreview": "SELECT tft.* FROM task_field_type tft, task_type_version__task_field_type ttvft WHERE tft.id= ttvft.field_type_id AND task_type_version_id=?2 AND tft.name=?1 AND is_deleted IS FALSE;",
+          "reviewReason": "could not resolve column 'tft.name' (table/alias/column unknown)"
+        },
+        {
+          "id": "task-q-35",
+          "name": "findAllFieldsNamesById",
+          "description": "via TaskFieldTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskFieldTypeRepository",
+          "sqlIdentifier": "findAllFieldsNamesById",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_field_type WHERE id in (?1);",
+          "explainPlan": "Index Scan using task_field_type_pkey on task_field_type  (cost=20.20..21.80 rows=3 width=57) (actual time=0.794..0.798 rows=3 loops=1)\n  Index Cond: (id = ANY ('{212,1267,389}'::bigint[]))\nPlanning Time: 0.101 ms\nExecution Time: 0.868 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-36",
+          "name": "findByFieldName",
+          "description": "via TaskFieldTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskFieldTypeRepository",
+          "sqlIdentifier": "findByFieldName",
+          "status": "needs-review",
+          "sqlPreview": "SELECT id from task_field_type where name =?1;",
+          "reviewReason": "could not resolve column 'name' (table/alias/column unknown)"
+        },
+        {
+          "id": "task-q-37",
+          "name": "findOneByTaskTypeVersionAndPropKey",
+          "description": "via TaskFieldTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskFieldTypeRepository",
+          "sqlIdentifier": "findOneByTaskTypeVersionAndPropKey",
+          "status": "healthy",
+          "sqlPreview": "SELECT * from task_field_type where task_type_version_id = ?1 and prop_key = ?2;",
+          "explainPlan": "Seq Scan on task_field_type  (cost=40.00..1007.66 rows=1 width=57) (actual time=3.344..3.347 rows=2 loops=1)\n  Storage Filter: ((task_type_version_id = 30) AND ((prop_key)::text = 'vtc'::text))\nPlanning Time: 0.102 ms\nExecution Time: 3.424 ms\nPeak Memory Usage: 14 kB"
+        },
+        {
+          "id": "task-q-38",
+          "name": "findByTaskTypeVersionId",
+          "description": "via TaskFieldTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskFieldTypeRepository",
+          "sqlIdentifier": "findByTaskTypeVersionId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * from task_field_type where task_type_version_id = ?1 and is_deleted is false;",
+          "explainPlan": "Seq Scan on task_field_type  (cost=40.00..990.85 rows=56 width=57) (actual time=3.537..3.565 rows=56 loops=1)\n  Storage Filter: (task_type_version_id = 30)\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.072 ms\nExecution Time: 3.658 ms\nPeak Memory Usage: 14 kB"
+        }
+      ]
+    },
+    {
+      "id": "tasklistfordeligationextractor-5059db",
+      "name": "TaskListForDeligationExtractor",
+      "daoClass": "in.novopay.task.mfi.repository.TaskListForDeligationExtractor",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-1",
+          "name": "Field TaskListForDeligationExtractor.SELECT_QUERY",
+          "description": "via TaskListForDeligationExtractor",
+          "daoClass": "in.novopay.task.mfi.repository.TaskListForDeligationExtractor",
+          "sqlIdentifier": "Field TaskListForDeligationExtractor.SELECT_QUERY",
+          "status": "healthy",
+          "sqlPreview": "SELECT t.id AS task_id, tt.task_category, tt.task_type, tt.name,te.product_code, t.description as description,t.office_id as office_id,t.created_on as created_date,te.loan_app_id AS loan_app_id,te.group_id as group_id, te.sales_promo_code as sales_promo_code,te.loan_account_number as loan_account_number,te.product_code,tt.task_sub_type FROM task t JOIN task_extension te ON te.task_id = t.id AND t.assignee_contributor IS NOT NULL JOIN task_type tt ON tt.id = t.task_type_id WHERE t.current_status = 'ASSIGNED';",
+          "explainPlan": "Hash Join  (cost=1053.19..49320.53 rows=38138 width=303) (actual time=135.547..2501.372 rows=40841 loops=1)\n  Hash Cond: (t.task_type_id = tt.id)\n  ->  YB Batched Nested Loop Join  (cost=165.94..47908.88 rows=38138 width=244) (actual time=134.489..2471.245 rows=40841 loops=1)\n        Join Filter: (t.id = te.task_id)\n        ->  Index Scan using task_office_id_current_status_idx on task t  (cost=91.56..27892.77 rows=38744 width=200) (actual time=37.085..1435.577 rows=40851 loops=1)\n              Index Cond: ((current_status)::text = 'ASSIGNED'::text)\n              Rows Removed by Index Recheck: 1\n              Storage Filter: (assignee_contributor IS NOT NULL)\n        ->  Index Scan using task_extension_task_idx on task_extension te  (cost=74.38..516.22 rows=1024 width=52) (actual time=21.519..22.822 rows=1021 loops=40)\n              Index Cond: (task_id = ANY (ARRAY[t.id, $1, $2, ..., $1023]))\n  ->  Hash  (cost=884.96..884.96 rows=183 width=69) (actual time=1.027..1.027 rows=183 loops=1)\n        Buckets: 1024  Batches: 1  Memory Usage: 27kB\n        ->  Seq Scan on task_type tt  (cost=40.00..884.96 rows=183 width=69) (actual time=0.842..0.936 rows=183 loops=1)\nPlanning Time: 135.829 ms\nExecution Time: 2513.635 ms\nPeak Memory Usage: 3544 kB"
+        }
+      ]
+    },
+    {
+      "id": "taskrepository-821a66",
+      "name": "TaskRepository",
+      "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-47",
+          "name": "findByVillageIdsInAndCurrentStatusInAndSourcingUserId",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findByVillageIdsInAndCurrentStatusInAndSourcingUserId",
+          "status": "healthy",
+          "sqlPreview": "SELECT t.* FROM task t WHERE t.current_status IN ?2 AND t.is_deleted IS FALSE AND EXISTS (SELECT 1 FROM task_extension te WHERE te.task_id = t.id AND te.sourcing_user_id = ?3 AND te.vtc_id IN ?1);",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=17710.39..19074.85 rows=1533 width=1487) (actual time=241.109..241.109 rows=0 loops=1)\n  Join Filter: (t.id = te.task_id)\n  ->  HashAggregate  (cost=17279.57..17306.91 rows=2734 width=8) (actual time=241.104..241.105 rows=0 loops=1)\n        Group Key: te.task_id\n        ->  Seq Scan on task_extension te  (cost=40.00..17272.73 rows=2734 width=8) (actual time=241.086..241.086 rows=0 loops=1)\n              Storage Filter: (((sourcing_user_id)::text = '252'::text) AND (vtc_id = ANY ('{43521,43526,43521}'::bigint[])))\n  ->  Index Scan using task_pkey on task t  (cost=430.82..657.98 rows=574 width=1487) (never executed)\n        Index Cond: (id = ANY (ARRAY[te.task_id, $1, $2, ..., $1023]))\n        Storage Filter: ((current_status)::text = ANY ('{ASSIGNED,ASSIGNED,ASSIGNED}'::text[]))\n        Filter: (is_deleted IS FALSE)\nPlanning Time: 1.831 ms\nExecution Time: 241.405 ms\nPeak Memory Usage: 628 kB"
+        },
+        {
+          "id": "task-q-48",
+          "name": "findAllTaskStatusAndNamesByOfficeId",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findAllTaskStatusAndNamesByOfficeId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task WHERE office_id = :officeId AND name IN (:names) AND current_status = :status AND is_deleted IS FALSE;",
+          "explainPlan": "Index Scan using task_office_id_current_status_idx on task  (cost=91.56..5239.99 rows=8951 width=1487) (actual time=17.108..812.566 rows=3044 loops=1)\n  Index Cond: ((office_id = 2) AND ((current_status)::text = 'ASSIGNED'::text) AND (is_deleted = false))\n  Storage Filter: ((name)::text = ANY ('{\"Print Loan Documents\",\"Eligibility Summary\",\"Account Details\"}'::text[]))\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.787 ms\nExecution Time: 813.509 ms\nPeak Memory Usage: 45 kB"
+        },
+        {
+          "id": "task-q-49",
+          "name": "findById",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findById",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task WHERE id = ?1 AND is_deleted IS FALSE;",
+          "explainPlan": "Index Scan using task_pkey on task  (cost=20.71..22.00 rows=1 width=1487) (actual time=0.789..0.791 rows=1 loops=1)\n  Index Cond: (id = 4443)\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.165 ms\nExecution Time: 0.867 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-50",
+          "name": "findById",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findById",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task WHERE id = ?1 AND is_deleted IS FALSE;",
+          "explainPlan": "Index Scan using task_pkey on task  (cost=20.71..22.00 rows=1 width=1487) (actual time=0.746..0.748 rows=1 loops=1)\n  Index Cond: (id = 4443)\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.141 ms\nExecution Time: 0.818 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-51",
+          "name": "findAllByRoles",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findAllByRoles",
+          "status": "needs-review",
+          "sqlPreview": "SELECT t.name, t.office_id, ttvr.role_code, tt.task_sub_type, t.assignee_contributor, t.current_status, tt.task_code, t.created_on, t.description, t.id FROM task t JOIN task_type tt ON t.task_type_id = tt.id JOIN task_type_version__role ttvr ON ttvr.task_type_version_id = tt.task_type_version_id WHERE ttvr.role_code IN ?1 AND t.current_status = ?2 AND t.office_id = ?3 ORDER BY t.created_on DESC;",
+          "reviewReason": "could not resolve column 'ttvr.role_code' (table/alias/column unknown)"
+        },
+        {
+          "id": "task-q-52",
+          "name": "countAllByUserId",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "countAllByUserId",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(distinct(t.id)) FROM task t join task_extension te on te.task_id = t.id JOIN task_type_version ttv ON ttv.id = t.task_type_version_id inner join task_type tt on tt.task_type_version_id = t.task_type_version_id and tt.is_deleted = false WHERE t.assignee_contributor = ?1 AND t.current_status = 'ASSIGNED' AND ttv.channel ilike concat('%', ?2, '%') AND t.is_deleted IS FALSE and tt.task_code NOT IN ?3 and te.product_code in (?4);",
+          "explainPlan": "Aggregate  (cost=189.72..189.73 rows=1 width=8) (actual time=3.562..3.563 rows=1 loops=1)\n  ->  Nested Loop  (cost=120.77..189.72 rows=1 width=8) (actual time=3.542..3.542 rows=0 loops=1)\n        ->  Nested Loop  (cost=100.76..165.02 rows=1 width=8) (actual time=3.541..3.541 rows=0 loops=1)\n              Join Filter: (ttv.id = t.task_type_version_id)\n              Rows Removed by Join Filter: 5\n              ->  YB Batched Nested Loop Join  (cost=60.15..90.81 rows=1 width=16) (actual time=2.262..2.271 rows=1 loops=1)\n                    Join Filter: (ttv.id = tt.task_type_version_id)\n                    ->  Index Scan using task_type_task_code_key on task_type tt  (cost=40.14..69.24 rows=3 width=8) (actual time=1.429..1.434 rows=3 loops=1)\n                          Index Cond: ((task_code)::text = ANY ('{ETB_SCHEDULED_BET,DO_GROUP_COLLECTION,TRANSACTION_REVERSAL_CHECKER}'::text[]))\n                          Storage Filter: (NOT is_deleted)\n                    ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.01..21.56 rows=1 width=8) (actual time=0.752..0.753 rows=1 loops=1)\n                          Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\n                          Storage Filter: ((channel)::text ~~* '%APK%'::text)\n              ->  Index Scan using task_assignee_contributor_current_status_idx on task t  (cost=40.61..73.63 rows=47 width=16) (actual time=1.215..1.263 rows=5 loops=1)\n                    Index Cond: ((assignee_contributor = 217) AND ((current_status)::text = 'ASSIGNED'::text))\n                    Filter: (is_deleted IS FALSE)\n        ->  Index Only Scan using task_extension_task_id_idx on task_extension te  (cost=20.01..24.69 rows=1 width=8) (never executed)\n              Index Cond: ((task_id = t.id) AND (product_code = ANY ('{INDL_LOAN,SHGDL,INDL_LOAN}'::text[])))\n              Heap Fetches: 0\nPlanning Time: 2.606 ms\nExecution Time: 3.894 ms\nPeak Memory Usage: 612 kB"
+        },
+        {
+          "id": "task-q-53",
+          "name": "countAllByUserId",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "countAllByUserId",
+          "status": "healthy",
+          "sqlPreview": "SELECT COUNT(1) FROM task t join task_extension te on te.task_id = t.id JOIN task_type_version ttv ON ttv.id = t.task_type_version_id WHERE t.assignee_contributor = ?1 AND t.current_status = 'ASSIGNED' AND ttv.channel ilike concat('%', ?2, '%') AND t.is_deleted IS FALSE AND te.product_code in (?3);",
+          "explainPlan": "Aggregate  (cost=159.40..159.41 rows=1 width=8) (actual time=2.942..2.943 rows=1 loops=1)\n  ->  YB Batched Nested Loop Join  (cost=80.98..159.37 rows=14 width=0) (actual time=2.938..2.938 rows=0 loops=1)\n        Join Filter: (t.task_type_version_id = ttv.id)\n        ->  YB Batched Nested Loop Join  (cost=60.84..125.51 rows=33 width=8) (actual time=2.273..2.285 rows=3 loops=1)\n              Join Filter: (t.id = te.task_id)\n              ->  Index Scan using task_assignee_contributor_current_status_idx on task t  (cost=40.61..73.63 rows=47 width=16) (actual time=1.447..1.458 rows=5 loops=1)\n                    Index Cond: ((assignee_contributor = 217) AND ((current_status)::text = 'ASSIGNED'::text))\n                    Filter: (is_deleted IS FALSE)\n              ->  Index Only Scan using task_extension_task_id_idx on task_extension te  (cost=20.23..51.86 rows=33 width=8) (actual time=0.676..0.680 rows=3 loops=1)\n                    Index Cond: ((task_id = ANY (ARRAY[t.id, $1, $2, ..., $1023])) AND (product_code = ANY ('{INDL_LOAN,SHGDL,INDL_LOAN}'::text[])))\n                    Heap Fetches: 0\n        ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.14..28.86 rows=20 width=8) (actual time=0.575..0.575 rows=0 loops=1)\n              Index Cond: (id = ANY (ARRAY[t.task_type_version_id, $1025, $1026, ..., $2047]))\n              Storage Filter: ((channel)::text ~~* '%APK%'::text)\nPlanning Time: 2.900 ms\nExecution Time: 3.477 ms\nPeak Memory Usage: 920 kB"
+        },
+        {
+          "id": "task-q-54",
+          "name": "countAllByUserId",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "countAllByUserId",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(distinct(t.id)) FROM task t JOIN task_type_version ttv ON ttv.id = t.task_type_version_id join task_extension te on te.task_id = t.id inner join task_type tt on tt.task_type_version_id = t.task_type_version_id and tt.is_deleted = false WHERE t.assignee_contributor = ?1 AND t.current_status = 'ASSIGNED' AND t.office_id IN (?2) AND ttv.channel ilike concat('%', ?3, '%') AND t.is_deleted IS FALSE and tt.task_code NOT IN ?4 and te.product_code in (?5);",
+          "explainPlan": "Aggregate  (cost=190.67..190.68 rows=1 width=8) (actual time=3.756..3.756 rows=1 loops=1)\n  ->  Nested Loop  (cost=120.77..190.67 rows=1 width=8) (actual time=3.735..3.735 rows=0 loops=1)\n        ->  Nested Loop  (cost=100.76..165.97 rows=1 width=8) (actual time=3.734..3.734 rows=0 loops=1)\n              Join Filter: (ttv.id = t.task_type_version_id)\n              Rows Removed by Join Filter: 5\n              ->  YB Batched Nested Loop Join  (cost=60.15..90.81 rows=1 width=16) (actual time=2.578..2.584 rows=1 loops=1)\n                    Join Filter: (ttv.id = tt.task_type_version_id)\n                    ->  Index Scan using task_type_task_code_key on task_type tt  (cost=40.14..69.24 rows=3 width=8) (actual time=1.836..1.841 rows=3 loops=1)\n                          Index Cond: ((task_code)::text = ANY ('{ETB_SCHEDULED_BET,DO_GROUP_COLLECTION,TRANSACTION_REVERSAL_CHECKER}'::text[]))\n                          Storage Filter: (NOT is_deleted)\n                    ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.01..21.56 rows=1 width=8) (actual time=0.659..0.660 rows=1 loops=1)\n                          Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\n                          Storage Filter: ((channel)::text ~~* '%APK%'::text)\n              ->  Index Scan using task_assignee_contributor_current_status_idx on task t  (cost=40.61..74.57 rows=47 width=16) (actual time=1.136..1.144 rows=5 loops=1)\n                    Index Cond: ((assignee_contributor = 217) AND ((current_status)::text = 'ASSIGNED'::text) AND (office_id = ANY ('{2,2,2}'::bigint[])))\n                    Filter: (is_deleted IS FALSE)\n        ->  Index Only Scan using task_extension_task_id_idx on task_extension te  (cost=20.01..24.69 rows=1 width=8) (never executed)\n              Index Cond: ((task_id = t.id) AND (product_code = ANY ('{INDL_LOAN,SHGDL,INDL_LOAN}'::text[])))\n              Heap Fetches: 0\nPlanning Time: 2.893 ms\nExecution Time: 4.052 ms\nPeak Memory Usage: 620 kB"
+        },
+        {
+          "id": "task-q-55",
+          "name": "countAllByUserId",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "countAllByUserId",
+          "status": "healthy",
+          "sqlPreview": "SELECT COUNT(1) FROM task t join task_extension te on te.task_id = t.id JOIN task_type_version ttv ON ttv.id = t.task_type_version_id WHERE t.assignee_contributor = ?1 AND t.current_status = 'ASSIGNED' AND t.office_id IN (?2) AND ttv.channel ilike concat('%', ?3, '%') and te.product_code in (?4) AND t.is_deleted IS FALSE;",
+          "explainPlan": "Aggregate  (cost=160.35..160.36 rows=1 width=8) (actual time=2.794..2.794 rows=1 loops=1)\n  ->  YB Batched Nested Loop Join  (cost=80.98..160.31 rows=14 width=0) (actual time=2.790..2.790 rows=0 loops=1)\n        Join Filter: (t.task_type_version_id = ttv.id)\n        ->  YB Batched Nested Loop Join  (cost=60.84..126.45 rows=33 width=8) (actual time=2.159..2.170 rows=3 loops=1)\n              Join Filter: (t.id = te.task_id)\n              ->  Index Scan using task_assignee_contributor_current_status_idx on task t  (cost=40.61..74.57 rows=47 width=16) (actual time=1.376..1.384 rows=5 loops=1)\n                    Index Cond: ((assignee_contributor = 217) AND ((current_status)::text = 'ASSIGNED'::text) AND (office_id = ANY ('{2,2,2}'::bigint[])))\n                    Filter: (is_deleted IS FALSE)\n              ->  Index Only Scan using task_extension_task_id_idx on task_extension te  (cost=20.23..51.86 rows=33 width=8) (actual time=0.700..0.704 rows=3 loops=1)\n                    Index Cond: ((task_id = ANY (ARRAY[t.id, $1, $2, ..., $1023])) AND (product_code = ANY ('{INDL_LOAN,SHGDL,INDL_LOAN}'::text[])))\n                    Heap Fetches: 0\n        ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.14..28.86 rows=20 width=8) (actual time=0.548..0.548 rows=0 loops=1)\n              Index Cond: (id = ANY (ARRAY[t.task_type_version_id, $1025, $1026, ..., $2047]))\n              Storage Filter: ((channel)::text ~~* '%APK%'::text)\nPlanning Time: 2.556 ms\nExecution Time: 3.165 ms\nPeak Memory Usage: 920 kB"
+        },
+        {
+          "id": "task-q-56",
+          "name": "poolTaskCount",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "poolTaskCount",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(distinct(t.id)) FROM task t join task_type_version ttv on ttv.id = t.task_type_version_id join task_extension te on te.task_id = t.id inner join task_type tt on tt.task_type_version_id = t.task_type_version_id and tt.is_deleted = false WHERE t.current_status = 'UN_ASSIGNED' AND ttv.role_code ilike concat('%|', ?1, '|%') AND t.is_deleted IS FALSE AND t.office_id IN (?2) AND ttv.channel ilike concat('%', ?3, '%') and tt.task_code NOT IN ?4 and te.product_code in (?5);",
+          "explainPlan": "Aggregate  (cost=206.18..206.19 rows=1 width=8) (actual time=2.373..2.373 rows=1 loops=1)\n  ->  Nested Loop  (cost=122.63..206.18 rows=1 width=8) (actual time=2.340..2.340 rows=0 loops=1)\n        ->  YB Batched Nested Loop Join  (cost=102.62..181.48 rows=1 width=8) (actual time=2.339..2.339 rows=0 loops=1)\n              Join Filter: (ttv.id = t.task_type_version_id)\n              ->  YB Batched Nested Loop Join  (cost=60.15..90.80 rows=1 width=16) (actual time=2.335..2.335 rows=0 loops=1)\n                    Join Filter: (ttv.id = tt.task_type_version_id)\n                    ->  Index Scan using task_type_task_code_key on task_type tt  (cost=40.14..69.24 rows=3 width=8) (actual time=1.507..1.513 rows=3 loops=1)\n                          Index Cond: ((task_code)::text = ANY ('{ETB_SCHEDULED_BET,DO_GROUP_COLLECTION,TRANSACTION_REVERSAL_CHECKER}'::text[]))\n                          Storage Filter: (NOT is_deleted)\n                    ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.01..21.56 rows=1 width=8) (actual time=0.741..0.741 rows=0 loops=1)\n                          Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\n                          Storage Filter: (((role_code)::text ~~* '%||FLCC_SO|RM|SO||%'::text) AND ((channel)::text ~~* '%APK%'::text))\n              ->  Index Scan using task_task_type_version_id_current_status_idx on task t  (cost=42.48..90.69 rows=58 width=16) (never executed)\n                    Index Cond: ((task_type_version_id = ANY (ARRAY[ttv.id, $1025, $1026, ..., $2047])) AND ((current_status)::text = 'UN_ASSIGNED'::text))\n                    Storage Filter: (office_id = ANY ('{2,2,2}'::bigint[]))\n                    Filter: (is_deleted IS FALSE)\n        ->  Index Only Scan using task_extension_task_id_idx on task_extension te  (cost=20.01..24.69 rows=1 width=8) (never executed)\n              Index Cond: ((task_id = t.id) AND (product_code = ANY ('{INDL_LOAN,SHGDL,INDL_LOAN}'::text[])))\n              Heap Fetches: 0\nPlanning Time: 4.626 ms\nExecution Time: 2.850 ms\nPeak Memory Usage: 1027 kB"
+        },
+        {
+          "id": "task-q-57",
+          "name": "poolTaskCount",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "poolTaskCount",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(distinct(t.id)) FROM task t join task_extension te on te.task_id = t.id join task_type_version ttv on ttv.id = t.task_type_version_id inner join task_type tt on tt.task_type_version_id = t.task_type_version_id and tt.is_deleted = false WHERE t.current_status = 'UN_ASSIGNED' AND ttv.role_code ilike concat('%|', ?1, '|%') AND ttv.channel ilike concat('%', ?2, '%') AND t.is_deleted IS FALSE and tt.task_code NOT IN ?3 and te.product_code in (?4);",
+          "explainPlan": "Aggregate  (cost=205.52..205.53 rows=1 width=8) (actual time=2.225..2.225 rows=1 loops=1)\n  ->  Nested Loop  (cost=122.63..205.52 rows=1 width=8) (actual time=2.205..2.206 rows=0 loops=1)\n        ->  YB Batched Nested Loop Join  (cost=102.62..180.82 rows=1 width=8) (actual time=2.204..2.204 rows=0 loops=1)\n              Join Filter: (ttv.id = t.task_type_version_id)\n              ->  YB Batched Nested Loop Join  (cost=60.15..90.80 rows=1 width=16) (actual time=2.201..2.201 rows=0 loops=1)\n                    Join Filter: (ttv.id = tt.task_type_version_id)\n                    ->  Index Scan using task_type_task_code_key on task_type tt  (cost=40.14..69.24 rows=3 width=8) (actual time=1.416..1.444 rows=3 loops=1)\n                          Index Cond: ((task_code)::text = ANY ('{ETB_SCHEDULED_BET,DO_GROUP_COLLECTION,TRANSACTION_REVERSAL_CHECKER}'::text[]))\n                          Storage Filter: (NOT is_deleted)\n                    ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.01..21.56 rows=1 width=8) (actual time=0.678..0.678 rows=0 loops=1)\n                          Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\n                          Storage Filter: (((role_code)::text ~~* '%||FLCC_SO|RM|SO||%'::text) AND ((channel)::text ~~* '%APK%'::text))\n              ->  Index Scan using task_task_type_version_id_current_status_idx on task t  (cost=42.48..90.02 rows=58 width=16) (never executed)\n                    Index Cond: ((task_type_version_id = ANY (ARRAY[ttv.id, $1025, $1026, ..., $2047])) AND ((current_status)::text = 'UN_ASSIGNED'::text))\n                    Filter: (is_deleted IS FALSE)\n        ->  Index Only Scan using task_extension_task_id_idx on task_extension te  (cost=20.01..24.69 rows=1 width=8) (never executed)\n              Index Cond: ((task_id = t.id) AND (product_code = ANY ('{INDL_LOAN,SHGDL,INDL_LOAN}'::text[])))\n              Heap Fetches: 0\nPlanning Time: 2.998 ms\nExecution Time: 2.655 ms\nPeak Memory Usage: 995 kB"
+        },
+        {
+          "id": "task-q-58",
+          "name": "poolTaskCount",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "poolTaskCount",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(1) FROM task t join task_type_version ttv on ttv.id = t.task_type_version_id join task_extension te on te.task_id = t.id WHERE t.current_status = 'UN_ASSIGNED' AND ttv.role_code ilike concat('%|', ?1, '|%') AND t.is_deleted IS FALSE AND t.office_id IN (?2) AND ttv.channel ilike concat('%', ?3, '%') and te.product_code in (?4);",
+          "explainPlan": "Aggregate  (cost=1429.37..1429.38 rows=1 width=8) (actual time=1.003..1.003 rows=1 loops=1)\n  ->  YB Batched Nested Loop Join  (cost=156.85..1429.30 rows=29 width=0) (actual time=1.000..1.000 rows=0 loops=1)\n        Join Filter: (t.id = te.task_id)\n        ->  YB Batched Nested Loop Join  (cost=82.48..960.25 rows=41 width=8) (actual time=0.996..0.996 rows=0 loops=1)\n              Join Filter: (t.task_type_version_id = ttv.id)\n              ->  Seq Scan on task_type_version ttv  (cost=40.00..869.56 rows=1 width=8) (actual time=0.992..0.992 rows=0 loops=1)\n                    Storage Filter: (((role_code)::text ~~* '%||FLCC_SO|RM|SO||%'::text) AND ((channel)::text ~~* '%APK%'::text))\n              ->  Index Scan using task_task_type_version_id_current_status_idx on task t  (cost=42.48..90.69 rows=58 width=16) (never executed)\n                    Index Cond: ((task_type_version_id = ANY (ARRAY[ttv.id, $1, $2, ..., $1023])) AND ((current_status)::text = 'UN_ASSIGNED'::text))\n                    Storage Filter: (office_id = ANY ('{2,2,2}'::bigint[]))\n                    Filter: (is_deleted IS FALSE)\n        ->  Index Scan using task_extension_task_idx on task_extension te  (cost=74.38..468.69 rows=729 width=8) (never executed)\n              Index Cond: (task_id = ANY (ARRAY[t.id, $1025, $1026, ..., $2047]))\n              Storage Filter: ((product_code)::text = ANY ('{INDL_LOAN,SHGDL,INDL_LOAN}'::text[]))\nPlanning Time: 2.837 ms\nExecution Time: 1.364 ms\nPeak Memory Usage: 920 kB"
+        },
+        {
+          "id": "task-q-59",
+          "name": "poolTaskCount",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "poolTaskCount",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(1) FROM task t join task_extension te on te.task_id = t.id join task_type_version ttv on ttv.id = t.task_type_version_id WHERE t.current_status = 'UN_ASSIGNED' AND ttv.role_code ilike concat('%|', ?1, '|%') AND ttv.channel ilike concat('%', ?2, '%') AND te.product_code in (?3) AND t.is_deleted IS FALSE;",
+          "explainPlan": "Aggregate  (cost=1428.71..1428.72 rows=1 width=8) (actual time=1.095..1.095 rows=1 loops=1)\n  ->  YB Batched Nested Loop Join  (cost=156.85..1428.64 rows=29 width=0) (actual time=1.092..1.092 rows=0 loops=1)\n        Join Filter: (t.id = te.task_id)\n        ->  YB Batched Nested Loop Join  (cost=82.48..959.58 rows=41 width=8) (actual time=1.089..1.089 rows=0 loops=1)\n              Join Filter: (t.task_type_version_id = ttv.id)\n              ->  Seq Scan on task_type_version ttv  (cost=40.00..869.56 rows=1 width=8) (actual time=1.085..1.085 rows=0 loops=1)\n                    Storage Filter: (((role_code)::text ~~* '%||FLCC_SO|RM|SO||%'::text) AND ((channel)::text ~~* '%APK%'::text))\n              ->  Index Scan using task_task_type_version_id_current_status_idx on task t  (cost=42.48..90.02 rows=58 width=16) (never executed)\n                    Index Cond: ((task_type_version_id = ANY (ARRAY[ttv.id, $1, $2, ..., $1023])) AND ((current_status)::text = 'UN_ASSIGNED'::text))\n                    Filter: (is_deleted IS FALSE)\n        ->  Index Scan using task_extension_task_idx on task_extension te  (cost=74.38..468.69 rows=729 width=8) (never executed)\n              Index Cond: (task_id = ANY (ARRAY[t.id, $1025, $1026, ..., $2047]))\n              Storage Filter: ((product_code)::text = ANY ('{INDL_LOAN,SHGDL,INDL_LOAN}'::text[]))\nPlanning Time: 2.432 ms\nExecution Time: 1.458 ms\nPeak Memory Usage: 920 kB"
+        },
+        {
+          "id": "task-q-60",
+          "name": "countForCompletedTask",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "countForCompletedTask",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(1) FROM task WHERE id IN ?1 AND current_status != 'ASSIGNED';",
+          "explainPlan": "Finalize Aggregate  (cost=21.70..21.71 rows=1 width=8) (actual time=0.687..0.687 rows=1 loops=1)\n  ->  Index Scan using task_pkey on task  (cost=20.01..21.70 rows=2 width=0) (actual time=0.680..0.681 rows=1 loops=1)\n        Index Cond: (id = ANY ('{4443,163448,3540950}'::bigint[]))\n        Storage Filter: ((current_status)::text <> 'ASSIGNED'::text)\n        Partial Aggregate: true\nPlanning Time: 1.055 ms\nExecution Time: 0.792 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "task-q-61",
+          "name": "getDescriptionByIds",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "getDescriptionByIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT id, description FROM task WHERE id IN :taskIdList;",
+          "explainPlan": "Index Scan using task_pkey on task  (cost=20.43..22.11 rows=3 width=176) (actual time=0.737..0.741 rows=3 loops=1)\n  Index Cond: (id = ANY ('{4443,163448,3540950}'::bigint[]))\nPlanning Time: 0.134 ms\nExecution Time: 0.832 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-62",
+          "name": "getLosTaskFromTaskIdList",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "getLosTaskFromTaskIdList",
+          "status": "healthy",
+          "sqlPreview": "SELECT t.id FROM task t JOIN task_type tt ON t.task_type_id = tt.id WHERE t.id IN (?1) AND tt.task_category = 'LOS';",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=40.05..43.35 rows=2 width=8) (actual time=1.496..1.505 rows=3 loops=1)\n  Join Filter: (t.task_type_id = tt.id)\n  ->  Index Scan using task_pkey on task t  (cost=20.04..21.72 rows=3 width=16) (actual time=0.799..0.803 rows=3 loops=1)\n        Index Cond: (id = ANY ('{4443,163448,3540950}'::bigint[]))\n  ->  Index Scan using task_type_pkey on task_type tt  (cost=20.01..21.57 rows=2 width=8) (actual time=0.620..0.623 rows=3 loops=1)\n        Index Cond: (id = ANY (ARRAY[t.task_type_id, $1, $2, ..., $1023]))\n        Storage Filter: ((task_category)::text = 'LOS'::text)\nPlanning Time: 0.779 ms\nExecution Time: 1.720 ms\nPeak Memory Usage: 536 kB"
+        },
+        {
+          "id": "task-q-63",
+          "name": "findAllExpiredTasks",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findAllExpiredTasks",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task WHERE ?1 >= expired_on AND is_deleted IS FALSE AND current_status IN ('ASSIGNED','UN_ASSIGNED') AND task_type_version_id IN (SELECT id from task_type_version WHERE eligible_for_expiry= true);",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=92.95..1390.31 rows=284 width=1487) (actual time=10.323..10.333 rows=1 loops=1)\n  Join Filter: (task.task_type_version_id = task_type_version.id)\n  ->  Index Scan using idx_task_expiry_eligible on task  (cost=72.67..1028.11 rows=867 width=1487) (actual time=8.331..8.949 rows=373 loops=1)\n        Index Cond: ('2023-12-07 13:59:53.129'::timestamp without time zone >= expired_on)\n  ->  Index Scan using task_type_version_pkey on task_type_version  (cost=20.27..162.70 rows=40 width=8) (actual time=0.928..0.930 rows=1 loops=1)\n        Index Cond: (id = ANY (ARRAY[task.task_type_version_id, $1, $2, ..., $1023]))\n        Storage Filter: eligible_for_expiry\nPlanning Time: 1.350 ms\nExecution Time: 10.580 ms\nPeak Memory Usage: 1555 kB"
+        },
+        {
+          "id": "task-q-64",
+          "name": "getCountAllExpiredTasks",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "getCountAllExpiredTasks",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id), MAX(id) max, MIN(id) min FROM task WHERE ?1 >= expired_on AND is_deleted IS FALSE AND current_status IN ('ASSIGNED','UN_ASSIGNED') AND task_type_version_id IN (SELECT id from task_type_version WHERE eligible_for_expiry= true);",
+          "explainPlan": "Aggregate  (cost=784.31..784.32 rows=1 width=24) (actual time=8.000..8.000 rows=1 loops=1)\n  ->  YB Batched Nested Loop Join  (cost=92.95..782.18 rows=284 width=8) (actual time=7.986..7.993 rows=1 loops=1)\n        Join Filter: (task.task_type_version_id = task_type_version.id)\n        ->  Index Scan using idx_task_expiry_eligible on task  (cost=72.67..419.98 rows=867 width=16) (actual time=6.521..6.809 rows=373 loops=1)\n              Index Cond: ('2023-12-07 13:59:53.129'::timestamp without time zone >= expired_on)\n        ->  Index Scan using task_type_version_pkey on task_type_version  (cost=20.27..162.70 rows=40 width=8) (actual time=0.831..0.833 rows=1 loops=1)\n              Index Cond: (id = ANY (ARRAY[task.task_type_version_id, $1, $2, ..., $1023]))\n              Storage Filter: eligible_for_expiry\nPlanning Time: 1.247 ms\nExecution Time: 8.261 ms\nPeak Memory Usage: 751 kB"
+        },
+        {
+          "id": "task-q-65",
+          "name": "getDistinctTaskCodeFortaskId",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "getDistinctTaskCodeFortaskId",
+          "status": "healthy",
+          "sqlPreview": "SELECT DISTINCT tt.task_code FROM task t JOIN task_type tt ON t.task_type_id = tt.id WHERE t.id IN ?1;",
+          "explainPlan": "Unique  (cost=43.49..43.51 rows=3 width=24) (actual time=1.363..1.365 rows=3 loops=1)\n  ->  Sort  (cost=43.49..43.50 rows=3 width=24) (actual time=1.362..1.362 rows=3 loops=1)\n        Sort Key: tt.task_code\n        Sort Method: quicksort  Memory: 25kB\n        ->  YB Batched Nested Loop Join  (cost=40.12..43.47 rows=3 width=24) (actual time=1.341..1.351 rows=3 loops=1)\n              Join Filter: (t.task_type_id = tt.id)\n              ->  Index Scan using task_pkey on task t  (cost=20.02..21.70 rows=3 width=8) (actual time=0.732..0.736 rows=3 loops=1)\n                    Index Cond: (id = ANY ('{4443,163448,3540950}'::bigint[]))\n              ->  Index Scan using task_type_pkey on task_type tt  (cost=20.10..21.66 rows=3 width=32) (actual time=0.534..0.538 rows=3 loops=1)\n                    Index Cond: (id = ANY (ARRAY[t.task_type_id, $1, $2, ..., $1023]))\nPlanning Time: 0.770 ms\nExecution Time: 1.596 ms\nPeak Memory Usage: 544 kB"
+        },
+        {
+          "id": "task-q-66",
+          "name": "getTatCrossedTasksCount",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "getTatCrossedTasksCount",
+          "status": "healthy",
+          "sqlPreview": "SELECT COUNT(tsk.id) AS cnt, MIN(tsk.id) AS MIN, MAX(tsk.id) AS MAX FROM task tsk WHERE tsk.current_status in ('ASSIGNED', 'UN_ASSIGNED', 'UNASSIGNED') AND tsk.is_deleted IS false;",
+          "explainPlan": "Aggregate  (cost=23471.62..23471.63 rows=1 width=24) (actual time=904.504..904.504 rows=1 loops=1)\n  ->  Index Scan using task_assignee_contributor_current_status_idx on task tsk  (cost=97.03..23133.58 rows=45071 width=8) (actual time=19.376..889.885 rows=46073 loops=1)\n        Index Cond: ((current_status)::text = ANY ('{ASSIGNED,UN_ASSIGNED,UNASSIGNED}'::text[]))\n        Rows Removed by Index Recheck: 4457\n        Filter: (is_deleted IS FALSE)\n        Rows Removed by Filter: 8\nPlanning Time: 0.253 ms\nExecution Time: 904.620 ms\nPeak Memory Usage: 37 kB"
+        },
+        {
+          "id": "task-q-67",
+          "name": "getETBTaskFromTaskIdList",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "getETBTaskFromTaskIdList",
+          "status": "healthy",
+          "sqlPreview": "SELECT t.id FROM task t JOIN task_type tt ON t.task_type_id = tt.id WHERE t.id IN :taskIds AND tt.task_category = 'LOS' AND tt.task_type = 'ETB';",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=40.05..43.29 rows=1 width=8) (actual time=1.828..1.835 rows=1 loops=1)\n  Join Filter: (t.task_type_id = tt.id)\n  ->  Index Scan using task_pkey on task t  (cost=20.04..21.72 rows=3 width=16) (actual time=1.045..1.049 rows=3 loops=1)\n        Index Cond: (id = ANY ('{4443,163448,3540950}'::bigint[]))\n  ->  Index Scan using task_type_pkey on task_type tt  (cost=20.01..21.57 rows=1 width=8) (actual time=0.672..0.673 rows=1 loops=1)\n        Index Cond: (id = ANY (ARRAY[t.task_type_id, $1, $2, ..., $1023]))\n        Storage Filter: (((task_category)::text = 'LOS'::text) AND ((task_type)::text = 'ETB'::text))\nPlanning Time: 1.030 ms\nExecution Time: 2.060 ms\nPeak Memory Usage: 536 kB"
+        },
+        {
+          "id": "task-q-68",
+          "name": "getETBTaskDetailsByTaskIds",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "getETBTaskDetailsByTaskIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT t.id AS task_id,t.description AS description, tt.task_category, tt.task_type, tt.task_sub_type, t.office_id AS office_id,t.created_on AS created_date,te.loan_app_id AS loan_app_id, te.group_id AS group_id, te.sales_promo_code AS sales_promo_code FROM task t JOIN task_type tt ON tt.id = t.task_type_id JOIN task_extension te ON te.task_id = t.id WHERE t.id IN :taskIds;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=60.77..68.95 rows=3 width=259) (actual time=2.137..2.150 rows=3 loops=1)\n  Join Filter: (t.id = te.task_id)\n  ->  YB Batched Nested Loop Join  (cost=40.66..44.01 rows=3 width=231) (actual time=1.505..1.516 rows=3 loops=1)\n        Join Filter: (t.task_type_id = tt.id)\n        ->  Index Scan using task_pkey on task t  (cost=20.49..22.17 rows=3 width=200) (actual time=0.797..0.802 rows=3 loops=1)\n              Index Cond: (id = ANY ('{4443,163448,3540950}'::bigint[]))\n        ->  Index Scan using task_type_pkey on task_type tt  (cost=20.17..21.73 rows=3 width=47) (actual time=0.629..0.633 rows=3 loops=1)\n              Index Cond: (id = ANY (ARRAY[t.task_type_id, $1, $2, ..., $1023]))\n  ->  Index Only Scan using task_extension_task_id_idx on task_extension te  (cost=20.11..24.94 rows=3 width=36) (actual time=0.550..0.556 rows=3 loops=1)\n        Index Cond: (task_id = ANY (ARRAY[t.id, $1025, $1026, ..., $2047]))\n        Heap Fetches: 0\nPlanning Time: 1.490 ms\nExecution Time: 2.583 ms\nPeak Memory Usage: 920 kB"
+        },
+        {
+          "id": "task-q-69",
+          "name": "getTaskDetailsByTaskIds",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "getTaskDetailsByTaskIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT t.id AS task_id,t.description AS description, tt.task_category, tt.task_type, tt.task_sub_type, t.office_id AS office_id,t.created_on AS created_date,te.loan_app_id AS loan_app_id, te.group_id AS group_id, te.sales_promo_code AS sales_promo_code FROM task t JOIN task_type tt ON tt.id = t.task_type_id JOIN task_extension te ON te.task_id = t.id WHERE t.id IN :taskIds;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=60.77..68.95 rows=3 width=259) (actual time=2.024..2.037 rows=3 loops=1)\n  Join Filter: (t.id = te.task_id)\n  ->  YB Batched Nested Loop Join  (cost=40.66..44.01 rows=3 width=231) (actual time=1.376..1.387 rows=3 loops=1)\n        Join Filter: (t.task_type_id = tt.id)\n        ->  Index Scan using task_pkey on task t  (cost=20.49..22.17 rows=3 width=200) (actual time=0.781..0.785 rows=3 loops=1)\n              Index Cond: (id = ANY ('{4443,163448,3540950}'::bigint[]))\n        ->  Index Scan using task_type_pkey on task_type tt  (cost=20.17..21.73 rows=3 width=47) (actual time=0.517..0.521 rows=3 loops=1)\n              Index Cond: (id = ANY (ARRAY[t.task_type_id, $1, $2, ..., $1023]))\n  ->  Index Only Scan using task_extension_task_id_idx on task_extension te  (cost=20.11..24.94 rows=3 width=36) (actual time=0.567..0.573 rows=3 loops=1)\n        Index Cond: (task_id = ANY (ARRAY[t.id, $1025, $1026, ..., $2047]))\n        Heap Fetches: 0\nPlanning Time: 1.443 ms\nExecution Time: 2.396 ms\nPeak Memory Usage: 920 kB"
+        },
+        {
+          "id": "task-q-70",
+          "name": "getTaskByTaskId",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "getTaskByTaskId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task WHERE id = ?1;",
+          "explainPlan": "Index Scan using task_pkey on task  (cost=20.71..22.00 rows=1 width=1487) (actual time=0.759..0.761 rows=1 loops=1)\n  Index Cond: (id = 4443)\nPlanning Time: 0.150 ms\nExecution Time: 0.840 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-71",
+          "name": "getTaskByIdentifierAndTypeId",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "getTaskByIdentifierAndTypeId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task WHERE task_type_id = ?1 AND identifier = ?2 AND current_status IN ('ASSIGNED','UN_ASSIGNED') AND is_deleted IS FALSE;",
+          "explainPlan": "Index Scan using idx_task_task_type_id_identifier on task  (cost=40.05..69.37 rows=1 width=1487) (actual time=0.791..0.791 rows=0 loops=1)\n  Index Cond: ((task_type_id = 116) AND ((identifier)::text = '6000008384'::text))\nPlanning Time: 0.511 ms\nExecution Time: 0.865 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-72",
+          "name": "findAllTaskStatusAndName",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findAllTaskStatusAndName",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task WHERE current_status =?1 AND name =?2 AND is_deleted IS FALSE;",
+          "explainPlan": "Index Scan using idx_task_expiry_eligible on task  (cost=78.28..19566.65 rows=554 width=1487) (actual time=18.305..894.683 rows=169 loops=1)\n  Storage Filter: (((current_status)::text = 'ASSIGNED'::text) AND ((name)::text = 'Print Loan Documents'::text))\nPlanning Time: 0.351 ms\nExecution Time: 894.849 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-73",
+          "name": "findAllPendingTaskByAssigneeContributor",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findAllPendingTaskByAssigneeContributor",
+          "status": "healthy",
+          "sqlPreview": "SELECT id FROM task WHERE assignee_contributor = ?1 AND current_status = 'ASSIGNED' AND is_deleted IS false;",
+          "explainPlan": "Index Scan using task_assignee_contributor_current_status_idx on task  (cost=40.61..73.55 rows=47 width=8) (actual time=1.308..1.318 rows=5 loops=1)\n  Index Cond: ((assignee_contributor = 217) AND ((current_status)::text = 'ASSIGNED'::text))\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.287 ms\nExecution Time: 1.394 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-74",
+          "name": "findAllByTaskCodeAndLoanAppId",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findAllByTaskCodeAndLoanAppId",
+          "status": "healthy",
+          "sqlPreview": "SELECT t.* FROM task t JOIN task_extension te ON te.task_id = t.id JOIN task_type tt ON tt.task_type_version_id = t.task_type_version_id WHERE t.current_status = ?3 AND te.loan_app_id = ?2 AND tt.task_code = ?1;",
+          "explainPlan": "Nested Loop  (cost=100.99..161.71 rows=1 width=1487) (actual time=2.155..2.155 rows=0 loops=1)\n  Join Filter: (t.task_type_version_id = tt.task_type_version_id)\n  ->  YB Batched Nested Loop Join  (cost=60.94..93.14 rows=1 width=1487) (actual time=2.155..2.155 rows=0 loops=1)\n        Join Filter: (t.id = te.task_id)\n        ->  Index Scan using task_extension_loan_app_id_idx on task_extension te  (cost=40.23..69.95 rows=7 width=8) (actual time=1.354..1.361 rows=6 loops=1)\n              Index Cond: (loan_app_id = 504620)\n        ->  Index Scan using task_pkey on task t  (cost=20.71..23.17 rows=1 width=1487) (actual time=0.718..0.718 rows=0 loops=1)\n              Index Cond: (id = ANY (ARRAY[te.task_id, $1, $2, ..., $1023]))\n              Storage Filter: ((current_status)::text = 'ASSIGNED'::text)\n  ->  Index Scan using task_type_task_code_key on task_type tt  (cost=40.05..68.56 rows=1 width=8) (never executed)\n        Index Cond: ((task_code)::text = 'ETB_SCHEDULED_BET'::text)\nPlanning Time: 1.508 ms\nExecution Time: 2.399 ms\nPeak Memory Usage: 516 kB"
+        },
+        {
+          "id": "task-q-75",
+          "name": "findAllByTaskCodeAndGroupId",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findAllByTaskCodeAndGroupId",
+          "status": "healthy",
+          "sqlPreview": "SELECT t.* FROM task t JOIN task_extension te ON te.task_id = t.id JOIN task_type tt ON tt.task_type_version_id = t.task_type_version_id WHERE t.current_status = ?3 AND te.group_id = ?2 AND tt.task_code = ?1;",
+          "explainPlan": "Nested Loop  (cost=101.87..164.39 rows=1 width=1487) (actual time=3.717..3.718 rows=0 loops=1)\n  Join Filter: (t.task_type_version_id = tt.task_type_version_id)\n  Rows Removed by Join Filter: 8\n  ->  Index Scan using task_type_task_code_key on task_type tt  (cost=40.05..68.56 rows=1 width=8) (actual time=1.191..1.193 rows=1 loops=1)\n        Index Cond: ((task_code)::text = 'ETB_SCHEDULED_BET'::text)\n  ->  YB Batched Nested Loop Join  (cost=61.82..95.80 rows=2 width=1487) (actual time=2.485..2.514 rows=8 loops=1)\n        Join Filter: (t.id = te.task_id)\n        ->  Index Scan using task_extension_group_id_idx on task_extension te  (cost=40.40..70.89 rows=12 width=8) (actual time=1.184..1.203 rows=27 loops=1)\n              Index Cond: (group_id = 409198)\n        ->  Index Scan using task_pkey on task t  (cost=21.42..24.86 rows=2 width=1487) (actual time=1.193..1.207 rows=8 loops=1)\n              Index Cond: (id = ANY (ARRAY[te.task_id, $1, $2, ..., $1023]))\n              Storage Filter: ((current_status)::text = 'ASSIGNED'::text)\nPlanning Time: 1.504 ms\nExecution Time: 3.965 ms\nPeak Memory Usage: 516 kB"
+        },
+        {
+          "id": "task-q-76",
+          "name": "getTaskSubTypeFromTaskIds",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "getTaskSubTypeFromTaskIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT DISTINCT tt.task_sub_type FROM task t JOIN task_type tt ON t.task_type_id = tt.id WHERE t.id IN ?1 AND t.is_deleted IS FALSE;",
+          "explainPlan": "Unique  (cost=43.49..43.51 rows=3 width=21) (actual time=1.401..1.403 rows=3 loops=1)\n  ->  Sort  (cost=43.49..43.50 rows=3 width=21) (actual time=1.400..1.400 rows=3 loops=1)\n        Sort Key: tt.task_sub_type\n        Sort Method: quicksort  Memory: 25kB\n        ->  YB Batched Nested Loop Join  (cost=40.11..43.47 rows=3 width=21) (actual time=1.381..1.390 rows=3 loops=1)\n              Join Filter: (t.task_type_id = tt.id)\n              ->  Index Scan using task_pkey on task t  (cost=20.03..21.71 rows=3 width=8) (actual time=0.765..0.769 rows=3 loops=1)\n                    Index Cond: (id = ANY ('{4443,163448,3540950}'::bigint[]))\n                    Filter: (is_deleted IS FALSE)\n              ->  Index Scan using task_type_pkey on task_type tt  (cost=20.09..21.65 rows=3 width=29) (actual time=0.530..0.534 rows=3 loops=1)\n                    Index Cond: (id = ANY (ARRAY[t.task_type_id, $1, $2, ..., $1023]))\nPlanning Time: 0.752 ms\nExecution Time: 1.615 ms\nPeak Memory Usage: 544 kB"
+        },
+        {
+          "id": "task-q-77",
+          "name": "findAllByTaskIdsList",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findAllByTaskIdsList",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task WHERE id in ?1 and is_deleted IS FALSE;",
+          "explainPlan": "Index Scan using task_pkey on task  (cost=22.13..23.81 rows=3 width=1487) (actual time=0.770..0.777 rows=3 loops=1)\n  Index Cond: (id = ANY ('{4443,163448,3540950}'::bigint[]))\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.173 ms\nExecution Time: 0.848 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-78",
+          "name": "poolTaskCountForUnassigned",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "poolTaskCountForUnassigned",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(distinct(t.id)) FROM task t join task_type_version ttv on ttv.id = t.task_type_version_id join task_extension te on te.task_id = t.id inner join task_type tt on tt.task_type_version_id = t.task_type_version_id and tt.is_deleted = false and tt.task_sub_type = :taskSubType WHERE t.current_status = 'UN_ASSIGNED' AND ttv.role_code ilike concat('%|', :roleCode, '|%') AND t.is_deleted IS FALSE AND t.office_id IN (:officeIdList) AND ttv.channel ilike concat('%', :channelCode , '%') and tt.task_code NOT IN (:taskCodesToExclude) and te.product_code in (:productCodeList);",
+          "explainPlan": "Aggregate  (cost=205.85..205.86 rows=1 width=8) (actual time=1.360..1.360 rows=1 loops=1)\n  ->  Nested Loop  (cost=122.63..205.85 rows=1 width=8) (actual time=1.345..1.345 rows=0 loops=1)\n        ->  YB Batched Nested Loop Join  (cost=102.62..181.15 rows=1 width=8) (actual time=1.344..1.344 rows=0 loops=1)\n              Join Filter: (ttv.id = t.task_type_version_id)\n              ->  YB Batched Nested Loop Join  (cost=60.15..90.46 rows=1 width=16) (actual time=1.340..1.340 rows=0 loops=1)\n                    Join Filter: (ttv.id = tt.task_type_version_id)\n                    ->  Index Scan using task_type_task_code_key on task_type tt  (cost=40.14..69.23 rows=1 width=8) (actual time=1.336..1.336 rows=0 loops=1)\n                          Index Cond: ((task_code)::text = ANY ('{ETB_SCHEDULED_BET,DO_GROUP_COLLECTION,TRANSACTION_REVERSAL_CHECKER}'::text[]))\n                          Storage Filter: ((NOT is_deleted) AND ((task_sub_type)::text = 'ACCEPT_BET'::text))\n                    ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.01..21.23 rows=1 width=8) (never executed)\n                          Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\n                          Storage Filter: (((role_code)::text ~~* '%||FLCC_SO|RM|SO||%'::text) AND ((channel)::text ~~* '%APK%'::text))\n              ->  Index Scan using task_task_type_version_id_current_status_idx on task t  (cost=42.48..90.69 rows=58 width=16) (never executed)\n                    Index Cond: ((task_type_version_id = ANY (ARRAY[ttv.id, $1025, $1026, ..., $2047])) AND ((current_status)::text = 'UN_ASSIGNED'::text))\n                    Storage Filter: (office_id = ANY ('{2,2,2}'::bigint[]))\n                    Filter: (is_deleted IS FALSE)\n        ->  Index Only Scan using task_extension_task_id_idx on task_extension te  (cost=20.01..24.69 rows=1 width=8) (never executed)\n              Index Cond: ((task_id = t.id) AND (product_code = ANY ('{INDL_LOAN,SHGDL,INDL_LOAN}'::text[])))\n              Heap Fetches: 0\nPlanning Time: 3.862 ms\nExecution Time: 1.815 ms\nPeak Memory Usage: 985 kB"
+        },
+        {
+          "id": "task-q-79",
+          "name": "poolTaskCountForUnassigned",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "poolTaskCountForUnassigned",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(distinct(t.id)) FROM task t join task_type_version ttv on ttv.id = t.task_type_version_id join task_extension te on te.task_id = t.id and te.sourcing_user_id = :sourcingUserId inner join task_type tt on tt.task_type_version_id = t.task_type_version_id and tt.is_deleted = false and tt.task_sub_type = :taskSubType WHERE t.current_status = 'UN_ASSIGNED' AND ttv.role_code ilike concat('%|', :roleCode, '|%') AND t.is_deleted IS FALSE AND ttv.channel ilike concat('%', :channelCode , '%') and tt.task_code NOT IN (:taskCodesToExclude) and te.product_code in (:productCodeList);",
+          "explainPlan": "Aggregate  (cost=249.19..249.20 rows=1 width=8) (actual time=1.346..1.346 rows=1 loops=1)\n  ->  Nested Loop  (cost=142.66..249.18 rows=1 width=8) (actual time=1.330..1.330 rows=0 loops=1)\n        ->  YB Batched Nested Loop Join  (cost=102.62..180.49 rows=1 width=8) (actual time=1.330..1.330 rows=0 loops=1)\n              Join Filter: (ttv.id = t.task_type_version_id)\n              ->  YB Batched Nested Loop Join  (cost=60.15..90.46 rows=1 width=16) (actual time=1.326..1.326 rows=0 loops=1)\n                    Join Filter: (ttv.id = tt.task_type_version_id)\n                    ->  Index Scan using task_type_task_code_key on task_type tt  (cost=40.14..69.23 rows=1 width=8) (actual time=1.323..1.323 rows=0 loops=1)\n                          Index Cond: ((task_code)::text = ANY ('{ETB_SCHEDULED_BET,DO_GROUP_COLLECTION,TRANSACTION_REVERSAL_CHECKER}'::text[]))\n                          Storage Filter: ((NOT is_deleted) AND ((task_sub_type)::text = 'ACCEPT_BET'::text))\n                    ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.01..21.23 rows=1 width=8) (never executed)\n                          Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\n                          Storage Filter: (((role_code)::text ~~* '%||FLCC_SO|RM|SO||%'::text) AND ((channel)::text ~~* '%APK%'::text))\n              ->  Index Scan using task_task_type_version_id_current_status_idx on task t  (cost=42.48..90.02 rows=58 width=16) (never executed)\n                    Index Cond: ((task_type_version_id = ANY (ARRAY[ttv.id, $1025, $1026, ..., $2047])) AND ((current_status)::text = 'UN_ASSIGNED'::text))\n                    Filter: (is_deleted IS FALSE)\n        ->  Index Scan using task_extension_task_idx on task_extension te  (cost=40.03..68.69 rows=1 width=8) (never executed)\n              Index Cond: (task_id = t.id)\n              Storage Filter: (((sourcing_user_id)::text = '252'::text) AND ((product_code)::text = ANY ('{INDL_LOAN,SHGDL,INDL_LOAN}'::text[])))\nPlanning Time: 3.241 ms\nExecution Time: 1.720 ms\nPeak Memory Usage: 985 kB"
+        },
+        {
+          "id": "task-q-80",
+          "name": "poolTaskCountForUnassigned",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "poolTaskCountForUnassigned",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(distinct(t.id)) FROM task t join task_type_version ttv on ttv.id = t.task_type_version_id join task_extension te on te.task_id = t.id inner join task_type tt on tt.task_type_version_id = t.task_type_version_id and tt.is_deleted = false and tt.task_sub_type = :taskSubType WHERE t.current_status = 'UN_ASSIGNED' AND ttv.role_code ilike concat('%|', :roleCode, '|%') AND t.is_deleted IS FALSE AND ttv.channel ilike concat('%',:channelCode, '%') and tt.task_code NOT IN (:taskCodesToExclude) and te.product_code in (:productCodeList);",
+          "explainPlan": "Aggregate  (cost=205.19..205.20 rows=1 width=8) (actual time=1.426..1.426 rows=1 loops=1)\n  ->  Nested Loop  (cost=122.63..205.19 rows=1 width=8) (actual time=1.410..1.410 rows=0 loops=1)\n        ->  YB Batched Nested Loop Join  (cost=102.62..180.49 rows=1 width=8) (actual time=1.409..1.409 rows=0 loops=1)\n              Join Filter: (ttv.id = t.task_type_version_id)\n              ->  YB Batched Nested Loop Join  (cost=60.15..90.46 rows=1 width=16) (actual time=1.406..1.406 rows=0 loops=1)\n                    Join Filter: (ttv.id = tt.task_type_version_id)\n                    ->  Index Scan using task_type_task_code_key on task_type tt  (cost=40.14..69.23 rows=1 width=8) (actual time=1.402..1.402 rows=0 loops=1)\n                          Index Cond: ((task_code)::text = ANY ('{ETB_SCHEDULED_BET,DO_GROUP_COLLECTION,TRANSACTION_REVERSAL_CHECKER}'::text[]))\n                          Storage Filter: ((NOT is_deleted) AND ((task_sub_type)::text = 'ACCEPT_BET'::text))\n                    ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.01..21.23 rows=1 width=8) (never executed)\n                          Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\n                          Storage Filter: (((role_code)::text ~~* '%||FLCC_SO|RM|SO||%'::text) AND ((channel)::text ~~* '%APK%'::text))\n              ->  Index Scan using task_task_type_version_id_current_status_idx on task t  (cost=42.48..90.02 rows=58 width=16) (never executed)\n                    Index Cond: ((task_type_version_id = ANY (ARRAY[ttv.id, $1025, $1026, ..., $2047])) AND ((current_status)::text = 'UN_ASSIGNED'::text))\n                    Filter: (is_deleted IS FALSE)\n        ->  Index Only Scan using task_extension_task_id_idx on task_extension te  (cost=20.01..24.69 rows=1 width=8) (never executed)\n              Index Cond: ((task_id = t.id) AND (product_code = ANY ('{INDL_LOAN,SHGDL,INDL_LOAN}'::text[])))\n              Heap Fetches: 0\nPlanning Time: 3.135 ms\nExecution Time: 1.801 ms\nPeak Memory Usage: 985 kB"
+        },
+        {
+          "id": "task-q-81",
+          "name": "poolTaskCountForUnassigned",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "poolTaskCountForUnassigned",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(distinct(t.id)) FROM task t join task_type_version ttv on ttv.id = t.task_type_version_id join task_extension te on te.task_id = t.id and te.sourcing_user_id = :sourcingUserId inner join task_type tt on tt.task_type_version_id = t.task_type_version_id and tt.is_deleted = false and tt.task_sub_type = :taskSubType WHERE t.current_status = 'UN_ASSIGNED' AND ttv.role_code ilike concat('%|', :roleCode, '|%') AND t.is_deleted IS FALSE AND t.office_id IN (:officeIdList) AND ttv.channel ilike concat('%', :channelCode , '%') and tt.task_code NOT IN (:taskCodesToExclude) and te.product_code in (:productCodeList);",
+          "explainPlan": "Aggregate  (cost=249.85..249.86 rows=1 width=8) (actual time=1.326..1.326 rows=1 loops=1)\n  ->  Nested Loop  (cost=142.66..249.85 rows=1 width=8) (actual time=1.312..1.312 rows=0 loops=1)\n        ->  YB Batched Nested Loop Join  (cost=102.62..181.15 rows=1 width=8) (actual time=1.311..1.311 rows=0 loops=1)\n              Join Filter: (ttv.id = t.task_type_version_id)\n              ->  YB Batched Nested Loop Join  (cost=60.15..90.46 rows=1 width=16) (actual time=1.308..1.308 rows=0 loops=1)\n                    Join Filter: (ttv.id = tt.task_type_version_id)\n                    ->  Index Scan using task_type_task_code_key on task_type tt  (cost=40.14..69.23 rows=1 width=8) (actual time=1.303..1.303 rows=0 loops=1)\n                          Index Cond: ((task_code)::text = ANY ('{ETB_SCHEDULED_BET,DO_GROUP_COLLECTION,TRANSACTION_REVERSAL_CHECKER}'::text[]))\n                          Storage Filter: ((NOT is_deleted) AND ((task_sub_type)::text = 'ACCEPT_BET'::text))\n                    ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.01..21.23 rows=1 width=8) (never executed)\n                          Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\n                          Storage Filter: (((role_code)::text ~~* '%||FLCC_SO|RM|SO||%'::text) AND ((channel)::text ~~* '%APK%'::text))\n              ->  Index Scan using task_task_type_version_id_current_status_idx on task t  (cost=42.48..90.69 rows=58 width=16) (never executed)\n                    Index Cond: ((task_type_version_id = ANY (ARRAY[ttv.id, $1025, $1026, ..., $2047])) AND ((current_status)::text = 'UN_ASSIGNED'::text))\n                    Storage Filter: (office_id = ANY ('{2,2,2}'::bigint[]))\n                    Filter: (is_deleted IS FALSE)\n        ->  Index Scan using task_extension_task_idx on task_extension te  (cost=40.03..68.69 rows=1 width=8) (never executed)\n              Index Cond: (task_id = t.id)\n              Storage Filter: (((sourcing_user_id)::text = '252'::text) AND ((product_code)::text = ANY ('{INDL_LOAN,SHGDL,INDL_LOAN}'::text[])))\nPlanning Time: 3.779 ms\nExecution Time: 1.705 ms\nPeak Memory Usage: 993 kB"
+        },
+        {
+          "id": "task-q-82",
+          "name": "findTaskIdAndRoleCodeByTaskIdsIn",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findTaskIdAndRoleCodeByTaskIdsIn",
+          "status": "healthy",
+          "sqlPreview": "SELECT t.id AS task_id, ttv.role_code FROM task t JOIN task_type_version ttv ON t.task_type_version_id = ttv.id WHERE t.id IN (:taskIds) AND t.is_deleted IS FALSE;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=40.11..43.46 rows=3 width=18) (actual time=1.345..1.354 rows=3 loops=1)\n  Join Filter: (t.task_type_version_id = ttv.id)\n  ->  Index Scan using task_pkey on task t  (cost=20.05..21.73 rows=3 width=16) (actual time=0.725..0.730 rows=3 loops=1)\n        Index Cond: (id = ANY ('{4443,163448,3540950}'::bigint[]))\n        Filter: (is_deleted IS FALSE)\n  ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.06..21.62 rows=3 width=18) (actual time=0.540..0.544 rows=3 loops=1)\n        Index Cond: (id = ANY (ARRAY[t.task_type_version_id, $1, $2, ..., $1023]))\nPlanning Time: 0.754 ms\nExecution Time: 1.569 ms\nPeak Memory Usage: 542 kB"
+        },
+        {
+          "id": "task-q-83",
+          "name": "findByOfficeIdAndVillageIdsInAndCurrentStatusInAndIsDeletedFalse",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findByOfficeIdAndVillageIdsInAndCurrentStatusInAndIsDeletedFalse",
+          "status": "healthy",
+          "sqlPreview": "SELECT t.* FROM task t WHERE t.office_id = ?1 AND t.current_status IN ?3 AND t.is_deleted IS FALSE AND EXISTS (SELECT 1 FROM task_extension te WHERE te.task_id = t.id AND te.vtc_id IN ?2);",
+          "explainPlan": "Hash Semi Join  (cost=21531.72..94180.47 rows=94867 width=1487) (actual time=299.757..1298.250 rows=19374 loops=1)\n  Hash Cond: (t.id = te.task_id)\n  ->  Index Scan using task_office_id_current_status_idx on task t  (cost=91.56..28561.36 rows=114120 width=1487) (actual time=16.826..941.842 rows=36250 loops=1)\n        Index Cond: ((office_id = 2) AND ((current_status)::text = ANY ('{ASSIGNED,ASSIGNED,ASSIGNED}'::text[])) AND (is_deleted = false))\n        Filter: (is_deleted IS FALSE)\n  ->  Hash  (cost=18519.82..18519.82 rows=177947 width=8) (actual time=282.310..282.311 rows=95544 loops=1)\n        Buckets: 131072  Batches: 4  Memory Usage: 1956kB\n        ->  Index Only Scan using task_extension_task_id_idx on task_extension te  (cost=27.03..18519.82 rows=177947 width=8) (actual time=1.491..236.804 rows=95544 loops=1)\n              Index Cond: (vtc_id = ANY ('{43521,43526,43521}'::bigint[]))\n              Rows Removed by Index Recheck: 117088\n              Heap Fetches: 0\nPlanning Time: 1.196 ms\nExecution Time: 1303.401 ms\nPeak Memory Usage: 4098 kB"
+        },
+        {
+          "id": "task-q-84",
+          "name": "findByAssigneeContributorInAndVillageIdsInAndCurrentStatusInAndIsDeletedFalse",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findByAssigneeContributorInAndVillageIdsInAndCurrentStatusInAndIsDeletedFalse",
+          "status": "healthy",
+          "sqlPreview": "SELECT t.* FROM task t WHERE t.assignee_contributor IN ?1 AND t.current_status IN ?3 AND t.is_deleted IS FALSE AND EXISTS (SELECT 1 FROM task_extension te WHERE te.task_id = t.id AND te.vtc_id IN ?2);",
+          "explainPlan": "Hash Semi Join  (cost=21537.19..25870.28 rows=3676 width=1487) (actual time=292.440..292.440 rows=0 loops=1)\n  Hash Cond: (t.id = te.task_id)\n  ->  Index Scan using task_assignee_contributor_current_status_idx on task t  (cost=97.03..2047.62 rows=4422 width=1487) (actual time=5.183..5.597 rows=242 loops=1)\n        Index Cond: ((assignee_contributor = ANY ('{217,37,23615}'::bigint[])) AND ((current_status)::text = ANY ('{ASSIGNED,ASSIGNED,ASSIGNED}'::text[])))\n        Filter: (is_deleted IS FALSE)\n  ->  Hash  (cost=18519.82..18519.82 rows=177947 width=8) (actual time=277.967..277.968 rows=95544 loops=1)\n        Buckets: 131072  Batches: 4  Memory Usage: 1956kB\n        ->  Index Only Scan using task_extension_task_id_idx on task_extension te  (cost=27.03..18519.82 rows=177947 width=8) (actual time=1.456..232.699 rows=95544 loops=1)\n              Index Cond: (vtc_id = ANY ('{43521,43526,43521}'::bigint[]))\n              Rows Removed by Index Recheck: 117088\n              Heap Fetches: 0\nPlanning Time: 1.816 ms\nExecution Time: 292.568 ms\nPeak Memory Usage: 2975 kB"
+        },
+        {
+          "id": "task-q-85",
+          "name": "findCountForEscalationNotification",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findCountForEscalationNotification",
+          "status": "healthy",
+          "sqlPreview": "select count(id) AS cnt ,MIN(id) AS MIN ,MAX(id) AS MAX from task where task_type_id in (select task_type_id from task_escalation_notification_details where is_deleted IS FALSE) and current_status = 'ASSIGNED' and is_deleted IS FALSE;",
+          "explainPlan": "Aggregate  (cost=2032.14..2032.15 rows=1 width=24) (actual time=5.388..5.388 rows=1 loops=1)\n  ->  YB Batched Nested Loop Join  (cost=949.08..2015.98 rows=2155 width=8) (actual time=5.058..5.336 rows=119 loops=1)\n        Join Filter: (task.task_type_id = task_escalation_notification_details.task_type_id)\n        ->  HashAggregate  (cost=861.43..861.50 rows=7 width=8) (actual time=0.568..0.570 rows=7 loops=1)\n              Group Key: task_escalation_notification_details.task_type_id\n              ->  Seq Scan on task_escalation_notification_details  (cost=40.00..861.41 rows=7 width=8) (actual time=0.558..0.561 rows=7 loops=1)\n                    Filter: (is_deleted IS FALSE)\n        ->  Index Scan using idx_task_task_type_id_identifier on task  (cost=87.66..1154.29 rows=2155 width=16) (actual time=4.413..4.566 rows=119 loops=1)\n              Index Cond: (task_type_id = ANY (ARRAY[task_escalation_notification_details.task_type_id, $1, $2, ..., $1023]))\n              Storage Filter: ((current_status)::text = 'ASSIGNED'::text)\nPlanning Time: 0.915 ms\nExecution Time: 5.662 ms\nPeak Memory Usage: 536 kB"
+        },
+        {
+          "id": "task-q-86",
+          "name": "findByOfficeIdAndCurrentStatusInAndRoleCodeAndIsDeletedFalse",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findByOfficeIdAndCurrentStatusInAndRoleCodeAndIsDeletedFalse",
+          "status": "healthy",
+          "sqlPreview": "SELECT DISTINCT t.* FROM task t JOIN task_type tt ON tt.id = t.task_type_id JOIN task_type_version ttv ON ttv.id = tt.task_type_version_id WHERE t.office_id = ?1 AND t.current_status IN ?2 AND t.is_deleted IS FALSE AND ttv.role_code ILIKE CONCAT('%|', ?3, '|%');",
+          "explainPlan": "HashAggregate  (cost=1686.22..1695.57 rows=935 width=1487) (actual time=2.428..2.428 rows=0 loops=1)\n  Group Key: t.id, t.name, t.description, t.estimated_tat, t.actual_tat, t.task_type_id, t.task_type_version_id, t.task_location_id, t.current_status, t.assignee_contributor, t.feedback_rating, t.feedback_comments, t.scheduled_on, t.scheduled_by, t.tat_unit, t.office_id, t.created_on, t.created_by, t.updated_on, t.updated_by, t.is_deleted, t.expired_on, t.identifier, t.data, t.sourcing_employee_id\n  ->  Nested Loop  (cost=116.30..1627.79 rows=935 width=1487) (actual time=2.418..2.418 rows=0 loops=1)\n        ->  YB Batched Nested Loop Join  (cost=60.01..923.61 rows=2 width=8) (actual time=2.418..2.418 rows=0 loops=1)\n              Join Filter: (tt.task_type_version_id = ttv.id)\n              ->  Seq Scan on task_type tt  (cost=40.00..872.68 rows=183 width=16) (actual time=0.666..0.707 rows=183 loops=1)\n              ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.01..50.91 rows=1 width=8) (actual time=1.532..1.532 rows=0 loops=1)\n                    Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\n                    Storage Filter: ((role_code)::text ~~* '%||FLCC_SO|RM|SO||%'::text)\n        ->  Index Scan using idx_task_task_type_id_identifier on task t  (cost=56.29..343.31 rows=878 width=1487) (never executed)\n              Index Cond: (task_type_id = tt.id)\n              Storage Filter: ((office_id = 2) AND ((current_status)::text = ANY ('{ASSIGNED,ASSIGNED,ASSIGNED}'::text[])))\nPlanning Time: 1.751 ms\nExecution Time: 2.721 ms\nPeak Memory Usage: 739 kB"
+        },
+        {
+          "id": "task-q-87",
+          "name": "findByOfficeIdAndVillageIdsInAndCurrentStatusInAndRoleCodeAndIsDeletedFalse",
+          "description": "via TaskRepository",
+          "daoClass": "in.novopay.task.mgmt.datamodel.repository.TaskRepository",
+          "sqlIdentifier": "findByOfficeIdAndVillageIdsInAndCurrentStatusInAndRoleCodeAndIsDeletedFalse",
+          "status": "healthy",
+          "sqlPreview": "SELECT DISTINCT t.* FROM task t JOIN task_type tt ON tt.id = t.task_type_id JOIN task_type_version ttv ON ttv.id = tt.task_type_version_id WHERE t.office_id = ?1 AND t.current_status IN ?3 AND t.is_deleted IS FALSE AND ttv.role_code ILIKE CONCAT('%|', ?4, '|%') AND EXISTS (SELECT 1 FROM task_extension te WHERE te.task_id = t.id AND te.vtc_id IN ?2);",
+          "explainPlan": "Unique  (cost=10536.02..10584.58 rows=777 width=1487) (actual time=2.397..2.397 rows=0 loops=1)\n  ->  Sort  (cost=10536.02..10537.96 rows=777 width=1487) (actual time=2.397..2.397 rows=0 loops=1)\n        Sort Key: t.id, t.name, t.description, t.estimated_tat, t.actual_tat, t.task_type_id, t.task_type_version_id, t.task_location_id, t.current_status, t.assignee_contributor, t.feedback_rating, t.feedback_comments, t.scheduled_on, t.scheduled_by, t.tat_unit, t.created_on, t.created_by, t.updated_on, t.updated_by, t.is_deleted, t.expired_on, t.identifier, t.data, t.sourcing_employee_id\n        Sort Method: quicksort  Memory: 25kB\n        ->  YB Batched Nested Loop Semi Join  (cost=190.67..10498.72 rows=777 width=1487) (actual time=2.383..2.383 rows=0 loops=1)\n              Join Filter: (t.id = te.task_id)\n              ->  Nested Loop  (cost=116.30..1627.79 rows=935 width=1487) (actual time=2.380..2.380 rows=0 loops=1)\n                    ->  YB Batched Nested Loop Join  (cost=60.01..923.61 rows=2 width=8) (actual time=2.379..2.379 rows=0 loops=1)\n                          Join Filter: (tt.task_type_version_id = ttv.id)\n                          ->  Seq Scan on task_type tt  (cost=40.00..872.68 rows=183 width=16) (actual time=0.852..0.892 rows=183 loops=1)\n                          ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.01..50.91 rows=1 width=8) (actual time=1.307..1.307 rows=0 loops=1)\n                                Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\n                                Storage Filter: ((role_code)::text ~~* '%||FLCC_SO|RM|SO||%'::text)\n                    ->  Index Scan using idx_task_task_type_id_identifier on task t  (cost=56.29..343.31 rows=878 width=1487) (never executed)\n                          Index Cond: (task_type_id = tt.id)\n                          Storage Filter: ((office_id = 2) AND ((current_status)::text = ANY ('{ASSIGNED,ASSIGNED,ASSIGNED}'::text[])))\n              ->  Index Scan using task_extension_task_idx on task_extension te  (cost=74.38..469.62 rows=865 width=8) (never executed)\n                    Index Cond: (task_id = ANY (ARRAY[t.id, $1026, $1027, ..., $2048]))\n                    Storage Filter: (vtc_id = ANY ('{43521,43526,43521}'::bigint[]))\nPlanning Time: 3.180 ms\nExecution Time: 2.800 ms\nPeak Memory Usage: 1110 kB"
+        }
+      ]
+    },
+    {
+      "id": "tasktypeapiexecutionrepository-593dd7",
+      "name": "TaskTypeApiExecutionRepository",
+      "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeApiExecutionRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-31",
+          "name": "findOneByTaskTypeVersionId",
+          "description": "via TaskTypeApiExecutionRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeApiExecutionRepository",
+          "sqlIdentifier": "findOneByTaskTypeVersionId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_type_api_execution WHERE task_type_version_id = ?1;",
+          "explainPlan": "Index Scan using task_type_api_execution_task_type_version_id on task_type_api_execution  (cost=40.03..69.31 rows=1 width=1005) (actual time=1.482..1.486 rows=1 loops=1)\n  Index Cond: (task_type_version_id = 55)\nPlanning Time: 0.156 ms\nExecution Time: 1.578 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-32",
+          "name": "findOneByTaskTypeVersionIdAndAction",
+          "description": "via TaskTypeApiExecutionRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeApiExecutionRepository",
+          "sqlIdentifier": "findOneByTaskTypeVersionIdAndAction",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_type_api_execution WHERE task_type_version_id = ?1 AND action = ?2;",
+          "explainPlan": "Index Scan using task_type_api_execution_task_type_version_id on task_type_api_execution  (cost=40.03..69.32 rows=1 width=1005) (actual time=1.353..1.353 rows=0 loops=1)\n  Index Cond: (task_type_version_id = 55)\n  Storage Filter: ((action)::text = 'REJECT'::text)\nPlanning Time: 0.157 ms\nExecution Time: 1.451 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "tasktyperepository-7ea91d",
+      "name": "TaskTypeRepository",
+      "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-17",
+          "name": "findAllBy",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "findAllBy",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_type tt INNER JOIN task_type_version tv on tt.task_type_version_id=tv.id WHERE ?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=86.14..1031.21 rows=183 width=244) (actual time=6.817..7.524 rows=183 loops=1)\n  Join Filter: (tt.task_type_version_id = tv.id)\n  ->  Seq Scan on task_type_version tv  (cost=40.00..881.63 rows=122 width=94) (actual time=1.577..1.690 rows=122 loops=1)\n  ->  Index Scan using task_type_task_type_version_id on task_type tt  (cost=46.14..149.30 rows=183 width=150) (actual time=4.869..5.189 rows=183 loops=1)\n        Index Cond: (task_type_version_id = ANY (ARRAY[tv.id, $1, $2, ..., $1023]))\nPlanning Time: 0.974 ms\nExecution Time: 7.921 ms\nPeak Memory Usage: 543 kB"
+        },
+        {
+          "id": "task-q-18",
+          "name": "getTaskTypeDetailsById",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "getTaskTypeDetailsById",
+          "status": "healthy",
+          "sqlPreview": "SELECT tt.id ,tt.\"name\" ,tt.task_code ,ttv.tat ,ttv.tat_unit FROM task_type tt JOIN task_type_version ttv ON ttv.id = tt.task_type_version_id WHERE tt.id = ?1 AND tt.is_deleted IS FALSE;",
+          "explainPlan": "Nested Loop  (cost=40.09..42.55 rows=1 width=67) (actual time=1.843..1.848 rows=1 loops=1)\n  ->  Index Scan using task_type_pkey on task_type tt  (cost=20.06..21.29 rows=1 width=62) (actual time=0.976..0.980 rows=1 loops=1)\n        Index Cond: (id = 23)\n        Filter: (is_deleted IS FALSE)\n  ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.02..21.25 rows=1 width=21) (actual time=0.859..0.859 rows=1 loops=1)\n        Index Cond: (id = tt.task_type_version_id)\nPlanning Time: 0.355 ms\nExecution Time: 1.977 ms\nPeak Memory Usage: 24 kB"
+        },
+        {
+          "id": "task-q-19",
+          "name": "findByVersionId",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "findByVersionId",
+          "status": "healthy",
+          "sqlPreview": "SELECT task_category FROM task_type WHERE id = ?1;",
+          "explainPlan": "Index Scan using task_type_pkey on task_type  (cost=20.01..21.24 rows=1 width=6) (actual time=1.269..1.272 rows=1 loops=1)\n  Index Cond: (id = 23)\nPlanning Time: 0.114 ms\nExecution Time: 1.365 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-20",
+          "name": "findByCodeAndIsDeletedIsFalse",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "findByCodeAndIsDeletedIsFalse",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_type WHERE task_code = ?1 AND is_deleted is false;",
+          "explainPlan": "Index Scan using task_type_task_code_key on task_type  (cost=40.05..68.73 rows=1 width=150) (actual time=2.759..2.764 rows=1 loops=1)\n  Index Cond: ((task_code)::text = 'ETB_SCHEDULED_BET'::text)\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.132 ms\nExecution Time: 2.846 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-21",
+          "name": "findByTaskTypeAndRoleCode",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "findByTaskTypeAndRoleCode",
+          "status": "needs-review",
+          "sqlPreview": "SELECT tt.* FROM task_type tt JOIN task_type_version__order ttvo ON tt.task_type_version_id = ttvo.task_type_version_id JOIN task_type_version__role ttvr ON ttvo.task_type_version_id = ttvr.task_type_version_id WHERE ttvr.role_code = ?1 AND tt.task_type IN ?2 AND tt.is_deleted IS FALSE AND tt.task_type_version_id IN(SELECT task_type_version_id FROM task_type_version__product WHERE product_code IN ?3)ORDER BY ttvo.sequence;",
+          "reviewReason": "could not resolve column 'ttvr.role_code' (table/alias/column unknown)"
+        },
+        {
+          "id": "task-q-22",
+          "name": "findAllByTaskCategoryAndTaskTypeAndRoleCode",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "findAllByTaskCategoryAndTaskTypeAndRoleCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT tt.task_sub_type ,tt.\"name\" FROM task_type tt JOIN task_type_version ttv ON ttv.id = tt.task_type_version_id And ttv.role_code ILIKE %?3% WHERE task_category = ?1 AND task_type IN ?2 AND is_deleted IS FALSE ORDER BY ttv.task_order;",
+          "explainPlan": "Sort  (cost=113.82..113.83 rows=1 width=45) (actual time=3.161..3.161 rows=2 loops=1)\n  Sort Key: ttv.task_order\n  Sort Method: quicksort  Memory: 25kB\n  ->  YB Batched Nested Loop Join  (cost=63.31..113.81 rows=1 width=45) (actual time=3.129..3.144 rows=2 loops=1)\n        Join Filter: (tt.task_type_version_id = ttv.id)\n        ->  Index Scan using task_type_task_category_task_type_task_sub_type_idx on task_type tt  (cost=43.30..83.92 rows=54 width=51) (actual time=1.744..1.795 rows=34 loops=1)\n              Index Cond: (((task_category)::text = 'LOS'::text) AND ((task_type)::text = ANY ('{ETB,ETB,ETB}'::text[])))\n              Filter: (is_deleted IS FALSE)\n        ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.01..29.88 rows=1 width=10) (actual time=1.198..1.203 rows=2 loops=1)\n              Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\n              Storage Filter: ((role_code)::text ~~* '%|FLCC_SO|RM|SO|%'::text)\nPlanning Time: 1.361 ms\nExecution Time: 3.720 ms\nPeak Memory Usage: 626 kB"
+        },
+        {
+          "id": "task-q-23",
+          "name": "findAllByTaskCategoryAndTaskType",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "findAllByTaskCategoryAndTaskType",
+          "status": "healthy",
+          "sqlPreview": "SELECT tt.task_sub_type ,tt.\"name\" FROM task_type tt JOIN task_type_version ttv ON ttv.id = tt.task_type_version_id WHERE task_category = ?1 AND task_type IN ?2 AND is_deleted IS FALSE ORDER BY ttv.task_order;",
+          "explainPlan": "Sort  (cost=152.29..152.43 rows=54 width=45) (actual time=4.400..4.402 rows=34 loops=1)\n  Sort Key: ttv.task_order\n  Sort Method: quicksort  Memory: 28kB\n  ->  YB Batched Nested Loop Join  (cost=63.79..150.74 rows=54 width=45) (actual time=4.268..4.358 rows=34 loops=1)\n        Join Filter: (tt.task_type_version_id = ttv.id)\n        ->  Index Scan using task_type_task_category_task_type_task_sub_type_idx on task_type tt  (cost=43.30..83.92 rows=54 width=51) (actual time=2.559..2.610 rows=34 loops=1)\n              Index Cond: (((task_category)::text = 'LOS'::text) AND ((task_type)::text = ANY ('{ETB,ETB,ETB}'::text[])))\n              Filter: (is_deleted IS FALSE)\n        ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.49..30.36 rows=54 width=10) (actual time=1.518..1.553 rows=34 loops=1)\n              Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\nPlanning Time: 0.991 ms\nExecution Time: 5.101 ms\nPeak Memory Usage: 626 kB"
+        },
+        {
+          "id": "task-q-24",
+          "name": "findAllByTaskTypeAndRoleCode",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "findAllByTaskTypeAndRoleCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT tt.task_sub_type ,tt.\"name\" FROM task_type tt JOIN task_type_version ttv ON ttv.id = tt.task_type_version_id And ttv.role_code ILIKE %?2% WHERE tt.task_type IN ?1 AND tt.is_deleted IS FALSE ORDER BY ttv.task_order;",
+          "explainPlan": "Sort  (cost=155.94..155.94 rows=2 width=45) (actual time=4.885..4.885 rows=2 loops=1)\n  Sort Key: ttv.task_order\n  Sort Method: quicksort  Memory: 25kB\n  ->  YB Batched Nested Loop Join  (cost=71.19..155.93 rows=2 width=45) (actual time=4.855..4.874 rows=2 loops=1)\n        Join Filter: (tt.task_type_version_id = ttv.id)\n        ->  Index Scan using task_type_task_category_task_type_task_sub_type_idx on task_type tt  (cost=51.17..118.33 rows=101 width=51) (actual time=2.761..2.992 rows=34 loops=1)\n              Index Cond: ((task_type)::text = ANY ('{ETB,ETB,ETB}'::text[]))\n              Rows Removed by Index Recheck: 149\n              Filter: (is_deleted IS FALSE)\n        ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.02..37.55 rows=2 width=10) (actual time=1.727..1.731 rows=2 loops=1)\n              Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\n              Storage Filter: ((role_code)::text ~~* '%|FLCC_SO|RM|SO|%'::text)\nPlanning Time: 1.269 ms\nExecution Time: 5.162 ms\nPeak Memory Usage: 654 kB"
+        },
+        {
+          "id": "task-q-25",
+          "name": "findAllByTaskType",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "findAllByTaskType",
+          "status": "healthy",
+          "sqlPreview": "SELECT tt.task_sub_type ,tt.\"name\" FROM task_type tt JOIN task_type_version ttv ON ttv.id = tt.task_type_version_id WHERE tt.task_type IN ?1 AND tt.is_deleted IS FALSE ORDER BY ttv.task_order;",
+          "explainPlan": "Sort  (cost=287.66..287.91 rows=101 width=45) (actual time=4.624..4.627 rows=34 loops=1)\n  Sort Key: ttv.task_order\n  Sort Method: quicksort  Memory: 28kB\n  ->  YB Batched Nested Loop Join  (cost=72.09..284.30 rows=101 width=45) (actual time=4.506..4.592 rows=34 loops=1)\n        Join Filter: (tt.task_type_version_id = ttv.id)\n        ->  Index Scan using task_type_task_category_task_type_task_sub_type_idx on task_type tt  (cost=51.17..118.33 rows=101 width=51) (actual time=3.073..3.309 rows=34 loops=1)\n              Index Cond: ((task_type)::text = ANY ('{ETB,ETB,ETB}'::text[]))\n              Rows Removed by Index Recheck: 149\n              Filter: (is_deleted IS FALSE)\n        ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.92..38.46 rows=101 width=10) (actual time=1.041..1.075 rows=34 loops=1)\n              Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\nPlanning Time: 1.521 ms\nExecution Time: 4.927 ms\nPeak Memory Usage: 654 kB"
+        },
+        {
+          "id": "task-q-26",
+          "name": "findOneByTaskTypeVersionId",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "findOneByTaskTypeVersionId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_type WHERE task_type_version_id = ?1;",
+          "explainPlan": "Index Scan using task_type_task_type_version_id on task_type  (cost=40.10..69.45 rows=3 width=150) (actual time=1.441..1.450 rows=3 loops=1)\n  Index Cond: (task_type_version_id = 22)\nPlanning Time: 0.134 ms\nExecution Time: 1.536 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-27",
+          "name": "findAllByTaskCategory",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "findAllByTaskCategory",
+          "status": "healthy",
+          "sqlPreview": "SELECT DISTINCT task_type AS task_type_code FROM task_type WHERE task_category = ?1 AND is_deleted IS FALSE;",
+          "explainPlan": "Unique  (cost=45.92..90.73 rows=51 width=12) (actual time=1.759..1.904 rows=6 loops=1)\n  ->  Index Scan using task_type_task_category_task_type_task_sub_type_idx on task_type  (cost=45.92..90.49 rows=96 width=12) (actual time=1.757..1.864 rows=96 loops=1)\n        Index Cond: ((task_category)::text = 'LOS'::text)\n        Filter: (is_deleted IS FALSE)\n        Rows Removed by Filter: 1\nPlanning Time: 0.164 ms\nExecution Time: 2.007 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-28",
+          "name": "getTaskTypeEntityByTaskId",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "getTaskTypeEntityByTaskId",
+          "status": "healthy",
+          "sqlPreview": "SELECT tt.* FROM task_type tt JOIN task t ON t.task_type_id = tt.id WHERE t.id = ?1 AND t.is_deleted IS FALSE AND tt.is_deleted IS FALSE;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=40.18..42.70 rows=1 width=150) (actual time=1.807..1.818 rows=1 loops=1)\n  Join Filter: (tt.id = t.task_type_id)\n  ->  Index Scan using task_pkey on task t  (cost=20.01..21.30 rows=1 width=8) (actual time=0.915..0.918 rows=1 loops=1)\n        Index Cond: (id = 4443)\n        Filter: (is_deleted IS FALSE)\n  ->  Index Scan using task_type_pkey on task_type tt  (cost=20.18..21.41 rows=1 width=150) (actual time=0.799..0.803 rows=1 loops=1)\n        Index Cond: (id = ANY (ARRAY[t.task_type_id, $1, $2, ..., $1023]))\n        Filter: (is_deleted IS FALSE)\nPlanning Time: 0.905 ms\nExecution Time: 2.094 ms\nPeak Memory Usage: 516 kB"
+        },
+        {
+          "id": "task-q-29",
+          "name": "findAllByIds",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "findAllByIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT * from task_type WHERE id in ?1 AND is_deleted IS FALSE;",
+          "explainPlan": "Index Scan using task_type_pkey on task_type  (cost=20.53..22.09 rows=3 width=150) (actual time=0.746..0.753 rows=3 loops=1)\n  Index Cond: (id = ANY ('{23,116,572}'::bigint[]))\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.161 ms\nExecution Time: 0.827 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-30",
+          "name": "findOneByTaskTypeId",
+          "description": "via TaskTypeRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeRepository",
+          "sqlIdentifier": "findOneByTaskTypeId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM task_type WHERE id = ?1;",
+          "explainPlan": "Index Scan using task_type_pkey on task_type  (cost=20.18..21.41 rows=1 width=150) (actual time=0.781..0.784 rows=1 loops=1)\n  Index Cond: (id = 23)\nPlanning Time: 0.166 ms\nExecution Time: 0.877 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "tasktypeversionrepository-bc7765",
+      "name": "TaskTypeVersionRepository",
+      "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeVersionRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-11",
+          "name": "findOneByDescription",
+          "description": "via TaskTypeVersionRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeVersionRepository",
+          "sqlIdentifier": "findOneByDescription",
+          "status": "healthy",
+          "sqlPreview": "select * from task_type_version where description = ?1;",
+          "explainPlan": "Seq Scan on task_type_version  (cost=40.00..868.45 rows=1 width=94) (actual time=0.917..0.919 rows=1 loops=1)\n  Storage Filter: ((description)::text = 'eSign Pending'::text)\nPlanning Time: 0.112 ms\nExecution Time: 0.988 ms\nPeak Memory Usage: 15 kB"
+        },
+        {
+          "id": "task-q-12",
+          "name": "findByDescription",
+          "description": "via TaskTypeVersionRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeVersionRepository",
+          "sqlIdentifier": "findByDescription",
+          "status": "healthy",
+          "sqlPreview": "select * from task_type_version where description in ?1;",
+          "explainPlan": "Seq Scan on task_type_version  (cost=40.00..868.84 rows=3 width=94) (actual time=1.027..1.032 rows=3 loops=1)\n  Storage Filter: ((description)::text = ANY ('{\"eSign Pending\",\"Dispatch Document\",\"Promise To Pay\"}'::text[]))\nPlanning Time: 0.099 ms\nExecution Time: 1.116 ms\nPeak Memory Usage: 15 kB"
+        },
+        {
+          "id": "task-q-13",
+          "name": "findByTaskCode",
+          "description": "via TaskTypeVersionRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeVersionRepository",
+          "sqlIdentifier": "findByTaskCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT ttv.* FROM task_type_version ttv JOIN task_type tt ON ttv.id = tt.task_type_version_id WHERE tt.task_code = ?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=60.17..89.91 rows=1 width=94) (actual time=2.723..2.734 rows=1 loops=1)\n  Join Filter: (ttv.id = tt.task_type_version_id)\n  ->  Index Scan using task_type_task_code_key on task_type tt  (cost=40.05..68.56 rows=1 width=8) (actual time=1.648..1.652 rows=1 loops=1)\n        Index Cond: ((task_code)::text = 'ETB_SCHEDULED_BET'::text)\n  ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.12..21.35 rows=1 width=94) (actual time=0.971..0.975 rows=1 loops=1)\n        Index Cond: (id = ANY (ARRAY[tt.task_type_version_id, $1, $2, ..., $1023]))\nPlanning Time: 2.253 ms\nExecution Time: 3.044 ms\nPeak Memory Usage: 543 kB"
+        },
+        {
+          "id": "task-q-14",
+          "name": "findAllbyTaskTypeIds",
+          "description": "via TaskTypeVersionRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeVersionRepository",
+          "sqlIdentifier": "findAllbyTaskTypeIds",
+          "status": "healthy",
+          "sqlPreview": "select ttv.* from task_type_version ttv inner join task_type tt on tt.task_type_version_id = ttv.id and ttv.id in ?1 and tt.is_deleted IS FALSE;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=60.49..91.18 rows=4 width=94) (actual time=4.437..4.468 rows=7 loops=1)\n  Join Filter: (ttv.id = tt.task_type_version_id)\n  ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.36..21.91 rows=3 width=94) (actual time=1.018..1.025 rows=3 loops=1)\n        Index Cond: (id = ANY ('{22,38,46}'::bigint[]))\n  ->  Index Scan using task_type_task_type_version_id on task_type tt  (cost=40.13..69.27 rows=4 width=8) (actual time=3.325..3.337 rows=7 loops=1)\n        Index Cond: (task_type_version_id = ANY (ARRAY[ttv.id, $1, $2, ..., $1023]))\n        Filter: (is_deleted IS FALSE)\nPlanning Time: 0.848 ms\nExecution Time: 4.746 ms\nPeak Memory Usage: 535 kB"
+        },
+        {
+          "id": "task-q-15",
+          "name": "getTaskTypeVersionByTaskIds",
+          "description": "via TaskTypeVersionRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TaskTypeVersionRepository",
+          "sqlIdentifier": "getTaskTypeVersionByTaskIds",
+          "status": "healthy",
+          "sqlPreview": "select ttv.* from task t join task_type_version ttv on t.task_type_version_id = ttv.id where t.id in ?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=40.38..43.72 rows=3 width=94) (actual time=2.643..2.660 rows=3 loops=1)\n  Join Filter: (t.task_type_version_id = ttv.id)\n  ->  Index Scan using task_pkey on task t  (cost=20.02..21.70 rows=3 width=8) (actual time=1.742..1.748 rows=3 loops=1)\n        Index Cond: (id = ANY ('{4443,163448,3540950}'::bigint[]))\n  ->  Index Scan using task_type_version_pkey on task_type_version ttv  (cost=20.36..21.91 rows=3 width=94) (actual time=0.804..0.810 rows=3 loops=1)\n        Index Cond: (id = ANY (ARRAY[t.task_type_version_id, $1, $2, ..., $1023]))\nPlanning Time: 1.085 ms\nExecution Time: 2.944 ms\nPeak Memory Usage: 542 kB"
+        }
+      ]
+    },
+    {
+      "id": "tatescalationmatrixrepository-cff88b",
+      "name": "TatEscalationMatrixRepository",
+      "daoClass": "in.novopay.task.defn.datamodel.repository.TatEscalationMatrixRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-16",
+          "name": "findOneByTaskCodeAndProductCode",
+          "description": "via TatEscalationMatrixRepository",
+          "daoClass": "in.novopay.task.defn.datamodel.repository.TatEscalationMatrixRepository",
+          "sqlIdentifier": "findOneByTaskCodeAndProductCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM tat_escalation_matrix WHERE task_type_id in (select max(id) from task_type WHERE task_code = ?1 and is_deleted is false) and loan_product = ?2 and escalation_level = '0' and is_deleted is false;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=108.61..137.59 rows=1 width=98) (actual time=4.666..4.677 rows=1 loops=1)\n  Join Filter: (tat_escalation_matrix.task_type_id = (max(task_type.id)))\n  ->  Aggregate  (cost=68.57..68.58 rows=1 width=8) (actual time=1.857..1.857 rows=1 loops=1)\n        ->  Index Scan using task_type_task_code_key on task_type  (cost=40.05..68.56 rows=1 width=8) (actual time=1.842..1.847 rows=1 loops=1)\n              Index Cond: ((task_code)::text = 'ETB_SCHEDULED_BET'::text)\n              Filter: (is_deleted IS FALSE)\n  ->  Index Scan using tat_escalation_matrix_task_type_id_loan_product_escalation__idx on tat_escalation_matrix  (cost=40.04..69.00 rows=1 width=98) (actual time=2.721..2.725 rows=1 loops=1)\n        Index Cond: ((task_type_id = ANY (ARRAY[(max(task_type.id)), $1, $2, ..., $1023])) AND ((loan_product)::text = 'INDL_LOAN'::text))\n        Storage Index Filter: (escalation_level = '0'::bigint)\n        Filter: (is_deleted IS FALSE)\nPlanning Time: 3.119 ms\nExecution Time: 5.030 ms\nPeak Memory Usage: 517 kB"
+        }
+      ]
+    },
+    {
+      "id": "workflowmasterrepository-a7bf7a",
+      "name": "WorkflowMasterRepository",
+      "daoClass": "in.novopay.workflow.repository.WorkflowMasterRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-94",
+          "name": "findOneByCode",
+          "description": "via WorkflowMasterRepository",
+          "daoClass": "in.novopay.workflow.repository.WorkflowMasterRepository",
+          "sqlIdentifier": "findOneByCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM workflow_master WHERE code = ?1 AND is_deleted IS FALSE;",
+          "explainPlan": "Seq Scan on workflow_master  (cost=40.00..861.24 rows=1 width=58) (actual time=0.607..0.609 rows=1 loops=1)\n  Storage Filter: ((code)::text = 'DEATH_FORECLOSURE'::text)\n  Filter: (is_deleted IS FALSE)\nPlanning Time: 0.070 ms\nExecution Time: 0.680 ms\nPeak Memory Usage: 14 kB"
+        }
+      ]
+    },
+    {
+      "id": "workflowstagedetailsrepository-6be898",
+      "name": "WorkflowStageDetailsRepository",
+      "daoClass": "in.novopay.workflow.repository.WorkflowStageDetailsRepository",
+      "moduleId": "task",
+      "queries": [
+        {
+          "id": "task-q-92",
+          "name": "findOneByWorkflowMasterIdAndTaskTypeVersionId",
+          "description": "via WorkflowStageDetailsRepository",
+          "daoClass": "in.novopay.workflow.repository.WorkflowStageDetailsRepository",
+          "sqlIdentifier": "findOneByWorkflowMasterIdAndTaskTypeVersionId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM workflow_stage_details WHERE workflow_master_id = ?1 AND task_type_version_id = ?2;",
+          "explainPlan": "Index Scan using workflow_stage_details_task_type_version_id on workflow_stage_details  (cost=40.03..68.53 rows=1 width=32) (actual time=1.266..1.268 rows=1 loops=1)\n  Index Cond: (task_type_version_id = 87)\n  Storage Filter: (workflow_master_id = 3)\nPlanning Time: 0.129 ms\nExecution Time: 1.334 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "task-q-93",
+          "name": "findNextStage",
+          "description": "via WorkflowStageDetailsRepository",
+          "daoClass": "in.novopay.workflow.repository.WorkflowStageDetailsRepository",
+          "sqlIdentifier": "findNextStage",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM workflow_stage_details WHERE workflow_master_id = ?1 AND sequence = ?2;",
+          "explainPlan": "Index Scan using workflow_stage_details_workflow_master_id on workflow_stage_details  (cost=40.20..69.40 rows=1 width=32) (actual time=1.252..1.256 rows=1 loops=1)\n  Index Cond: (workflow_master_id = 3)\n  Storage Filter: (sequence = 3)\nPlanning Time: 0.117 ms\nExecution Time: 1.332 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    }
+  ]
+}

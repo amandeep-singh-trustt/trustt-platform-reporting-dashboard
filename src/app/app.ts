@@ -10,6 +10,7 @@ import { MoveJobModal } from './components/move-job-modal/move-job-modal';
 import { RenameJobModal } from './components/rename-job-modal/rename-job-modal';
 import { ReportingDataService } from './services/reporting-data.service';
 import { DbObjectsService } from './services/db-objects.service';
+import { OltpDataService } from './services/oltp-data.service';
 import { ThemeService } from './services/theme.service';
 
 @Component({
@@ -21,11 +22,13 @@ import { ThemeService } from './services/theme.service';
 export class App implements OnInit {
   private readonly data = inject(ReportingDataService);
   private readonly dbObjects = inject(DbObjectsService);
+  private readonly oltp = inject(OltpDataService);
   private readonly theme = inject(ThemeService);
 
   ngOnInit(): void {
     this.theme.apply();
     this.data.load().subscribe();
     this.dbObjects.load().subscribe();
+    this.oltp.loadIndex().subscribe();
   }
 }

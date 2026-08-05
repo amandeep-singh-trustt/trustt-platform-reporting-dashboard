@@ -1,0 +1,143 @@
+{
+  "generatedAt": "2026-08-04T00:00:00Z",
+  "module": {
+    "id": "dms",
+    "name": "DMS"
+  },
+  "summary": {
+    "id": "dms",
+    "name": "DMS",
+    "daoGroupCount": 2,
+    "queryCount": 11,
+    "explainedCount": 11,
+    "needsReviewCount": 0
+  },
+  "daoGroups": [
+    {
+      "id": "documentmasterrepository-689607",
+      "name": "DocumentMasterRepository",
+      "daoClass": "in.novopay.dms.repository.DocumentMasterRepository",
+      "moduleId": "dms",
+      "queries": [
+        {
+          "id": "dms-q-6",
+          "name": "findUnverifiedByCodeAndVersion",
+          "description": "via DocumentMasterRepository",
+          "daoClass": "in.novopay.dms.repository.DocumentMasterRepository",
+          "sqlIdentifier": "findUnverifiedByCodeAndVersion",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM document_master WHERE code=?1 AND version=?2 AND is_deleted != true;",
+          "explainPlan": "Index Scan using document_master_code_idx on document_master  (cost=40.06..68.84 rows=1 width=95) (actual time=1.265..1.268 rows=1 loops=1)\n  Index Cond: (((code)::text = 'd19105b9-60c3-4e34-ad40-95bff3656e98'::text) AND (is_deleted = false))\n  Storage Index Filter: (NOT is_deleted)\n  Storage Filter: (version = 1)\nPlanning Time: 0.170 ms\nExecution Time: 1.353 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "dms-q-7",
+          "name": "findAllByCode",
+          "description": "via DocumentMasterRepository",
+          "daoClass": "in.novopay.dms.repository.DocumentMasterRepository",
+          "sqlIdentifier": "findAllByCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM document_master WHERE code=?1 AND is_deleted != true;",
+          "explainPlan": "Index Scan using document_master_code_idx on document_master  (cost=40.06..68.83 rows=1 width=95) (actual time=1.287..1.290 rows=1 loops=1)\n  Index Cond: (((code)::text = 'd19105b9-60c3-4e34-ad40-95bff3656e98'::text) AND (is_deleted = false))\n  Storage Index Filter: (NOT is_deleted)\nPlanning Time: 0.112 ms\nExecution Time: 1.362 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "dms-q-8",
+          "name": "findAllByCodes",
+          "description": "via DocumentMasterRepository",
+          "daoClass": "in.novopay.dms.repository.DocumentMasterRepository",
+          "sqlIdentifier": "findAllByCodes",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM document_master WHERE code In ?1 AND is_deleted != true;",
+          "explainPlan": "Index Scan using document_master_code_idx on document_master  (cost=40.17..69.83 rows=3 width=95) (actual time=1.967..1.972 rows=3 loops=1)\n  Index Cond: (((code)::text = ANY ('{d19105b9-60c3-4e34-ad40-95bff3656e98,32d3f6df-6c9a-4493-a5c9-a7c74372c9a9,376f9dc7-29f0-445f-9c61-4dec2344f71a}'::text[])) AND (is_deleted = false))\n  Storage Index Filter: (NOT is_deleted)\nPlanning Time: 1.369 ms\nExecution Time: 2.068 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "dms-q-9",
+          "name": "fetchAllInvalidDocuments",
+          "description": "via DocumentMasterRepository",
+          "daoClass": "in.novopay.dms.repository.DocumentMasterRepository",
+          "sqlIdentifier": "fetchAllInvalidDocuments",
+          "status": "healthy",
+          "sqlPreview": "SELECT id FROM document_master WHERE created_on < ?1 AND is_verified != true;",
+          "explainPlan": "Seq Scan on document_master  (cost=40.00..77749.43 rows=6137 width=8) (actual time=352.009..1503.041 rows=4358 loops=1)\n  Storage Filter: ((NOT is_verified) AND (created_on < '2023-01-05 10:38:20'::timestamp without time zone))\nPlanning Time: 0.073 ms\nExecution Time: 1504.170 ms\nPeak Memory Usage: 15 kB"
+        },
+        {
+          "id": "dms-q-10",
+          "name": "findLargestVersionByCode",
+          "description": "via DocumentMasterRepository",
+          "daoClass": "in.novopay.dms.repository.DocumentMasterRepository",
+          "sqlIdentifier": "findLargestVersionByCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT MAX(version) as version from document_master where code=?1 AND is_deleted != true AND is_verified != false;",
+          "explainPlan": "Finalize Aggregate  (cost=68.73..68.74 rows=1 width=2) (actual time=1.130..1.131 rows=1 loops=1)\n  ->  Index Scan using document_master_code_idx on document_master  (cost=40.06..68.73 rows=1 width=2) (actual time=1.126..1.126 rows=0 loops=1)\n        Index Cond: (((code)::text = 'd19105b9-60c3-4e34-ad40-95bff3656e98'::text) AND (is_deleted = false))\n        Storage Index Filter: (NOT is_deleted)\n        Storage Filter: is_verified\n        Partial Aggregate: true\nPlanning Time: 0.272 ms\nExecution Time: 1.252 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "dms-q-11",
+          "name": "findOneByCodeAndVersion",
+          "description": "via DocumentMasterRepository",
+          "daoClass": "in.novopay.dms.repository.DocumentMasterRepository",
+          "sqlIdentifier": "findOneByCodeAndVersion",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM document_master WHERE code=?1 AND version=?2 AND is_deleted != true AND is_verified != false;",
+          "explainPlan": "Index Scan using document_master_code_idx on document_master  (cost=40.06..68.84 rows=1 width=95) (actual time=1.526..1.526 rows=0 loops=1)\n  Index Cond: (((code)::text = 'd19105b9-60c3-4e34-ad40-95bff3656e98'::text) AND (is_deleted = false))\n  Storage Index Filter: (NOT is_deleted)\n  Storage Filter: (is_verified AND (version = 1))\nPlanning Time: 0.134 ms\nExecution Time: 1.615 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "filemasterrepository-75f98b",
+      "name": "FileMasterRepository",
+      "daoClass": "in.novopay.dms.repository.FileMasterRepository",
+      "moduleId": "dms",
+      "queries": [
+        {
+          "id": "dms-q-1",
+          "name": "findByDocumentId",
+          "description": "via FileMasterRepository",
+          "daoClass": "in.novopay.dms.repository.FileMasterRepository",
+          "sqlIdentifier": "findByDocumentId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM file_master WHERE document_id = ?1 AND is_deleted!=true order by file_number asc;",
+          "explainPlan": "Sort  (cost=69.53..69.54 rows=3 width=132) (actual time=1.268..1.268 rows=1 loops=1)\n  Sort Key: file_number\n  Sort Method: quicksort  Memory: 25kB\n  ->  Index Scan using file_master_document_id on file_master  (cost=40.10..69.51 rows=3 width=132) (actual time=1.256..1.258 rows=1 loops=1)\n        Index Cond: (document_id = 4443)\n        Storage Filter: (NOT is_deleted)\nPlanning Time: 0.141 ms\nExecution Time: 1.350 ms\nPeak Memory Usage: 36 kB"
+        },
+        {
+          "id": "dms-q-2",
+          "name": "getCountOfAllFilesByDocumentId",
+          "description": "via FileMasterRepository",
+          "daoClass": "in.novopay.dms.repository.FileMasterRepository",
+          "sqlIdentifier": "getCountOfAllFilesByDocumentId",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(1) FROM file_master WHERE document_id = ?1 and 1=1;",
+          "explainPlan": "Finalize Aggregate  (cost=24.44..24.45 rows=1 width=8) (actual time=0.514..0.514 rows=1 loops=1)\n  ->  Index Only Scan using file_master_document_id on file_master  (cost=20.02..24.43 rows=3 width=0) (actual time=0.508..0.509 rows=1 loops=1)\n        Index Cond: (document_id = 4443)\n        Heap Fetches: 0\n        Partial Aggregate: true\nPlanning Time: 0.098 ms\nExecution Time: 0.616 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "dms-q-3",
+          "name": "getByDocumentIdAndFileNumber",
+          "description": "via FileMasterRepository",
+          "daoClass": "in.novopay.dms.repository.FileMasterRepository",
+          "sqlIdentifier": "getByDocumentIdAndFileNumber",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM file_master WHERE document_id = ?1 AND file_number = ?2 and is_deleted!=true;",
+          "explainPlan": "Index Scan using file_master_document_id on file_master  (cost=40.10..69.39 rows=2 width=132) (actual time=1.142..1.145 rows=1 loops=1)\n  Index Cond: (document_id = 4443)\n  Storage Filter: ((NOT is_deleted) AND ((file_number)::text = '1'::text))\nPlanning Time: 0.112 ms\nExecution Time: 1.223 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "dms-q-4",
+          "name": "findFileNumbersByDocumentId",
+          "description": "via FileMasterRepository",
+          "daoClass": "in.novopay.dms.repository.FileMasterRepository",
+          "sqlIdentifier": "findFileNumbersByDocumentId",
+          "status": "healthy",
+          "sqlPreview": "SELECT file_number FROM file_master WHERE document_id = ?1 AND is_deleted = false order by file_number asc;",
+          "explainPlan": "Sort  (cost=69.19..69.20 rows=3 width=2) (actual time=1.142..1.142 rows=1 loops=1)\n  Sort Key: file_number\n  Sort Method: quicksort  Memory: 25kB\n  ->  Index Scan using file_master_document_id on file_master  (cost=40.10..69.17 rows=3 width=2) (actual time=1.107..1.110 rows=1 loops=1)\n        Index Cond: (document_id = 4443)\n        Storage Filter: (NOT is_deleted)\nPlanning Time: 0.105 ms\nExecution Time: 1.229 ms\nPeak Memory Usage: 68 kB"
+        },
+        {
+          "id": "dms-q-5",
+          "name": "getAllByOriginalName",
+          "description": "via FileMasterRepository",
+          "daoClass": "in.novopay.dms.repository.FileMasterRepository",
+          "sqlIdentifier": "getAllByOriginalName",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM file_master WHERE original_name = ?1 and is_deleted = false;",
+          "explainPlan": "Seq Scan on file_master  (cost=40.00..128997.00 rows=48 width=132) (actual time=2823.170..2823.174 rows=2 loops=1)\n  Storage Filter: ((NOT is_deleted) AND ((original_name)::text = 'VoterID1_19012023.jpg'::text))\nPlanning Time: 0.089 ms\nExecution Time: 2823.248 ms\nPeak Memory Usage: 15 kB"
+        }
+      ]
+    }
+  ]
+}

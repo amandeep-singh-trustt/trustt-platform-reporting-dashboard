@@ -1,0 +1,445 @@
+{
+  "generatedAt": "2026-08-04T00:00:00Z",
+  "module": {
+    "id": "batch",
+    "name": "Batch"
+  },
+  "summary": {
+    "id": "batch",
+    "name": "Batch",
+    "daoGroupCount": 11,
+    "queryCount": 34,
+    "explainedCount": 22,
+    "needsReviewCount": 12
+  },
+  "daoGroups": [
+    {
+      "id": "batchcommonapiconfigrepository-2de10b",
+      "name": "BatchCommonApiConfigRepository",
+      "daoClass": "in.novopay.batch.batchschedule.daoservice.BatchCommonApiConfigRepository",
+      "moduleId": "batch",
+      "queries": [
+        {
+          "id": "batch-q-31",
+          "name": "getByKey",
+          "description": "via BatchCommonApiConfigRepository",
+          "daoClass": "in.novopay.batch.batchschedule.daoservice.BatchCommonApiConfigRepository",
+          "sqlIdentifier": "getByKey",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM batch_common_api_config WHERE key = ?1;",
+          "explainPlan": "Seq Scan on batch_common_api_config  (cost=40.00..861.55 rows=1 width=627) (actual time=0.644..0.645 rows=1 loops=1)\n  Storage Filter: ((key)::text = 'header'::text)\nPlanning Time: 0.058 ms\nExecution Time: 0.704 ms\nPeak Memory Usage: 0 kB"
+        }
+      ]
+    },
+    {
+      "id": "batchgroupjobrepository-825dba",
+      "name": "BatchGroupJobRepository",
+      "daoClass": "in.novopay.batch.batchgroup.daoservice.BatchGroupJobRepository",
+      "moduleId": "batch",
+      "queries": [
+        {
+          "id": "batch-q-6",
+          "name": "findAllByBatchGroupIdOrdered",
+          "description": "via BatchGroupJobRepository",
+          "daoClass": "in.novopay.batch.batchgroup.daoservice.BatchGroupJobRepository",
+          "sqlIdentifier": "findAllByBatchGroupIdOrdered",
+          "status": "healthy",
+          "sqlPreview": "SELECT bj.* FROM batch_group_job bgj JOIN batch_group bg ON bg.id = bgj.group_id JOIN batch_job bj ON bgj.job_id = bj.id WHERE bg.id = ?1 ORDER BY bgj.priority ASC;",
+          "explainPlan": "Sort  (cost=111.23..111.23 rows=1 width=139) (actual time=2.253..2.254 rows=1 loops=1)\n  Sort Key: bgj.priority\n  Sort Method: quicksort  Memory: 25kB\n  ->  Nested Loop  (cost=80.20..111.22 rows=1 width=139) (actual time=2.236..2.241 rows=1 loops=1)\n        ->  Nested Loop  (cost=60.04..89.82 rows=1 width=10) (actual time=1.673..1.678 rows=1 loops=1)\n              ->  Index Scan using batch_group_job_group_id on batch_group_job bgj  (cost=40.03..68.57 rows=1 width=18) (actual time=1.099..1.101 rows=1 loops=1)\n                    Index Cond: (group_id = 22)\n              ->  Index Scan using batch_group_pkey on batch_group bg  (cost=20.01..21.24 rows=1 width=8) (actual time=0.570..0.572 rows=1 loops=1)\n                    Index Cond: (id = 22)\n        ->  Index Scan using batch_job_pkey on batch_job bj  (cost=20.16..21.39 rows=1 width=137) (actual time=0.558..0.558 rows=1 loops=1)\n              Index Cond: (id = bgj.job_id)\nPlanning Time: 35.770 ms\nExecution Time: 2.403 ms\nPeak Memory Usage: 84 kB"
+        },
+        {
+          "id": "batch-q-7",
+          "name": "findAllActiveByBatchGroupIdOrdered",
+          "description": "via BatchGroupJobRepository",
+          "daoClass": "in.novopay.batch.batchgroup.daoservice.BatchGroupJobRepository",
+          "sqlIdentifier": "findAllActiveByBatchGroupIdOrdered",
+          "status": "healthy",
+          "sqlPreview": "SELECT bj.* FROM batch_group_job bgj JOIN batch_group bg ON bg.id = bgj.group_id JOIN batch_job bj ON bgj.job_id = bj.id WHERE bg.id = ?1 AND bj.status = 'ACTIVE' ORDER BY bgj.priority ASC;",
+          "explainPlan": "Sort  (cost=111.23..111.23 rows=1 width=139) (actual time=2.421..2.422 rows=1 loops=1)\n  Sort Key: bgj.priority\n  Sort Method: quicksort  Memory: 25kB\n  ->  Nested Loop  (cost=80.20..111.22 rows=1 width=139) (actual time=2.402..2.409 rows=1 loops=1)\n        ->  Nested Loop  (cost=60.04..89.82 rows=1 width=10) (actual time=1.755..1.761 rows=1 loops=1)\n              ->  Index Scan using batch_group_job_group_id on batch_group_job bgj  (cost=40.03..68.57 rows=1 width=18) (actual time=1.214..1.216 rows=1 loops=1)\n                    Index Cond: (group_id = 22)\n              ->  Index Scan using batch_group_pkey on batch_group bg  (cost=20.01..21.24 rows=1 width=8) (actual time=0.538..0.540 rows=1 loops=1)\n                    Index Cond: (id = 22)\n        ->  Index Scan using batch_job_pkey on batch_job bj  (cost=20.16..21.39 rows=1 width=137) (actual time=0.642..0.642 rows=1 loops=1)\n              Index Cond: (id = bgj.job_id)\n              Storage Filter: ((status)::text = 'ACTIVE'::text)\nPlanning Time: 0.448 ms\nExecution Time: 2.554 ms\nPeak Memory Usage: 84 kB"
+        },
+        {
+          "id": "batch-q-8",
+          "name": "findAllGroupJobByGroupIdOrdered",
+          "description": "via BatchGroupJobRepository",
+          "daoClass": "in.novopay.batch.batchgroup.daoservice.BatchGroupJobRepository",
+          "sqlIdentifier": "findAllGroupJobByGroupIdOrdered",
+          "status": "healthy",
+          "sqlPreview": "SELECT bgj.* FROM batch_group_job bgj JOIN batch_group bg ON bg.id = bgj.group_id WHERE bg.id = ?1 ORDER BY bgj.priority ASC;",
+          "explainPlan": "Sort  (cost=89.83..89.84 rows=1 width=26) (actual time=1.941..1.941 rows=1 loops=1)\n  Sort Key: bgj.priority\n  Sort Method: quicksort  Memory: 25kB\n  ->  Nested Loop  (cost=60.04..89.82 rows=1 width=26) (actual time=1.923..1.929 rows=1 loops=1)\n        ->  Index Scan using batch_group_job_group_id on batch_group_job bgj  (cost=40.03..68.58 rows=1 width=26) (actual time=1.348..1.351 rows=1 loops=1)\n              Index Cond: (group_id = 22)\n        ->  Index Scan using batch_group_pkey on batch_group bg  (cost=20.01..21.24 rows=1 width=8) (actual time=0.569..0.572 rows=1 loops=1)\n              Index Cond: (id = 22)\nPlanning Time: 0.172 ms\nExecution Time: 2.038 ms\nPeak Memory Usage: 52 kB"
+        },
+        {
+          "id": "batch-q-9",
+          "name": "getRemainingJobsByGroupIdAfterJobId",
+          "description": "via BatchGroupJobRepository",
+          "daoClass": "in.novopay.batch.batchgroup.daoservice.BatchGroupJobRepository",
+          "sqlIdentifier": "getRemainingJobsByGroupIdAfterJobId",
+          "status": "healthy",
+          "sqlPreview": "SELECT e.* FROM batch_group_job e JOIN batch_group g ON g.id = e.group_id JOIN batch_job j ON j.id = e.job_id WHERE j.status='ACTIVE' AND e.group_id =?1 AND e.priority > (SELECT t.priority FROM batch_group_job t WHERE job_id = ?2) ORDER BY e.priority ASC;",
+          "explainPlan": "Sort  (cost=179.65..179.66 rows=1 width=26) (actual time=2.549..2.549 rows=0 loops=1)\n  Sort Key: e.priority\n  Sort Method: quicksort  Memory: 25kB\n  InitPlan 1 (returns $0)\n    ->  Index Scan using batch_group_job_job_id on batch_group_job t  (cost=40.03..68.56 rows=1 width=2) (actual time=1.398..1.401 rows=1 loops=1)\n          Index Cond: (job_id = 3033)\n  ->  Nested Loop  (cost=80.05..111.09 rows=1 width=26) (actual time=2.541..2.541 rows=0 loops=1)\n        ->  Nested Loop  (cost=60.04..89.83 rows=1 width=26) (actual time=2.540..2.540 rows=0 loops=1)\n              ->  Index Scan using batch_group_job_group_id on batch_group_job e  (cost=40.03..68.59 rows=1 width=26) (actual time=2.539..2.539 rows=0 loops=1)\n                    Index Cond: (group_id = 22)\n                    Storage Filter: ((priority)::text > ($0)::text)\n              ->  Index Scan using batch_group_pkey on batch_group g  (cost=20.01..21.24 rows=1 width=8) (never executed)\n                    Index Cond: (id = 22)\n        ->  Index Scan using batch_job_pkey on batch_job j  (cost=20.01..21.24 rows=1 width=8) (never executed)\n              Index Cond: (id = e.job_id)\n              Storage Filter: ((status)::text = 'ACTIVE'::text)\nPlanning Time: 0.469 ms\nExecution Time: 2.676 ms\nPeak Memory Usage: 84 kB"
+        },
+        {
+          "id": "batch-q-10",
+          "name": "findAllByGroupId",
+          "description": "via BatchGroupJobRepository",
+          "daoClass": "in.novopay.batch.batchgroup.daoservice.BatchGroupJobRepository",
+          "sqlIdentifier": "findAllByGroupId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM batch_group_job WHERE group_id = ?1 ORDER BY priority ASC;",
+          "explainPlan": "Sort  (cost=68.59..68.59 rows=1 width=26) (actual time=1.270..1.271 rows=1 loops=1)\n  Sort Key: priority\n  Sort Method: quicksort  Memory: 25kB\n  ->  Index Scan using batch_group_job_group_id on batch_group_job  (cost=40.03..68.58 rows=1 width=26) (actual time=1.256..1.259 rows=1 loops=1)\n        Index Cond: (group_id = 22)\nPlanning Time: 0.113 ms\nExecution Time: 1.343 ms\nPeak Memory Usage: 36 kB"
+        }
+      ]
+    },
+    {
+      "id": "batchgrouprepository-5034b2",
+      "name": "BatchGroupRepository",
+      "daoClass": "in.novopay.batch.batchgroup.daoservice.BatchGroupRepository",
+      "moduleId": "batch",
+      "queries": [
+        {
+          "id": "batch-q-11",
+          "name": "getGroupByJobId",
+          "description": "via BatchGroupRepository",
+          "daoClass": "in.novopay.batch.batchgroup.daoservice.BatchGroupRepository",
+          "sqlIdentifier": "getGroupByJobId",
+          "status": "healthy",
+          "sqlPreview": "SELECT bg.* FROM batch_group bg JOIN batch_group_job bgj ON bgj.group_id = bg.id JOIN batch_job bj ON bgj.job_id = bj.id WHERE bj.id = ?1;",
+          "explainPlan": "Nested Loop  (cost=80.16..111.17 rows=1 width=103) (actual time=0.967..0.967 rows=0 loops=1)\n  ->  Nested Loop  (cost=60.15..89.92 rows=1 width=111) (actual time=0.966..0.966 rows=0 loops=1)\n        ->  Index Scan using batch_group_job_job_id on batch_group_job bgj  (cost=40.03..68.56 rows=1 width=16) (actual time=0.965..0.965 rows=0 loops=1)\n              Index Cond: (job_id = 212)\n        ->  Index Scan using batch_group_pkey on batch_group bg  (cost=20.12..21.35 rows=1 width=103) (never executed)\n              Index Cond: (id = bgj.group_id)\n  ->  Index Scan using batch_job_pkey on batch_job bj  (cost=20.01..21.24 rows=1 width=8) (never executed)\n        Index Cond: (id = 212)\nPlanning Time: 0.372 ms\nExecution Time: 1.070 ms\nPeak Memory Usage: 24 kB"
+        }
+      ]
+    },
+    {
+      "id": "batchjobparameterrepository-fb901d",
+      "name": "BatchJobParameterRepository",
+      "daoClass": "in.novopay.batch.batchjob.daoservice.BatchJobParameterRepository",
+      "moduleId": "batch",
+      "queries": [
+        {
+          "id": "batch-q-24",
+          "name": "findAllByBatchJob",
+          "description": "via BatchJobParameterRepository",
+          "daoClass": "in.novopay.batch.batchjob.daoservice.BatchJobParameterRepository",
+          "sqlIdentifier": "findAllByBatchJob",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM batch_job_parameter WHERE job_id = ?1;",
+          "explainPlan": "Seq Scan on batch_job_parameter  (cost=40.00..905.21 rows=2 width=32) (actual time=1.353..1.354 rows=2 loops=1)\n  Storage Filter: (job_id = 107)\nPlanning Time: 0.052 ms\nExecution Time: 1.407 ms\nPeak Memory Usage: 0 kB"
+        },
+        {
+          "id": "batch-q-25",
+          "name": "findAllByBatchJobInMap",
+          "description": "via BatchJobParameterRepository",
+          "daoClass": "in.novopay.batch.batchjob.daoservice.BatchJobParameterRepository",
+          "sqlIdentifier": "findAllByBatchJobInMap",
+          "status": "healthy",
+          "sqlPreview": "SELECT param_name,param_value FROM batch_job_parameter WHERE job_id = ?1;",
+          "explainPlan": "Seq Scan on batch_job_parameter  (cost=40.00..905.16 rows=2 width=9) (actual time=1.398..1.400 rows=2 loops=1)\n  Storage Filter: (job_id = 107)\nPlanning Time: 0.048 ms\nExecution Time: 1.466 ms\nPeak Memory Usage: 14 kB"
+        },
+        {
+          "id": "batch-q-26",
+          "name": "getJobExecutionJobTimeByInsId",
+          "description": "via BatchJobParameterRepository",
+          "daoClass": "in.novopay.batch.batchjob.daoservice.BatchJobParameterRepository",
+          "sqlIdentifier": "getJobExecutionJobTimeByInsId",
+          "status": "healthy",
+          "sqlPreview": "select 'business_date' as param_name,parameter_value as param_value from batch_job_execution_params where job_execution_id in ( select job_execution_id from batch_job_execution where job_instance_id = ?1 order by job_execution_id desc limit 1) and parameter_name = 'job_time' limit 1;",
+          "explainPlan": "Limit  (cost=109.10..139.37 rows=1 width=43) (actual time=3.147..3.147 rows=0 loops=1)\n  ->  YB Batched Nested Loop Join  (cost=109.10..139.37 rows=1 width=43) (actual time=3.146..3.146 rows=0 loops=1)\n        Join Filter: (batch_job_execution_params.job_execution_id = batch_job_execution.job_execution_id)\n        ->  HashAggregate  (cost=68.73..68.74 rows=1 width=8) (actual time=1.234..1.235 rows=1 loops=1)\n              Group Key: batch_job_execution.job_execution_id\n              ->  Limit  (cost=68.71..68.72 rows=1 width=8) (actual time=1.229..1.229 rows=1 loops=1)\n                    ->  Sort  (cost=68.71..68.72 rows=1 width=8) (actual time=1.229..1.229 rows=1 loops=1)\n                          Sort Key: batch_job_execution.job_execution_id DESC\n                          Sort Method: quicksort  Memory: 25kB\n                          ->  Index Scan using batch_job_execution_job_instance_id on batch_job_execution  (cost=40.03..68.70 rows=1 width=8) (actual time=1.214..1.220 rows=1 loops=1)\n                                Index Cond: (job_instance_id = 4443)\n        ->  Index Scan using batch_job_execution_params_job_execution_id on batch_job_execution_params  (cost=40.37..70.63 rows=1 width=19) (actual time=1.830..1.830 rows=0 loops=1)\n              Index Cond: (job_execution_id = ANY (ARRAY[batch_job_execution.job_execution_id, $1, $2, ..., $1023]))\n              Storage Filter: ((parameter_name)::text = 'job_time'::text)\nPlanning Time: 0.725 ms\nExecution Time: 3.383 ms\nPeak Memory Usage: 544 kB"
+        },
+        {
+          "id": "batch-q-27",
+          "name": "getBatchJobParameterByJobIdAndParam",
+          "description": "via BatchJobParameterRepository",
+          "daoClass": "in.novopay.batch.batchjob.daoservice.BatchJobParameterRepository",
+          "sqlIdentifier": "getBatchJobParameterByJobIdAndParam",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM batch_job_parameter WHERE job_id = ?1 and param_name = ?2;",
+          "explainPlan": "Seq Scan on batch_job_parameter  (cost=40.00..912.52 rows=1 width=32) (actual time=1.537..1.539 rows=1 loops=1)\n  Storage Filter: ((job_id = 107) AND ((param_name)::text = 'maxId'::text))\nPlanning Time: 0.064 ms\nExecution Time: 1.594 ms\nPeak Memory Usage: 14 kB"
+        }
+      ]
+    },
+    {
+      "id": "batchjobrepository-ef81b7",
+      "name": "BatchJobRepository",
+      "daoClass": "in.novopay.batch.batchjob.daoservice.BatchJobRepository",
+      "moduleId": "batch",
+      "queries": [
+        {
+          "id": "batch-q-28",
+          "name": "getBatchJobByName",
+          "description": "via BatchJobRepository",
+          "daoClass": "in.novopay.batch.batchjob.daoservice.BatchJobRepository",
+          "sqlIdentifier": "getBatchJobByName",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM batch_job WHERE name = ?1;",
+          "explainPlan": "Seq Scan on batch_job  (cost=40.00..883.65 rows=1 width=137) (actual time=1.309..1.311 rows=1 loops=1)\n  Storage Filter: ((name)::text = 'bulkSGToDynamicTwoJob'::text)\nPlanning Time: 0.064 ms\nExecution Time: 1.370 ms\nPeak Memory Usage: 15 kB"
+        },
+        {
+          "id": "batch-q-29",
+          "name": "getJobByName",
+          "description": "via BatchJobRepository",
+          "daoClass": "in.novopay.batch.batchjob.daoservice.BatchJobRepository",
+          "sqlIdentifier": "getJobByName",
+          "status": "needs-review",
+          "sqlPreview": "select e.name from BatchJob e where e.name = :jobName;",
+          "reviewReason": "could not resolve column 'e.name' (table/alias/column unknown)"
+        },
+        {
+          "id": "batch-q-30",
+          "name": "getAllJobs",
+          "description": "via BatchJobRepository",
+          "daoClass": "in.novopay.batch.batchjob.daoservice.BatchJobRepository",
+          "sqlIdentifier": "getAllJobs",
+          "status": "healthy",
+          "sqlPreview": "SELECT name FROM batch_job;",
+          "explainPlan": "Seq Scan on batch_job  (cost=40.00..890.57 rows=358 width=30) (actual time=0.963..1.054 rows=361 loops=1)\nPlanning Time: 0.050 ms\nExecution Time: 1.201 ms\nPeak Memory Usage: 0 kB"
+        }
+      ]
+    },
+    {
+      "id": "batchschedulerepository-1cddd2",
+      "name": "BatchScheduleRepository",
+      "daoClass": "in.novopay.batch.batchschedule.daoservice.BatchScheduleRepository",
+      "moduleId": "batch",
+      "queries": [
+        {
+          "id": "batch-q-32",
+          "name": "getScheduleByGroup",
+          "description": "via BatchScheduleRepository",
+          "daoClass": "in.novopay.batch.batchschedule.daoservice.BatchScheduleRepository",
+          "sqlIdentifier": "getScheduleByGroup",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM batch_schedule WHERE group_id = ?1;",
+          "explainPlan": "Index Scan using batch_schedule_group_id on batch_schedule  (cost=40.03..68.66 rows=1 width=96) (actual time=1.297..1.300 rows=1 loops=1)\n  Index Cond: (group_id = 22)\nPlanning Time: 0.094 ms\nExecution Time: 1.376 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "batch-q-33",
+          "name": "findAllByScheduled",
+          "description": "via BatchScheduleRepository",
+          "daoClass": "in.novopay.batch.batchschedule.daoservice.BatchScheduleRepository",
+          "sqlIdentifier": "findAllByScheduled",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM batch_schedule WHERE is_scheduled = true;",
+          "explainPlan": "Seq Scan on batch_schedule  (cost=40.00..890.60 rows=170 width=96) (actual time=3.783..3.926 rows=173 loops=1)\n  Storage Filter: is_scheduled\nPlanning Time: 0.060 ms\nExecution Time: 4.047 ms\nPeak Memory Usage: 15 kB"
+        },
+        {
+          "id": "batch-q-34",
+          "name": "getScheduleByJobId",
+          "description": "via BatchScheduleRepository",
+          "daoClass": "in.novopay.batch.batchschedule.daoservice.BatchScheduleRepository",
+          "sqlIdentifier": "getScheduleByJobId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM batch_schedule s where s.group_id in ( select gj.group_id from batch_group_job gj WHERE gj.job_id = ?1 );",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=108.59..137.23 rows=1 width=96) (actual time=2.285..2.294 rows=1 loops=1)\n  Join Filter: (s.group_id = gj.group_id)\n  ->  HashAggregate  (cost=68.56..68.57 rows=1 width=8) (actual time=1.060..1.060 rows=1 loops=1)\n        Group Key: gj.group_id\n        ->  Index Scan using batch_group_job_job_id on batch_group_job gj  (cost=40.03..68.56 rows=1 width=8) (actual time=1.052..1.054 rows=1 loops=1)\n              Index Cond: (job_id = 3033)\n  ->  Index Scan using batch_schedule_group_id on batch_schedule s  (cost=40.03..68.66 rows=1 width=96) (actual time=1.150..1.153 rows=1 loops=1)\n        Index Cond: (group_id = ANY (ARRAY[gj.group_id, $1, $2, ..., $1023]))\nPlanning Time: 1.985 ms\nExecution Time: 2.568 ms\nPeak Memory Usage: 517 kB"
+        }
+      ]
+    },
+    {
+      "id": "fileuploadrepository-1cdc9c",
+      "name": "FileUploadRepository",
+      "daoClass": "in.novopay.batch.bulk.repository.FileUploadRepository",
+      "moduleId": "batch",
+      "queries": [
+        {
+          "id": "batch-q-1",
+          "name": "getAllByDatesAndType",
+          "description": "via FileUploadRepository",
+          "daoClass": "in.novopay.batch.bulk.repository.FileUploadRepository",
+          "sqlIdentifier": "getAllByDatesAndType",
+          "status": "needs-review",
+          "sqlPreview": "SELECT * FROM file_upload WHERE file_type =?1 and DATE(created_on) >= DATE(?2) AND DATE(created_on) <=DATE(?3) order BY id LIMIT ?4 OFFSET ?5;",
+          "reviewReason": "no preceding column/operator found for placeholder '?2'"
+        },
+        {
+          "id": "batch-q-2",
+          "name": "countAllByDatesAndType",
+          "description": "via FileUploadRepository",
+          "daoClass": "in.novopay.batch.bulk.repository.FileUploadRepository",
+          "sqlIdentifier": "countAllByDatesAndType",
+          "status": "needs-review",
+          "sqlPreview": "SELECT count(1) FROM file_upload WHERE file_type =?1 and DATE(created_on) >= DATE(?2) AND DATE(created_on) <=DATE(?3);",
+          "reviewReason": "no preceding column/operator found for placeholder '?2'"
+        }
+      ]
+    },
+    {
+      "id": "jobexecutionentityrepository-6ee31a",
+      "name": "JobExecutionEntityRepository",
+      "daoClass": "in.novopay.batch.core.repository.JobExecutionEntityRepository",
+      "moduleId": "batch",
+      "queries": [
+        {
+          "id": "batch-q-15",
+          "name": "getLastJobExecution",
+          "description": "via JobExecutionEntityRepository",
+          "daoClass": "in.novopay.batch.core.repository.JobExecutionEntityRepository",
+          "sqlIdentifier": "getLastJobExecution",
+          "status": "healthy",
+          "sqlPreview": "select * from BATCH_JOB_EXECUTION e where e.JOB_INSTANCE_ID = ( select job_instance_id from batch_job e2 WHERE e2.name = ?1 ) ORDER BY e.START_TIME DESC LIMIT 1;",
+          "explainPlan": "Limit  (cost=952.29..952.30 rows=1 width=75) (actual time=2.554..2.555 rows=1 loops=1)\n  InitPlan 1 (returns $0)\n    ->  Seq Scan on batch_job e2  (cost=40.00..883.50 rows=1 width=8) (actual time=1.068..1.069 rows=1 loops=1)\n          Storage Filter: ((name)::text = 'bulkSGToDynamicTwoJob'::text)\n  ->  Sort  (cost=68.79..68.79 rows=1 width=75) (actual time=2.553..2.553 rows=1 loops=1)\n        Sort Key: e.start_time DESC\n        Sort Method: quicksort  Memory: 25kB\n        ->  Index Scan using batch_job_execution_job_instance_id on batch_job_execution e  (cost=40.03..68.78 rows=1 width=75) (actual time=2.542..2.545 rows=1 loops=1)\n              Index Cond: (job_instance_id = $0)\nPlanning Time: 0.161 ms\nExecution Time: 2.653 ms\nPeak Memory Usage: 52 kB"
+        },
+        {
+          "id": "batch-q-16",
+          "name": "getLastJobExecutionCore",
+          "description": "via JobExecutionEntityRepository",
+          "daoClass": "in.novopay.batch.core.repository.JobExecutionEntityRepository",
+          "sqlIdentifier": "getLastJobExecutionCore",
+          "status": "needs-review",
+          "sqlPreview": "select e.* from BATCH_JOB_EXECUTION e join BATCH_JOB_INSTANCE i on e.job_instance_id =i.job_instance_id where i.job_name = ? ORDER BY e.create_time desc limit 1;",
+          "reviewReason": "could not resolve column 'i.job_name' (table/alias/column unknown)"
+        },
+        {
+          "id": "batch-q-17",
+          "name": "getJobExecutionByInsId",
+          "description": "via JobExecutionEntityRepository",
+          "daoClass": "in.novopay.batch.core.repository.JobExecutionEntityRepository",
+          "sqlIdentifier": "getJobExecutionByInsId",
+          "status": "needs-review",
+          "sqlPreview": "select * from BATCH_JOB_EXECUTION where JOB_INSTANCE_ID = ?1 ORDER BY START_TIME DESC LIMIT 1;",
+          "reviewReason": "could not resolve column 'JOB_INSTANCE_ID' (table/alias/column unknown)"
+        },
+        {
+          "id": "batch-q-18",
+          "name": "getStringCoreParamsFromExecutionId",
+          "description": "via JobExecutionEntityRepository",
+          "daoClass": "in.novopay.batch.core.repository.JobExecutionEntityRepository",
+          "sqlIdentifier": "getStringCoreParamsFromExecutionId",
+          "status": "needs-review",
+          "sqlPreview": "SELECT parameter_name as KeyName, parameter_value as val from BATCH_JOB_EXECUTION_PARAMS WHERE parameter_type in ('STRING','java.lang.String') and JOB_EXECUTION_ID =?;",
+          "reviewReason": "could not resolve column 'JOB_EXECUTION_ID' (table/alias/column unknown)"
+        },
+        {
+          "id": "batch-q-19",
+          "name": "getAllLastJobExecutionForGroup",
+          "description": "via JobExecutionEntityRepository",
+          "daoClass": "in.novopay.batch.core.repository.JobExecutionEntityRepository",
+          "sqlIdentifier": "getAllLastJobExecutionForGroup",
+          "status": "needs-review",
+          "sqlPreview": "select * from BATCH_JOB_EXECUTION e where e.JOB_INSTANCE_ID IN ?1 order by e.START_TIME desc;",
+          "reviewReason": "could not resolve column 'e.JOB_INSTANCE_ID' (table/alias/column unknown)"
+        },
+        {
+          "id": "batch-q-20",
+          "name": "getLatestJobExecutionCore",
+          "description": "via JobExecutionEntityRepository",
+          "daoClass": "in.novopay.batch.core.repository.JobExecutionEntityRepository",
+          "sqlIdentifier": "getLatestJobExecutionCore",
+          "status": "needs-review",
+          "sqlPreview": "select bje.* from BATCH_JOB_EXECUTION bje JOIN BATCH_JOB_INSTANCE bji on bje.JOB_INSTANCE_ID = bji.JOB_INSTANCE_ID where bji.JOB_NAME = ?1 order by bje.CREATE_TIME desc limit 1;",
+          "reviewReason": "could not resolve column 'bji.JOB_NAME' (table/alias/column unknown)"
+        },
+        {
+          "id": "batch-q-21",
+          "name": "getJobExecutionByExeId",
+          "description": "via JobExecutionEntityRepository",
+          "daoClass": "in.novopay.batch.core.repository.JobExecutionEntityRepository",
+          "sqlIdentifier": "getJobExecutionByExeId",
+          "status": "needs-review",
+          "sqlPreview": "select status,exit_message from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID = ?1;",
+          "reviewReason": "could not resolve column 'JOB_EXECUTION_ID' (table/alias/column unknown)"
+        },
+        {
+          "id": "batch-q-22",
+          "name": "getStepDetails",
+          "description": "via JobExecutionEntityRepository",
+          "daoClass": "in.novopay.batch.core.repository.JobExecutionEntityRepository",
+          "sqlIdentifier": "getStepDetails",
+          "status": "needs-review",
+          "sqlPreview": "SELECT STATUS,EXIT_CODE as exitCode,EXIT_MESSAGE as exitMessage FROM BATCH_STEP_EXECUTION WHERE ( STATUS='FAILED' OR EXIT_CODE ='FAILED') AND STEP_NAME LIKE '%:partition%' AND JOB_EXECUTION_ID IN (SELECT JOB_EXECUTION_ID FROM BATCH_JOB_EXECUTION WHERE JOB_INSTANCE_ID = ? order by START_TIME desc ) LIMIT 1;",
+          "reviewReason": "could not resolve column 'STEP_NAME' (table/alias/column unknown)"
+        },
+        {
+          "id": "batch-q-23",
+          "name": "getStepDetailsMaster",
+          "description": "via JobExecutionEntityRepository",
+          "daoClass": "in.novopay.batch.core.repository.JobExecutionEntityRepository",
+          "sqlIdentifier": "getStepDetailsMaster",
+          "status": "needs-review",
+          "sqlPreview": "SELECT STATUS,EXIT_CODE as exitCode,EXIT_MESSAGE as exitMessage FROM BATCH_STEP_EXECUTION WHERE ( STATUS='FAILED' OR EXIT_CODE ='FAILED') AND (STEP_NAME LIKE '%:mStep%' OR STEP_NAME LIKE '%TK%') AND JOB_EXECUTION_ID IN (SELECT JOB_EXECUTION_ID FROM BATCH_JOB_EXECUTION WHERE JOB_INSTANCE_ID = ? order by START_TIME desc ) LIMIT 1;",
+          "reviewReason": "could not resolve column 'STEP_NAME' (table/alias/column unknown)"
+        }
+      ]
+    },
+    {
+      "id": "jobinstanceentityrepository-3aed14",
+      "name": "JobInstanceEntityRepository",
+      "daoClass": "in.novopay.batch.core.repository.JobInstanceEntityRepository",
+      "moduleId": "batch",
+      "queries": [
+        {
+          "id": "batch-q-12",
+          "name": "getLastJobInstanceId",
+          "description": "via JobInstanceEntityRepository",
+          "daoClass": "in.novopay.batch.core.repository.JobInstanceEntityRepository",
+          "sqlIdentifier": "getLastJobInstanceId",
+          "status": "needs-review",
+          "sqlPreview": "select JOB_INSTANCE_ID from BATCH_JOB_INSTANCE WHERE JOB_NAME = ?1 ORDER BY JOB_INSTANCE_ID DESC LIMIT 1;",
+          "reviewReason": "could not resolve column 'JOB_NAME' (table/alias/column unknown)"
+        },
+        {
+          "id": "batch-q-13",
+          "name": "getExecutionIdByRefNo",
+          "description": "via JobInstanceEntityRepository",
+          "daoClass": "in.novopay.batch.core.repository.JobInstanceEntityRepository",
+          "sqlIdentifier": "getExecutionIdByRefNo",
+          "status": "healthy",
+          "sqlPreview": "select job_execution_id from batch_job_execution_params WHERE parameter_name = ?1 and parameter_value = ?2;",
+          "explainPlan": "Seq Scan on batch_job_execution_params  (cost=40.00..692175.16 rows=152842 width=8) (actual time=81.010..14973.720 rows=194033 loops=1)\n  Storage Filter: (((parameter_name)::text = 'maxId'::text) AND ((parameter_value)::text = '1'::text))\nPlanning Time: 0.101 ms\nExecution Time: 15023.311 ms\nPeak Memory Usage: 14 kB"
+        },
+        {
+          "id": "batch-q-14",
+          "name": "getExecutionIdByReportTypeAndRefNo",
+          "description": "via JobInstanceEntityRepository",
+          "daoClass": "in.novopay.batch.core.repository.JobInstanceEntityRepository",
+          "sqlIdentifier": "getExecutionIdByReportTypeAndRefNo",
+          "status": "healthy",
+          "sqlPreview": "SELECT DISTINCT(bje.job_execution_id) FROM batch_job_execution_params bjep JOIN batch_job_execution bje ON bjep.job_execution_id = bje.job_execution_id JOIN batch_job_instance bji ON bje.job_instance_id = bji.job_instance_id WHERE bjep.parameter_name = ?1 AND bjep.parameter_value = ?2 AND bji.job_name = ?3;",
+          "explainPlan": "Unique  (cost=177291.11..177322.50 rows=6277 width=8) (actual time=10702.866..10702.866 rows=0 loops=1)\n  ->  Sort  (cost=177291.11..177306.80 rows=6277 width=8) (actual time=10702.865..10702.865 rows=0 loops=1)\n        Sort Key: bje.job_execution_id\n        Sort Method: quicksort  Memory: 25kB\n        ->  YB Batched Nested Loop Join  (cost=287.97..176895.16 rows=6277 width=8) (actual time=10702.859..10702.859 rows=0 loops=1)\n              Join Filter: (bje.job_execution_id = bjep.job_execution_id)\n              ->  YB Batched Nested Loop Join  (cost=205.78..44000.23 rows=49778 width=8) (actual time=40.688..1790.083 rows=48522 loops=1)\n                    Join Filter: (bje.job_instance_id = bji.job_instance_id)\n                    ->  Index Scan using job_inst_un on batch_job_instance bji  (cost=115.00..15308.63 rows=48821 width=8) (actual time=15.874..553.929 rows=48030 loops=1)\n                          Index Cond: ((job_name)::text = 'triggerUploadDocument'::text)\n                    ->  Index Scan using batch_job_execution_job_instance_id on batch_job_execution bje  (cost=90.78..588.62 rows=1054 width=16) (actual time=22.698..24.134 rows=1032 loops=47)\n                          Index Cond: (job_instance_id = ANY (ARRAY[bji.job_instance_id, $1, $2, ..., $1023]))\n              ->  Index Scan using batch_job_execution_params_job_execution_id on batch_job_execution_params bjep  (cost=82.19..2731.95 rows=150 width=8) (actual time=184.514..184.514 rows=0 loops=48)\n                    Index Cond: (job_execution_id = ANY (ARRAY[bje.job_execution_id, $1025, $1026, ..., $2047]))\n                    Storage Filter: (((parameter_name)::text = 'maxId'::text) AND ((parameter_value)::text = '1'::text))\nPlanning Time: 21.571 ms\nExecution Time: 10703.312 ms\nPeak Memory Usage: 4193 kB"
+        }
+      ]
+    },
+    {
+      "id": "masterfiletypeconfigrepository-b36fec",
+      "name": "MasterFileTypeConfigRepository",
+      "daoClass": "in.novopay.batch.bulk.repository.MasterFileTypeConfigRepository",
+      "moduleId": "batch",
+      "queries": [
+        {
+          "id": "batch-q-3",
+          "name": "findAllFieldHeaders",
+          "description": "via MasterFileTypeConfigRepository",
+          "daoClass": "in.novopay.batch.bulk.repository.MasterFileTypeConfigRepository",
+          "sqlIdentifier": "findAllFieldHeaders",
+          "status": "healthy",
+          "sqlPreview": "SELECT fg.f_field_name from field_config fg join master_file_type_config m ON m.id = fg.master_config_id WHERE UPPER(m.file_type)=?1 order by fg.num asc;",
+          "explainPlan": "Sort  (cost=934.31..934.33 rows=9 width=16) (actual time=3.113..3.115 rows=28 loops=1)\n  Sort Key: fg.num\n  Sort Method: quicksort  Memory: 26kB\n  ->  YB Batched Nested Loop Join  (cost=80.30..934.17 rows=9 width=16) (actual time=3.027..3.087 rows=28 loops=1)\n        Join Filter: (fg.master_config_id = m.id)\n        ->  Seq Scan on master_file_type_config m  (cost=40.00..863.83 rows=1 width=8) (actual time=0.783..0.785 rows=1 loops=1)\n              Storage Filter: (upper((file_type)::text) = 'DYNAMIC_TWO'::text)\n        ->  Index Scan using field_config_master_config_id on field_config fg  (cost=40.30..70.34 rows=9 width=24) (actual time=2.125..2.151 rows=28 loops=1)\n              Index Cond: (master_config_id = ANY (ARRAY[m.id, $1, $2, ..., $1023]))\nPlanning Time: 21.855 ms\nExecution Time: 3.668 ms\nPeak Memory Usage: 544 kB"
+        },
+        {
+          "id": "batch-q-4",
+          "name": "findAllView",
+          "description": "via MasterFileTypeConfigRepository",
+          "daoClass": "in.novopay.batch.bulk.repository.MasterFileTypeConfigRepository",
+          "sqlIdentifier": "findAllView",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM master_file_type_config WHERE UPPER(view_type) =?1 order by position asc;",
+          "explainPlan": "Sort  (cost=864.16..864.16 rows=1 width=299) (actual time=0.917..0.918 rows=8 loops=1)\n  Sort Key: \"position\"\n  Sort Method: quicksort  Memory: 29kB\n  ->  Seq Scan on master_file_type_config  (cost=40.00..864.15 rows=1 width=299) (actual time=0.877..0.892 rows=8 loops=1)\n        Storage Filter: (upper((view_type)::text) = 'BACKEND'::text)\nPlanning Time: 0.113 ms\nExecution Time: 1.043 ms\nPeak Memory Usage: 67 kB"
+        }
+      ]
+    },
+    {
+      "id": "processoutbounddetailrepository-f2ef91",
+      "name": "ProcessOutboundDetailRepository",
+      "daoClass": "in.novopay.batch.bulk.repository.ProcessOutboundDetailRepository",
+      "moduleId": "batch",
+      "queries": [
+        {
+          "id": "batch-q-5",
+          "name": "findAllForInbound",
+          "description": "via ProcessOutboundDetailRepository",
+          "daoClass": "in.novopay.batch.bulk.repository.ProcessOutboundDetailRepository",
+          "sqlIdentifier": "findAllForInbound",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM process_outbound_detail WHERE UPPER(file_type) =?1 and status = ?2;",
+          "explainPlan": "Seq Scan on process_outbound_detail  (cost=40.00..4050.22 rows=202 width=98) (actual time=5.208..162.717 rows=35726 loops=1)\n  Storage Filter: (((status)::text = 'OUTBOUND_START'::text) AND (upper((file_type)::text) = 'INITIATE_FINNONE_FORECLOSURE'::text))\nPlanning Time: 0.098 ms\nExecution Time: 174.158 ms\nPeak Memory Usage: 15 kB"
+        }
+      ]
+    }
+  ]
+}

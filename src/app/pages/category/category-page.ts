@@ -3,16 +3,17 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { Icon } from '../../components/icon/icon';
-import { JobAccordion } from '../../components/job-accordion/job-accordion';
+import { GroupCard } from '../../components/group-card/group-card';
 import { ReportingDataService } from '../../services/reporting-data.service';
 import { SearchService } from '../../services/search.service';
+import { UiStateService } from '../../services/ui-state.service';
 import type { ReportingJob } from '../../types/reporting.types';
 import { categoryStyle } from '../../utils/category-style';
 
 @Component({
   selector: 'app-category-page',
   standalone: true,
-  imports: [Icon, JobAccordion],
+  imports: [Icon, GroupCard],
   template: `
     @if (category(); as cat) {
       <div class="flex flex-col gap-4">
@@ -49,13 +50,21 @@ import { categoryStyle } from '../../utils/category-style';
           </button>
         </div>
 
-        <div class="flex flex-col gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           @for (job of filteredJobs(); track job.id; let i = $index) {
             <div class="animate-fade-in-up" [style.animation-delay.ms]="(i % 12) * 30">
-              <app-job-accordion [job]="job" [category]="cat" />
+              <app-group-card
+                [name]="job.name"
+                [queries]="job.queries"
+                [routerLink]="['/category', cat.id, 'job', job.id]"
+                [canRename]="true"
+                [canMove]="true"
+                (rename)="ui.openRenameJob(job)"
+                (move)="ui.openMoveJob(job)"
+              />
             </div>
           } @empty {
-            <div class="flex flex-col items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-10 text-slate-400 dark:text-slate-500">
+            <div class="col-span-full flex flex-col items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-10 text-slate-400 dark:text-slate-500">
               <app-icon name="inbox" [size]="24" />
               <p class="text-sm">No reporting jobs match your filters</p>
             </div>
@@ -74,6 +83,7 @@ export class CategoryPage {
   private readonly route = inject(ActivatedRoute);
   private readonly data = inject(ReportingDataService);
   readonly search = inject(SearchService);
+  readonly ui = inject(UiStateService);
 
   private readonly categoryIdSignal = toSignal(
     this.route.paramMap.pipe(map((params) => params.get('categoryId') ?? '')),

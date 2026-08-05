@@ -1,0 +1,283 @@
+{
+  "generatedAt": "2026-08-04T00:00:00Z",
+  "module": {
+    "id": "approval",
+    "name": "Approval"
+  },
+  "summary": {
+    "id": "approval",
+    "name": "Approval",
+    "daoGroupCount": 2,
+    "queryCount": 25,
+    "explainedCount": 25,
+    "needsReviewCount": 0
+  },
+  "daoGroups": [
+    {
+      "id": "applicationrepository-7f90c5",
+      "name": "ApplicationRepository",
+      "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+      "moduleId": "approval",
+      "queries": [
+        {
+          "id": "approval-q-2",
+          "name": "getApplicationCountForUseCaseAndPermissionList",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountForUseCaseAndPermissionList",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE usecase IN (?1) AND assigned_permission IN (?2) AND created_by != ?3;",
+          "explainPlan": "Finalize Aggregate  (cost=106.05..106.06 rows=1 width=8) (actual time=1.716..1.716 rows=1 loops=1)\n  ->  Index Scan using idx_app_perm_created on application  (cost=41.61..106.01 rows=18 width=8) (actual time=1.710..1.710 rows=0 loops=1)\n        Index Cond: ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[]))\n        Storage Index Filter: ((created_by)::text <> '22'::text)\n        Storage Filter: ((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[]))\n        Partial Aggregate: true\nPlanning Time: 1.625 ms\nExecution Time: 1.856 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "approval-q-3",
+          "name": "getApplicationCountForUseCaseAndPermissionListWithDataScoping",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountForUseCaseAndPermissionListWithDataScoping",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE usecase IN (?1) AND assigned_permission IN (?2) AND created_by != ?3 AND corporate_id IN (?4);",
+          "explainPlan": "Finalize Aggregate  (cost=106.09..106.10 rows=1 width=8) (actual time=1.443..1.444 rows=1 loops=1)\n  ->  Index Scan using idx_app_perm_created on application  (cost=41.61..106.08 rows=5 width=8) (actual time=1.438..1.438 rows=0 loops=1)\n        Index Cond: ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[]))\n        Storage Index Filter: ((created_by)::text <> '22'::text)\n        Storage Filter: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (corporate_id = ANY ('{2,2,2}'::bigint[])))\n        Partial Aggregate: true\nPlanning Time: 2.847 ms\nExecution Time: 1.578 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "approval-q-4",
+          "name": "getApplicationByUserStoryIdentifierAndStatuses",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationByUserStoryIdentifierAndStatuses",
+          "status": "healthy",
+          "sqlPreview": "SELECT * from application WHERE user_story=?1 AND identifier=?2 AND status IN (?3);",
+          "explainPlan": "Seq Scan on application  (cost=40.00..3799.56 rows=1 width=5089) (actual time=43.624..43.628 rows=1 loops=1)\n  Storage Filter: (((user_story)::text = 'PLCY-ELGBL-CSTMR'::text) AND ((identifier)::text = 'bulk_POLICY_ELIGIBLE_CUSTOMERS_1907'::text) AND ((status)::text = ANY ('{APPROVED,REJECTED,APPROVED}'::text[])))\nPlanning Time: 0.268 ms\nExecution Time: 43.733 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "approval-q-5",
+          "name": "getApplicationCountWithDataScoping",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountWithDataScoping",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE (usecase IN (?1) AND assigned_user_id=?4 AND corporate_id IN (?3)) OR (usecase IN (?1) AND assigned_permission IN (?2) AND created_by != ?4 AND corporate_id IN (?3));",
+          "explainPlan": "Finalize Aggregate  (cost=620.77..620.78 rows=1 width=8) (actual time=2.417..2.417 rows=1 loops=1)\n  ->  YB Bitmap Table Scan on application  (cost=445.44..620.76 rows=5 width=8) (actual time=2.412..2.412 rows=0 loops=1)\n        Storage Filter: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (corporate_id = ANY ('{2,2,2}'::bigint[])))\n        Partial Aggregate: true\n        ->  BitmapOr  (cost=128.48..128.48 rows=47 width=0) (actual time=1.499..1.500 rows=15 loops=1)\n              ->  Bitmap Index Scan on idx_app_user  (cost=0.00..48.30 rows=2 width=0) (actual time=0.827..0.827 rows=2 loops=1)\n                    Index Cond: ((assigned_user_id)::text = '86'::text)\n              ->  Bitmap Index Scan on idx_app_perm_created  (cost=0.00..80.18 rows=45 width=0) (actual time=0.665..0.665 rows=13 loops=1)\n                    Index Cond: ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[]))\n                    Storage Index Filter: ((created_by)::text <> '22'::text)\nPlanning Time: 1.740 ms\nExecution Time: 2.578 ms\nPeak Memory Usage: 75 kB"
+        },
+        {
+          "id": "approval-q-6",
+          "name": "getApplicationCountWithDataScopingUsingOffice",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountWithDataScopingUsingOffice",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE (usecase IN (?1) AND assigned_user_id=?4 AND corporate_id IN (?3) AND office_id IN (?5)) OR (usecase IN (?1) AND assigned_permission IN (?2) AND created_by != ?4 AND corporate_id IN (?3) AND office_id IN (?5));",
+          "explainPlan": "Finalize Aggregate  (cost=622.22..622.23 rows=1 width=8) (actual time=2.168..2.168 rows=1 loops=1)\n  ->  YB Bitmap Table Scan on application  (cost=445.43..622.21 rows=2 width=8) (actual time=2.163..2.163 rows=0 loops=1)\n        Storage Filter: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (corporate_id = ANY ('{2,2,2}'::bigint[])) AND (office_id = ANY ('{1,1,1}'::bigint[])))\n        Partial Aggregate: true\n        ->  BitmapOr  (cost=128.48..128.48 rows=47 width=0) (actual time=1.279..1.279 rows=15 loops=1)\n              ->  Bitmap Index Scan on idx_app_user  (cost=0.00..48.30 rows=2 width=0) (actual time=0.619..0.619 rows=2 loops=1)\n                    Index Cond: ((assigned_user_id)::text = '86'::text)\n              ->  Bitmap Index Scan on idx_app_perm_created  (cost=0.00..80.18 rows=45 width=0) (actual time=0.657..0.657 rows=13 loops=1)\n                    Index Cond: ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[]))\n                    Storage Index Filter: ((created_by)::text <> '22'::text)\nPlanning Time: 1.705 ms\nExecution Time: 2.298 ms\nPeak Memory Usage: 75 kB"
+        },
+        {
+          "id": "approval-q-7",
+          "name": "getApplicationCountWithoutDataScoping",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountWithoutDataScoping",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE (usecase IN (?1) AND assigned_user_id=?3) OR (usecase IN (?1) AND assigned_permission IN (?2) AND created_by != ?3);",
+          "explainPlan": "Finalize Aggregate  (cost=619.57..619.58 rows=1 width=8) (actual time=2.091..2.092 rows=1 loops=1)\n  ->  YB Bitmap Table Scan on application  (cost=445.46..619.53 rows=18 width=8) (actual time=2.088..2.088 rows=0 loops=1)\n        Storage Filter: ((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[]))\n        Partial Aggregate: true\n        ->  BitmapOr  (cost=128.49..128.49 rows=47 width=0) (actual time=1.263..1.263 rows=15 loops=1)\n              ->  Bitmap Index Scan on idx_app_user  (cost=0.00..48.30 rows=2 width=0) (actual time=0.640..0.640 rows=2 loops=1)\n                    Index Cond: ((assigned_user_id)::text = '86'::text)\n              ->  Bitmap Index Scan on idx_app_perm_created  (cost=0.00..80.18 rows=45 width=0) (actual time=0.620..0.620 rows=13 loops=1)\n                    Index Cond: ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[]))\n                    Storage Index Filter: ((created_by)::text <> '22'::text)\nPlanning Time: 1.843 ms\nExecution Time: 2.214 ms\nPeak Memory Usage: 67 kB"
+        },
+        {
+          "id": "approval-q-8",
+          "name": "getApplicationCountWithoutDataScopingWithFilter",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountWithoutDataScopingWithFilter",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE usecase IN (?1) AND assigned_user_id=?2 AND (status != 'PENDING_APPROVAL' OR (status = 'PENDING_APPROVAL' AND created_by != ?2));",
+          "explainPlan": "Finalize Aggregate  (cost=68.74..68.75 rows=1 width=8) (actual time=1.297..1.298 rows=1 loops=1)\n  ->  Index Scan using idx_app_user on application  (cost=40.06..68.74 rows=1 width=8) (actual time=1.275..1.275 rows=0 loops=1)\n        Index Cond: ((assigned_user_id)::text = '86'::text)\n        Storage Filter: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (((status)::text <> 'PENDING_APPROVAL'::text) OR (((status)::text = 'PENDING_APPROVAL'::text) AND ((created_by)::text <> '22'::text))))\n        Partial Aggregate: true\nPlanning Time: 1.413 ms\nExecution Time: 1.418 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "approval-q-9",
+          "name": "getApplicationCountWithOnlyOfficeScoping",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountWithOnlyOfficeScoping",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE (usecase IN (?1) AND assigned_user_id=?3 AND office_id IN (?4)) OR (usecase IN (?1) AND assigned_permission IN (?2) AND created_by != ?3 AND office_id IN (?4));",
+          "explainPlan": "Finalize Aggregate  (cost=620.84..620.85 rows=1 width=8) (actual time=2.001..2.001 rows=1 loops=1)\n  ->  YB Bitmap Table Scan on application  (cost=445.44..620.82 rows=8 width=8) (actual time=1.996..1.997 rows=0 loops=1)\n        Storage Filter: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (office_id = ANY ('{1,1,1}'::bigint[])))\n        Partial Aggregate: true\n        ->  BitmapOr  (cost=128.48..128.48 rows=47 width=0) (actual time=1.200..1.200 rows=15 loops=1)\n              ->  Bitmap Index Scan on idx_app_user  (cost=0.00..48.30 rows=2 width=0) (actual time=0.602..0.603 rows=2 loops=1)\n                    Index Cond: ((assigned_user_id)::text = '86'::text)\n              ->  Bitmap Index Scan on idx_app_perm_created  (cost=0.00..80.18 rows=45 width=0) (actual time=0.595..0.595 rows=13 loops=1)\n                    Index Cond: ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[]))\n                    Storage Index Filter: ((created_by)::text <> '22'::text)\nPlanning Time: 1.785 ms\nExecution Time: 2.125 ms\nPeak Memory Usage: 75 kB"
+        },
+        {
+          "id": "approval-q-10",
+          "name": "getMfiApplicationCountWithDataScoping",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getMfiApplicationCountWithDataScoping",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE (usecase IN (?1) AND assigned_user_id=?4 AND corporate_id IN (?3)) OR (usecase IN (?1) AND assigned_permission IN (?2) AND created_by != ?4 AND corporate_id IN (?3)) AND identifier LIKE ?5;",
+          "explainPlan": "Finalize Aggregate  (cost=623.20..623.21 rows=1 width=8) (actual time=2.013..2.014 rows=1 loops=1)\n  ->  YB Bitmap Table Scan on application  (cost=445.43..623.20 rows=1 width=8) (actual time=2.008..2.008 rows=0 loops=1)\n        Storage Filter: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (corporate_id = ANY ('{2,2,2}'::bigint[])) AND (((assigned_user_id)::text = '86'::text) OR (((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[])) AND ((created_by)::text <> '22'::text) AND ((identifier)::text ~~ 'bulk_POLICY_ELIGIBLE_CUSTOMERS_1907'::text))))\n        Partial Aggregate: true\n        ->  BitmapOr  (cost=128.48..128.48 rows=47 width=0) (actual time=1.174..1.174 rows=15 loops=1)\n              ->  Bitmap Index Scan on idx_app_user  (cost=0.00..48.30 rows=2 width=0) (actual time=0.592..0.592 rows=2 loops=1)\n                    Index Cond: ((assigned_user_id)::text = '86'::text)\n              ->  Bitmap Index Scan on idx_app_perm_created  (cost=0.00..80.18 rows=45 width=0) (actual time=0.579..0.579 rows=13 loops=1)\n                    Index Cond: ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[]))\n                    Storage Index Filter: ((created_by)::text <> '22'::text)\nPlanning Time: 1.859 ms\nExecution Time: 2.134 ms\nPeak Memory Usage: 106 kB"
+        },
+        {
+          "id": "approval-q-11",
+          "name": "getMfiApplicationCountWithDataScopingUsingOffice",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getMfiApplicationCountWithDataScopingUsingOffice",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE (usecase IN (?1) AND assigned_user_id=?4 AND corporate_id IN (?3) AND office_id IN (?5)) OR (usecase IN (?1) AND assigned_permission IN (?2) AND created_by != ?4 AND corporate_id IN (?3) AND office_id IN (?5)) AND identifier LIKE ?6;",
+          "explainPlan": "Finalize Aggregate  (cost=624.72..624.73 rows=1 width=8) (actual time=2.159..2.160 rows=1 loops=1)\n  ->  YB Bitmap Table Scan on application  (cost=445.43..624.72 rows=1 width=8) (actual time=2.154..2.154 rows=0 loops=1)\n        Storage Filter: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (corporate_id = ANY ('{2,2,2}'::bigint[])) AND (office_id = ANY ('{1,1,1}'::bigint[])) AND (((assigned_user_id)::text = '86'::text) OR (((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[])) AND ((created_by)::text <> '22'::text) AND ((identifier)::text ~~ 'bulk_POLICY_ELIGIBLE_CUSTOMERS_1907'::text))))\n        Partial Aggregate: true\n        ->  BitmapOr  (cost=128.48..128.48 rows=47 width=0) (actual time=1.218..1.218 rows=15 loops=1)\n              ->  Bitmap Index Scan on idx_app_user  (cost=0.00..48.30 rows=2 width=0) (actual time=0.591..0.591 rows=2 loops=1)\n                    Index Cond: ((assigned_user_id)::text = '86'::text)\n              ->  Bitmap Index Scan on idx_app_perm_created  (cost=0.00..80.18 rows=45 width=0) (actual time=0.624..0.624 rows=13 loops=1)\n                    Index Cond: ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[]))\n                    Storage Index Filter: ((created_by)::text <> '22'::text)\nPlanning Time: 2.042 ms\nExecution Time: 2.296 ms\nPeak Memory Usage: 113 kB"
+        },
+        {
+          "id": "approval-q-12",
+          "name": "getMfiApplicationCountWithoutDataScoping",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getMfiApplicationCountWithoutDataScoping",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE (usecase IN (?1) AND assigned_user_id=?3) OR (usecase IN (?1) AND assigned_permission IN (?2) AND created_by != ?3) AND identifier LIKE ?4;",
+          "explainPlan": "Finalize Aggregate  (cost=621.68..621.69 rows=1 width=8) (actual time=2.001..2.002 rows=1 loops=1)\n  ->  YB Bitmap Table Scan on application  (cost=445.43..621.68 rows=1 width=8) (actual time=1.997..1.997 rows=0 loops=1)\n        Storage Filter: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (((assigned_user_id)::text = '86'::text) OR (((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[])) AND ((created_by)::text <> '22'::text) AND ((identifier)::text ~~ 'bulk_POLICY_ELIGIBLE_CUSTOMERS_1907'::text))))\n        Partial Aggregate: true\n        ->  BitmapOr  (cost=128.48..128.48 rows=47 width=0) (actual time=1.168..1.168 rows=15 loops=1)\n              ->  Bitmap Index Scan on idx_app_user  (cost=0.00..48.30 rows=2 width=0) (actual time=0.576..0.576 rows=2 loops=1)\n                    Index Cond: ((assigned_user_id)::text = '86'::text)\n              ->  Bitmap Index Scan on idx_app_perm_created  (cost=0.00..80.18 rows=45 width=0) (actual time=0.589..0.589 rows=13 loops=1)\n                    Index Cond: ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[]))\n                    Storage Index Filter: ((created_by)::text <> '22'::text)\nPlanning Time: 1.811 ms\nExecution Time: 2.116 ms\nPeak Memory Usage: 106 kB"
+        },
+        {
+          "id": "approval-q-13",
+          "name": "getMfiApplicationCountWithoutDataScopingWithFilter",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getMfiApplicationCountWithoutDataScopingWithFilter",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE usecase IN (?1) AND assigned_user_id=?2 AND identifier LIKE ?3 AND (status != 'PENDING_APPROVAL' OR (status = 'PENDING_APPROVAL' AND created_by != ?2));",
+          "explainPlan": "Finalize Aggregate  (cost=68.75..68.76 rows=1 width=8) (actual time=1.498..1.498 rows=1 loops=1)\n  ->  Index Scan using idx_app_user on application  (cost=40.06..68.74 rows=1 width=8) (actual time=1.493..1.493 rows=0 loops=1)\n        Index Cond: ((assigned_user_id)::text = '86'::text)\n        Storage Filter: (((identifier)::text ~~ 'bulk_POLICY_ELIGIBLE_CUSTOMERS_1907'::text) AND ((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (((status)::text <> 'PENDING_APPROVAL'::text) OR (((status)::text = 'PENDING_APPROVAL'::text) AND ((created_by)::text <> '22'::text))))\n        Partial Aggregate: true\nPlanning Time: 1.756 ms\nExecution Time: 1.615 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "approval-q-14",
+          "name": "getMfiApplicationCountWithOnlyOfficeScoping",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getMfiApplicationCountWithOnlyOfficeScoping",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE (usecase IN (?1) AND assigned_user_id=?3 AND office_id IN (?4)) OR (usecase IN (?1) AND assigned_permission IN (?2) AND created_by != ?3 AND office_id IN (?4)) AND identifier LIKE ?5;",
+          "explainPlan": "Finalize Aggregate  (cost=623.20..623.21 rows=1 width=8) (actual time=2.484..2.484 rows=1 loops=1)\n  ->  YB Bitmap Table Scan on application  (cost=445.43..623.20 rows=1 width=8) (actual time=2.478..2.478 rows=0 loops=1)\n        Storage Filter: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (office_id = ANY ('{1,1,1}'::bigint[])) AND (((assigned_user_id)::text = '86'::text) OR (((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[])) AND ((created_by)::text <> '22'::text) AND ((identifier)::text ~~ 'bulk_POLICY_ELIGIBLE_CUSTOMERS_1907'::text))))\n        Partial Aggregate: true\n        ->  BitmapOr  (cost=128.48..128.48 rows=47 width=0) (actual time=1.303..1.303 rows=15 loops=1)\n              ->  Bitmap Index Scan on idx_app_user  (cost=0.00..48.30 rows=2 width=0) (actual time=0.631..0.631 rows=2 loops=1)\n                    Index Cond: ((assigned_user_id)::text = '86'::text)\n              ->  Bitmap Index Scan on idx_app_perm_created  (cost=0.00..80.18 rows=45 width=0) (actual time=0.668..0.668 rows=13 loops=1)\n                    Index Cond: ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[]))\n                    Storage Index Filter: ((created_by)::text <> '22'::text)\nPlanning Time: 2.038 ms\nExecution Time: 2.644 ms\nPeak Memory Usage: 106 kB"
+        },
+        {
+          "id": "approval-q-15",
+          "name": "getApplicationCountScopedByUsecase",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountScopedByUsecase",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE (usecase IN (?1) AND assigned_user_id=?3) OR (usecase IN (?1) AND assigned_permission IN (?2) AND created_by != ?3) AND identifier IN ?4;",
+          "explainPlan": "Finalize Aggregate  (cost=621.85..621.86 rows=1 width=8) (actual time=2.123..2.123 rows=1 loops=1)\n  ->  YB Bitmap Table Scan on application  (cost=445.43..621.85 rows=1 width=8) (actual time=2.119..2.119 rows=0 loops=1)\n        Storage Filter: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (((assigned_user_id)::text = '86'::text) OR (((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[])) AND ((created_by)::text <> '22'::text) AND ((identifier)::text = ANY ('{bulk_POLICY_ELIGIBLE_CUSTOMERS_1907,Autor,bulk_POLICY_ELIGIBLE_CUSTOMERS_1898}'::text[])))))\n        Partial Aggregate: true\n        ->  BitmapOr  (cost=128.48..128.48 rows=47 width=0) (actual time=1.236..1.236 rows=15 loops=1)\n              ->  Bitmap Index Scan on idx_app_user  (cost=0.00..48.30 rows=2 width=0) (actual time=0.624..0.624 rows=2 loops=1)\n                    Index Cond: ((assigned_user_id)::text = '86'::text)\n              ->  Bitmap Index Scan on idx_app_perm_created  (cost=0.00..80.18 rows=45 width=0) (actual time=0.610..0.610 rows=13 loops=1)\n                    Index Cond: ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[]))\n                    Storage Index Filter: ((created_by)::text <> '22'::text)\nPlanning Time: 2.015 ms\nExecution Time: 2.250 ms\nPeak Memory Usage: 105 kB"
+        },
+        {
+          "id": "approval-q-16",
+          "name": "getApplicationCountForUCPermissionAssignedUserWithDataScoping",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountForUCPermissionAssignedUserWithDataScoping",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE usecase IN (?1) AND assigned_permission IN (?2) AND assigned_user_id IN (?3);",
+          "explainPlan": "Finalize Aggregate  (cost=90.53..90.54 rows=1 width=8) (actual time=1.807..1.807 rows=1 loops=1)\n  ->  Index Scan using idx_app_user on application  (cost=40.88..90.53 rows=1 width=8) (actual time=1.802..1.802 rows=0 loops=1)\n        Index Cond: ((assigned_user_id)::text = ANY ('{86,86,173}'::text[]))\n        Storage Filter: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[])))\n        Partial Aggregate: true\nPlanning Time: 0.636 ms\nExecution Time: 1.906 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "approval-q-17",
+          "name": "getApplicationCountForUseCaseAndUserId",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountForUseCaseAndUserId",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE usecase IN (?1) AND assigned_user_id=?2;",
+          "explainPlan": "Finalize Aggregate  (cost=68.73..68.74 rows=1 width=8) (actual time=1.315..1.315 rows=1 loops=1)\n  ->  Index Scan using idx_app_user on application  (cost=40.06..68.72 rows=1 width=8) (actual time=1.311..1.311 rows=0 loops=1)\n        Index Cond: ((assigned_user_id)::text = '86'::text)\n        Storage Filter: ((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[]))\n        Partial Aggregate: true\nPlanning Time: 0.281 ms\nExecution Time: 1.409 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "approval-q-18",
+          "name": "getApplicationCountForUseCaseAndUserIdWithDataScoping",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountForUseCaseAndUserIdWithDataScoping",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE usecase IN (?1) AND assigned_user_id=?2 AND corporate_id IN (?3);",
+          "explainPlan": "Finalize Aggregate  (cost=68.73..68.74 rows=1 width=8) (actual time=1.272..1.272 rows=1 loops=1)\n  ->  Index Scan using idx_app_user on application  (cost=40.06..68.73 rows=1 width=8) (actual time=1.267..1.267 rows=0 loops=1)\n        Index Cond: ((assigned_user_id)::text = '86'::text)\n        Storage Filter: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (corporate_id = ANY ('{2,2,2}'::bigint[])))\n        Partial Aggregate: true\nPlanning Time: 0.408 ms\nExecution Time: 1.399 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "approval-q-19",
+          "name": "getMfiApplicationCountWithoutDataScopingForCollectionOnly",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getMfiApplicationCountWithoutDataScopingForCollectionOnly",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE (usecase IN (?1) AND assigned_user_id=?3) AND (usecase IN (?1) AND assigned_permission IN (?2) AND created_by != ?3) AND identifier LIKE ?4;",
+          "explainPlan": "Finalize Aggregate  (cost=68.75..68.76 rows=1 width=8) (actual time=1.409..1.409 rows=1 loops=1)\n  ->  Index Scan using idx_app_user on application  (cost=40.06..68.75 rows=1 width=8) (actual time=1.404..1.404 rows=0 loops=1)\n        Index Cond: ((assigned_user_id)::text = '86'::text)\n        Storage Filter: (((created_by)::text <> '22'::text) AND ((identifier)::text ~~ 'bulk_POLICY_ELIGIBLE_CUSTOMERS_1907'::text) AND ((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND ((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[])))\n        Partial Aggregate: true\nPlanning Time: 2.118 ms\nExecution Time: 1.540 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "approval-q-20",
+          "name": "getApplicationCountScopedByUsecaseForCollectionOnly",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountScopedByUsecaseForCollectionOnly",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE (usecase IN (?1) AND assigned_user_id=?3) AND (usecase IN (?1) AND assigned_permission IN (?2) AND created_by != ?3) AND identifier IN ?4;",
+          "explainPlan": "Finalize Aggregate  (cost=68.75..68.76 rows=1 width=8) (actual time=1.297..1.298 rows=1 loops=1)\n  ->  Index Scan using idx_app_user on application  (cost=40.06..68.75 rows=1 width=8) (actual time=1.292..1.293 rows=0 loops=1)\n        Index Cond: ((assigned_user_id)::text = '86'::text)\n        Storage Filter: (((created_by)::text <> '22'::text) AND ((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND ((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[])) AND ((identifier)::text = ANY ('{bulk_POLICY_ELIGIBLE_CUSTOMERS_1907,Autor,bulk_POLICY_ELIGIBLE_CUSTOMERS_1898}'::text[])))\n        Partial Aggregate: true\nPlanning Time: 2.358 ms\nExecution Time: 1.430 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "approval-q-21",
+          "name": "getApplicationCountScopedByUsecaseForCollectionOnlyWithFilter",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountScopedByUsecaseForCollectionOnlyWithFilter",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE usecase IN (?1) AND assigned_user_id=?2 AND identifier IN ?3 AND (status != 'PENDING_APPROVAL' OR (status = 'PENDING_APPROVAL' AND created_by != ?2));",
+          "explainPlan": "Finalize Aggregate  (cost=68.75..68.76 rows=1 width=8) (actual time=1.358..1.359 rows=1 loops=1)\n  ->  Index Scan using idx_app_user on application  (cost=40.06..68.75 rows=1 width=8) (actual time=1.353..1.353 rows=0 loops=1)\n        Index Cond: ((assigned_user_id)::text = '86'::text)\n        Storage Filter: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND ((identifier)::text = ANY ('{bulk_POLICY_ELIGIBLE_CUSTOMERS_1907,Autor,bulk_POLICY_ELIGIBLE_CUSTOMERS_1898}'::text[])) AND (((status)::text <> 'PENDING_APPROVAL'::text) OR (((status)::text = 'PENDING_APPROVAL'::text) AND ((created_by)::text <> '22'::text))))\n        Partial Aggregate: true\nPlanning Time: 1.635 ms\nExecution Time: 1.496 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "approval-q-22",
+          "name": "getMfiPendingAppListByUsecase",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getMfiPendingAppListByUsecase",
+          "status": "healthy",
+          "sqlPreview": "SELECT * from application WHERE user_story IN ?1 and status = ?2;",
+          "explainPlan": "Seq Scan on application  (cost=40.00..20222.56 rows=3863 width=5089) (actual time=32.296..61.339 rows=1928 loops=1)\n  Storage Filter: (((status)::text = 'APPROVED'::text) AND ((user_story)::text = ANY ('{PLCY-ELGBL-CSTMR,PROD-LOAN,PLCY-ELGBL-CSTMR}'::text[])))\nPlanning Time: 0.196 ms\nExecution Time: 61.870 ms\nPeak Memory Usage: 8132 kB"
+        },
+        {
+          "id": "approval-q-23",
+          "name": "getApplicationCountForUCPermissionAssignedUserIdentifierWithDataScoping",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "getApplicationCountForUCPermissionAssignedUserIdentifierWithDataScoping",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from application WHERE usecase IN (?1) AND assigned_permission IN (?2) AND assigned_user_id IN (?3) and identifier like ?4;",
+          "explainPlan": "Finalize Aggregate  (cost=90.60..90.61 rows=1 width=8) (actual time=1.601..1.602 rows=1 loops=1)\n  ->  Index Scan using idx_app_user on application  (cost=40.88..90.60 rows=1 width=8) (actual time=1.597..1.597 rows=0 loops=1)\n        Index Cond: ((assigned_user_id)::text = ANY ('{86,86,173}'::text[]))\n        Storage Filter: (((identifier)::text ~~ 'bulk_POLICY_ELIGIBLE_CUSTOMERS_1907'::text) AND ((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND ((assigned_permission)::text = ANY ('{PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR,PROD-PRCD-CRET-APPR}'::text[])))\n        Partial Aggregate: true\nPlanning Time: 1.100 ms\nExecution Time: 1.713 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "approval-q-24",
+          "name": "findAllByStatusUseCaseOfficeIdAndIdentifier",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "findAllByStatusUseCaseOfficeIdAndIdentifier",
+          "status": "healthy",
+          "sqlPreview": "SELECT * from application WHERE usecase IN ?1 and office_id IN ?2 and status in ?3 AND identifier ilike ?4;",
+          "explainPlan": "Index Scan using idx_app_usecase_corp_office on application  (cost=97.81..2142.53 rows=1 width=5089) (actual time=4.125..4.125 rows=0 loops=1)\n  Index Cond: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (office_id = ANY ('{1,1,1}'::bigint[])))\n  Storage Filter: (((identifier)::text ~~* 'bulk_POLICY_ELIGIBLE_CUSTOMERS_1907'::text) AND ((status)::text = ANY ('{APPROVED,REJECTED,APPROVED}'::text[])))\nPlanning Time: 2.933 ms\nExecution Time: 4.234 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "approval-q-25",
+          "name": "findAllByStatusUseCaseOfficeId",
+          "description": "via ApplicationRepository",
+          "daoClass": "in.novopay.approval.application.daoservice.ApplicationRepository",
+          "sqlIdentifier": "findAllByStatusUseCaseOfficeId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * from application WHERE usecase IN ?1 and office_id IN ?2 and status in ?3;",
+          "explainPlan": "Index Scan using idx_app_usecase_corp_office on application  (cost=97.81..14540.98 rows=2121 width=5089) (actual time=5.838..6.612 rows=216 loops=1)\n  Index Cond: (((usecase)::text = ANY ('{PLCY-ELGBL-CSTMR-UC001,PROD-LOAN-UC001,PLCY-ELGBL-CSTMR-UC001}'::text[])) AND (office_id = ANY ('{1,1,1}'::bigint[])))\n  Storage Filter: ((status)::text = ANY ('{APPROVED,REJECTED,APPROVED}'::text[]))\nPlanning Time: 0.402 ms\nExecution Time: 6.755 ms\nPeak Memory Usage: 1104 kB"
+        }
+      ]
+    },
+    {
+      "id": "draftrepository-e4f563",
+      "name": "DraftRepository",
+      "daoClass": "in.novopay.approval.draft.daoservice.DraftRepository",
+      "moduleId": "approval",
+      "queries": [
+        {
+          "id": "approval-q-1",
+          "name": "getDraftApplicationCount",
+          "description": "via DraftRepository",
+          "daoClass": "in.novopay.approval.draft.daoservice.DraftRepository",
+          "sqlIdentifier": "getDraftApplicationCount",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(id) from draft_application WHERE usecase IN (?1) AND created_by=?2;",
+          "explainPlan": "Finalize Aggregate  (cost=891.86..891.87 rows=1 width=8) (actual time=0.877..0.877 rows=1 loops=1)\n  ->  Seq Scan on draft_application  (cost=40.00..891.85 rows=1 width=8) (actual time=0.869..0.871 rows=1 loops=1)\n        Storage Filter: (((created_by)::text = '21'::text) AND ((usecase)::text = ANY ('{TAX-GRUP-UC001,BANK-EMPL-UC001,PRIC-SETP-UC001}'::text[])))\n        Partial Aggregate: true\nPlanning Time: 1.377 ms\nExecution Time: 0.990 ms\nPeak Memory Usage: 24 kB"
+        }
+      ]
+    }
+  ]
+}

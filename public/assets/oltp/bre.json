@@ -1,0 +1,297 @@
+{
+  "generatedAt": "2026-08-04T00:00:00Z",
+  "module": {
+    "id": "bre",
+    "name": "BRE"
+  },
+  "summary": {
+    "id": "bre",
+    "name": "BRE",
+    "daoGroupCount": 10,
+    "queryCount": 20,
+    "explainedCount": 20,
+    "needsReviewCount": 0
+  },
+  "daoGroups": [
+    {
+      "id": "eligibilityrulemasterhistoryrepository-be10a9",
+      "name": "EligibilityRuleMasterHistoryRepository",
+      "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterHistoryRepository",
+      "moduleId": "bre",
+      "queries": [
+        {
+          "id": "bre-q-16",
+          "name": "getMaxVersionByRuleCode",
+          "description": "via EligibilityRuleMasterHistoryRepository",
+          "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterHistoryRepository",
+          "sqlIdentifier": "getMaxVersionByRuleCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT MAX(version) FROM eligibility_rule_master_history WHERE rule_code = ?1;",
+          "explainPlan": "Result  (cost=21.10..21.11 rows=1 width=4) (actual time=0.928..0.928 rows=1 loops=1)\n  InitPlan 1 (returns $0)\n    ->  Limit  (cost=20.02..21.10 rows=1 width=4) (actual time=0.925..0.925 rows=1 loops=1)\n          ->  Index Only Scan Backward using idx_rule_history_version on eligibility_rule_master_history  (cost=20.02..25.40 rows=5 width=4) (actual time=0.923..0.923 rows=1 loops=1)\n                Index Cond: ((rule_code = 'JLG0043'::text) AND (version IS NOT NULL))\n                Heap Fetches: 0\nPlanning Time: 0.214 ms\nExecution Time: 1.025 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "eligibilityrulemasterlistrowmapper-6ef214",
+      "name": "EligibilityRuleMasterListRowMapper",
+      "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterListRowMapper",
+      "moduleId": "bre",
+      "queries": [
+        {
+          "id": "bre-q-19",
+          "name": "Field EligibilityRuleMasterListRowMapper.BASIC_QUERY",
+          "description": "via EligibilityRuleMasterListRowMapper",
+          "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterListRowMapper",
+          "sqlIdentifier": "Field EligibilityRuleMasterListRowMapper.BASIC_QUERY",
+          "status": "healthy",
+          "sqlPreview": "SELECT rule_code, rule_name, description, created_by, created_on, updated_by, updated_on FROM eligibility_rule_master WHERE is_active = TRUE AND is_deleted = FALSE;",
+          "explainPlan": "Index Scan using idx_rule_deleted_active on eligibility_rule_master  (cost=43.84..151.45 rows=129 width=139) (actual time=2.368..2.518 rows=129 loops=1)\n  Index Cond: ((is_deleted = false) AND (is_active = true))\n  Storage Index Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 0.118 ms\nExecution Time: 2.621 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "eligibilityrulemasterrepository-a3608b",
+      "name": "EligibilityRuleMasterRepository",
+      "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterRepository",
+      "moduleId": "bre",
+      "queries": [
+        {
+          "id": "bre-q-7",
+          "name": "findAllActiveRulesForDropdown",
+          "description": "via EligibilityRuleMasterRepository",
+          "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterRepository",
+          "sqlIdentifier": "findAllActiveRulesForDropdown",
+          "status": "healthy",
+          "sqlPreview": "SELECT rule_code, rule_name FROM eligibility_rule_master WHERE is_active = true AND is_deleted = false;",
+          "explainPlan": "Index Scan using idx_rule_deleted_active on eligibility_rule_master  (cost=43.84..138.95 rows=129 width=41) (actual time=2.460..2.583 rows=129 loops=1)\n  Index Cond: ((is_deleted = false) AND (is_active = true))\n  Storage Index Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 25.005 ms\nExecution Time: 2.718 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "bre-q-8",
+          "name": "findAllActiveRulesForConfigurations",
+          "description": "via EligibilityRuleMasterRepository",
+          "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterRepository",
+          "sqlIdentifier": "findAllActiveRulesForConfigurations",
+          "status": "healthy",
+          "sqlPreview": "SELECT rule_code, rule_name, is_remedial_action_needed, is_note_code_applicable FROM eligibility_rule_master WHERE is_active = true AND is_deleted = false;",
+          "explainPlan": "Index Scan using idx_rule_deleted_active on eligibility_rule_master  (cost=43.84..139.44 rows=129 width=44) (actual time=2.083..2.191 rows=129 loops=1)\n  Index Cond: ((is_deleted = false) AND (is_active = true))\n  Storage Index Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 0.108 ms\nExecution Time: 2.300 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "bre-q-9",
+          "name": "findAllActiveRules",
+          "description": "via EligibilityRuleMasterRepository",
+          "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterRepository",
+          "sqlIdentifier": "findAllActiveRules",
+          "status": "healthy",
+          "sqlPreview": "SELECT rule_code, rule_name, description, created_by, created_on, updated_by, updated_on FROM eligibility_rule_master WHERE is_active = true AND is_deleted = false;",
+          "explainPlan": "Index Scan using idx_rule_deleted_active on eligibility_rule_master  (cost=43.84..151.45 rows=129 width=139) (actual time=2.255..2.430 rows=129 loops=1)\n  Index Cond: ((is_deleted = false) AND (is_active = true))\n  Storage Index Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 0.138 ms\nExecution Time: 2.552 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "bre-q-10",
+          "name": "findAllActiveRulesForDropdownByRuleCodes",
+          "description": "via EligibilityRuleMasterRepository",
+          "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterRepository",
+          "sqlIdentifier": "findAllActiveRulesForDropdownByRuleCodes",
+          "status": "healthy",
+          "sqlPreview": "SELECT rule_code, rule_name FROM eligibility_rule_master WHERE rule_code IN ?1 AND is_active = true AND is_deleted = false;",
+          "explainPlan": "Index Scan using unq_rule_code on eligibility_rule_master  (cost=40.10..69.30 rows=3 width=41) (actual time=1.170..1.175 rows=3 loops=1)\n  Index Cond: ((rule_code)::text = ANY ('{JLG0043,JLG0006,JLG0021}'::text[]))\n  Storage Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 1.544 ms\nExecution Time: 1.289 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "bre-q-11",
+          "name": "findAllActiveRulesForConfigurationsByRuleCodes",
+          "description": "via EligibilityRuleMasterRepository",
+          "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterRepository",
+          "sqlIdentifier": "findAllActiveRulesForConfigurationsByRuleCodes",
+          "status": "healthy",
+          "sqlPreview": "SELECT rule_code, rule_name, is_remedial_action_needed, is_note_code_applicable FROM eligibility_rule_master WHERE rule_code IN ?1 AND is_active = true AND is_deleted = false;",
+          "explainPlan": "Index Scan using unq_rule_code on eligibility_rule_master  (cost=40.10..69.31 rows=3 width=44) (actual time=1.281..1.286 rows=3 loops=1)\n  Index Cond: ((rule_code)::text = ANY ('{JLG0043,JLG0006,JLG0021}'::text[]))\n  Storage Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 0.198 ms\nExecution Time: 1.360 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "bre-q-12",
+          "name": "findAllActiveRulesByRuleCodes",
+          "description": "via EligibilityRuleMasterRepository",
+          "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterRepository",
+          "sqlIdentifier": "findAllActiveRulesByRuleCodes",
+          "status": "healthy",
+          "sqlPreview": "SELECT rule_code, rule_name, description, created_by, created_on, updated_by, updated_on FROM eligibility_rule_master WHERE rule_code IN ?1 AND is_active = true AND is_deleted = false;",
+          "explainPlan": "Index Scan using unq_rule_code on eligibility_rule_master  (cost=40.10..69.59 rows=3 width=139) (actual time=1.424..1.431 rows=3 loops=1)\n  Index Cond: ((rule_code)::text = ANY ('{JLG0043,JLG0006,JLG0021}'::text[]))\n  Storage Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 0.201 ms\nExecution Time: 1.506 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "bre-q-13",
+          "name": "findDetailsByIds",
+          "description": "via EligibilityRuleMasterRepository",
+          "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterRepository",
+          "sqlIdentifier": "findDetailsByIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT id, rule_code, rule_name, description FROM eligibility_rule_master WHERE id IN ?1 AND is_active = true AND is_deleted = false;",
+          "explainPlan": "Index Scan using eligibility_rule_master_pkey on eligibility_rule_master  (cost=20.33..21.89 rows=3 width=117) (actual time=0.721..0.725 rows=3 loops=1)\n  Index Cond: (id = ANY ('{22,38,46}'::bigint[]))\n  Storage Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 0.209 ms\nExecution Time: 0.794 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "bre-q-14",
+          "name": "findDetailsByRuleCodes",
+          "description": "via EligibilityRuleMasterRepository",
+          "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterRepository",
+          "sqlIdentifier": "findDetailsByRuleCodes",
+          "status": "healthy",
+          "sqlPreview": "SELECT id, rule_code, rule_name, description FROM eligibility_rule_master WHERE rule_code IN ?1 AND is_active = true AND is_deleted = false;",
+          "explainPlan": "Index Scan using unq_rule_code on eligibility_rule_master  (cost=40.10..69.50 rows=3 width=117) (actual time=1.339..1.344 rows=3 loops=1)\n  Index Cond: ((rule_code)::text = ANY ('{JLG0043,JLG0006,JLG0021}'::text[]))\n  Storage Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 0.242 ms\nExecution Time: 1.420 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "bre-q-15",
+          "name": "findProcedureDetailsByIds",
+          "description": "via EligibilityRuleMasterRepository",
+          "daoClass": "in.novopay.bre.repository.EligibilityRuleMasterRepository",
+          "sqlIdentifier": "findProcedureDetailsByIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT rule_name, procedure_name FROM eligibility_rule_master WHERE id IN ?1 AND is_active = true AND is_deleted = false;",
+          "explainPlan": "Index Scan using eligibility_rule_master_pkey on eligibility_rule_master  (cost=20.19..21.75 rows=3 width=66) (actual time=0.631..0.635 rows=3 loops=1)\n  Index Cond: (id = ANY ('{22,38,46}'::bigint[]))\n  Storage Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 0.293 ms\nExecution Time: 0.709 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "functionmasterrepository-58a657",
+      "name": "FunctionMasterRepository",
+      "daoClass": "in.novopay.bre.repository.FunctionMasterRepository",
+      "moduleId": "bre",
+      "queries": [
+        {
+          "id": "bre-q-4",
+          "name": "findByFunctionNameCode",
+          "description": "via FunctionMasterRepository",
+          "daoClass": "in.novopay.bre.repository.FunctionMasterRepository",
+          "sqlIdentifier": "findByFunctionNameCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM function_master WHERE function_name_code = ?1 AND is_active = true AND is_deleted = false;",
+          "explainPlan": "Index Scan using idx_function_master_function_name_code on function_master  (cost=40.04..68.70 rows=1 width=230) (actual time=1.247..1.250 rows=1 loops=1)\n  Index Cond: ((function_name_code)::text = 'GET_SHG_GROUP_ACCOUNT_TYPE'::text)\n  Storage Filter: is_active\nPlanning Time: 0.489 ms\nExecution Time: 1.334 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "functionparametermappingrepository-df5d69",
+      "name": "FunctionParameterMappingRepository",
+      "daoClass": "in.novopay.bre.repository.FunctionParameterMappingRepository",
+      "moduleId": "bre",
+      "queries": [
+        {
+          "id": "bre-q-1",
+          "name": "findByFunctionId",
+          "description": "via FunctionParameterMappingRepository",
+          "daoClass": "in.novopay.bre.repository.FunctionParameterMappingRepository",
+          "sqlIdentifier": "findByFunctionId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM function_parameter_mapping WHERE function_id = ?1 AND is_active = true AND is_deleted = false;",
+          "explainPlan": "Index Scan using idx_function_parameter_mapping_function_id on function_parameter_mapping  (cost=40.13..69.26 rows=4 width=65) (actual time=1.475..1.481 rows=4 loops=1)\n  Index Cond: (function_id = 1)\n  Storage Filter: is_active\nPlanning Time: 0.568 ms\nExecution Time: 1.609 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "parametermasterrepository-e66ec9",
+      "name": "ParameterMasterRepository",
+      "daoClass": "in.novopay.bre.repository.ParameterMasterRepository",
+      "moduleId": "bre",
+      "queries": [
+        {
+          "id": "bre-q-2",
+          "name": "findByIdAndIsDeletedFalseAndIsActiveTrue",
+          "description": "via ParameterMasterRepository",
+          "daoClass": "in.novopay.bre.repository.ParameterMasterRepository",
+          "sqlIdentifier": "findByIdAndIsDeletedFalseAndIsActiveTrue",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM parameter_master WHERE id = ?1 AND is_active = true AND is_deleted = false;",
+          "explainPlan": "Index Scan using parameter_master_pkey on parameter_master  (cost=20.10..21.30 rows=1 width=75) (actual time=0.768..0.771 rows=1 loops=1)\n  Index Cond: (id = 3)\n  Storage Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 0.603 ms\nExecution Time: 0.870 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "bre-q-3",
+          "name": "findByIdsAndIsDeletedFalseAndIsActiveTrue",
+          "description": "via ParameterMasterRepository",
+          "daoClass": "in.novopay.bre.repository.ParameterMasterRepository",
+          "sqlIdentifier": "findByIdsAndIsDeletedFalseAndIsActiveTrue",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM parameter_master WHERE id IN ?1 AND is_active = true AND is_deleted = false;",
+          "explainPlan": "Index Scan using parameter_master_pkey on parameter_master  (cost=20.29..21.79 rows=3 width=75) (actual time=0.780..0.785 rows=3 loops=1)\n  Index Cond: (id = ANY ('{3,9,5}'::bigint[]))\n  Storage Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 1.547 ms\nExecution Time: 0.902 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "rulegroupeligibilityrulemappingrepository-78e02b",
+      "name": "RuleGroupEligibilityRuleMappingRepository",
+      "daoClass": "in.novopay.bre.repository.RuleGroupEligibilityRuleMappingRepository",
+      "moduleId": "bre",
+      "queries": [
+        {
+          "id": "bre-q-17",
+          "name": "findByRuleGroupIds",
+          "description": "via RuleGroupEligibilityRuleMappingRepository",
+          "daoClass": "in.novopay.bre.repository.RuleGroupEligibilityRuleMappingRepository",
+          "sqlIdentifier": "findByRuleGroupIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM rule_group__eligibility_rule_mapping WHERE rule_group_id IN ?1;",
+          "explainPlan": "Index Scan using fk_rule_group_mapping on rule_group__eligibility_rule_mapping  (cost=41.31..76.83 rows=39 width=24) (actual time=1.294..1.302 rows=13 loops=1)\n  Index Cond: (rule_group_id = ANY ('{3,3,3}'::bigint[]))\nPlanning Time: 0.105 ms\nExecution Time: 1.372 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "rulegroupmasterhistoryrepository-f8651c",
+      "name": "RuleGroupMasterHistoryRepository",
+      "daoClass": "in.novopay.bre.repository.RuleGroupMasterHistoryRepository",
+      "moduleId": "bre",
+      "queries": [
+        {
+          "id": "bre-q-18",
+          "name": "getMaxVersionByRuleGroupCode",
+          "description": "via RuleGroupMasterHistoryRepository",
+          "daoClass": "in.novopay.bre.repository.RuleGroupMasterHistoryRepository",
+          "sqlIdentifier": "getMaxVersionByRuleGroupCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT MAX(version) FROM rule_group_master_history WHERE rule_group_code = ?1;",
+          "explainPlan": "Result  (cost=21.61..21.62 rows=1 width=4) (actual time=0.676..0.677 rows=1 loops=1)\n  InitPlan 1 (returns $0)\n    ->  Limit  (cost=20.01..21.61 rows=1 width=4) (actual time=0.673..0.673 rows=1 loops=1)\n          ->  Index Only Scan Backward using idx_rule_code_history_version on rule_group_master_history  (cost=20.01..24.82 rows=3 width=4) (actual time=0.671..0.671 rows=1 loops=1)\n                Index Cond: ((rule_group_code = 'JLGDL003'::text) AND (version IS NOT NULL))\n                Heap Fetches: 0\nPlanning Time: 0.157 ms\nExecution Time: 0.765 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "rulegroupmasterlistrowmapper-ebe5d2",
+      "name": "RuleGroupMasterListRowMapper",
+      "daoClass": "in.novopay.bre.repository.RuleGroupMasterListRowMapper",
+      "moduleId": "bre",
+      "queries": [
+        {
+          "id": "bre-q-20",
+          "name": "Field RuleGroupMasterListRowMapper.BASIC_QUERY",
+          "description": "via RuleGroupMasterListRowMapper",
+          "daoClass": "in.novopay.bre.repository.RuleGroupMasterListRowMapper",
+          "sqlIdentifier": "Field RuleGroupMasterListRowMapper.BASIC_QUERY",
+          "status": "healthy",
+          "sqlPreview": "SELECT rg.rule_group_code, rg.rule_group_name, rg.description, rg.created_by, rg.created_on, rg.updated_by, rg.updated_on, rs.loan_product_code, rs.stage_code, rs.stage_value, rs.entity_code, rs.entity_value FROM rule_group_master rg JOIN eligibility_rule_stage_master rs ON rs.id = rg.rule_stage_master_id AND rs.is_active = TRUE AND rs.is_deleted = FALSE WHERE rg.is_active = TRUE AND rg.is_deleted = FALSE;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=62.62..110.51 rows=22 width=160) (actual time=2.249..2.317 rows=27 loops=1)\n  Join Filter: (rg.rule_stage_master_id = rs.id)\n  ->  Index Scan using idx_rule_group_deleted_active on rule_group_master rg  (cost=40.80..75.95 rows=27 width=114) (actual time=1.374..1.408 rows=27 loops=1)\n        Index Cond: ((is_deleted = false) AND (is_active = true))\n        Storage Index Filter: (is_active AND (NOT is_deleted))\n  ->  Index Scan using eligibility_rule_stage_master_pkey on eligibility_rule_stage_master rs  (cost=21.81..27.14 rows=22 width=62) (actual time=0.740..0.774 rows=27 loops=1)\n        Index Cond: (id = ANY (ARRAY[rg.rule_stage_master_id, $1, $2, ..., $1023]))\n        Storage Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 0.847 ms\nExecution Time: 2.542 ms\nPeak Memory Usage: 575 kB"
+        }
+      ]
+    },
+    {
+      "id": "rulegroupmasterrepository-5faa49",
+      "name": "RuleGroupMasterRepository",
+      "daoClass": "in.novopay.bre.repository.RuleGroupMasterRepository",
+      "moduleId": "bre",
+      "queries": [
+        {
+          "id": "bre-q-5",
+          "name": "findAllActiveRuleGroups",
+          "description": "via RuleGroupMasterRepository",
+          "daoClass": "in.novopay.bre.repository.RuleGroupMasterRepository",
+          "sqlIdentifier": "findAllActiveRuleGroups",
+          "status": "healthy",
+          "sqlPreview": "SELECT rg.rule_group_code, rg.rule_group_name, rg.description, rg.created_by, rg.created_on, rg.updated_by, rg.updated_on, rs.loan_product_code, rs.stage_code, rs.stage_value, rs.entity_code, rs.entity_value FROM rule_group_master rg JOIN eligibility_rule_stage_master rs ON rs.id = rg.rule_stage_master_id AND rs.is_active = true AND rs.is_deleted = false WHERE rg.is_active = true AND rg.is_deleted = false;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=62.62..110.51 rows=22 width=160) (actual time=2.315..2.381 rows=27 loops=1)\n  Join Filter: (rg.rule_stage_master_id = rs.id)\n  ->  Index Scan using idx_rule_group_deleted_active on rule_group_master rg  (cost=40.80..75.95 rows=27 width=114) (actual time=1.400..1.434 rows=27 loops=1)\n        Index Cond: ((is_deleted = false) AND (is_active = true))\n        Storage Index Filter: (is_active AND (NOT is_deleted))\n  ->  Index Scan using eligibility_rule_stage_master_pkey on eligibility_rule_stage_master rs  (cost=21.81..27.14 rows=22 width=62) (actual time=0.776..0.807 rows=27 loops=1)\n        Index Cond: (id = ANY (ARRAY[rg.rule_stage_master_id, $1, $2, ..., $1023]))\n        Storage Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 48.559 ms\nExecution Time: 2.634 ms\nPeak Memory Usage: 575 kB"
+        },
+        {
+          "id": "bre-q-6",
+          "name": "findByRuleStageMasterIdsAndIsActiveAndIsDeleted",
+          "description": "via RuleGroupMasterRepository",
+          "daoClass": "in.novopay.bre.repository.RuleGroupMasterRepository",
+          "sqlIdentifier": "findByRuleStageMasterIdsAndIsActiveAndIsDeleted",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM rule_group_master rg WHERE rg.rule_stage_master_id IN ?1 AND rg.is_active = ?2 AND rg.is_deleted = ?3;",
+          "explainPlan": "Index Scan using fk_rule_group_stage_master on rule_group_master rg  (cost=40.10..69.52 rows=3 width=124) (actual time=1.279..1.284 rows=3 loops=1)\n  Index Cond: (rule_stage_master_id = ANY ('{22,3,30}'::bigint[]))\n  Storage Filter: (is_active AND (NOT is_deleted))\nPlanning Time: 0.222 ms\nExecution Time: 1.359 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    }
+  ]
+}

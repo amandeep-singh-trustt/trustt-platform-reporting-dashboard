@@ -1,0 +1,581 @@
+{
+  "generatedAt": "2026-08-04T00:00:00Z",
+  "module": {
+    "id": "authorization",
+    "name": "Authorization"
+  },
+  "summary": {
+    "id": "authorization",
+    "name": "Authorization",
+    "daoGroupCount": 8,
+    "queryCount": 50,
+    "explainedCount": 50,
+    "needsReviewCount": 0
+  },
+  "daoGroups": [
+    {
+      "id": "categoryrepository-268ab3",
+      "name": "CategoryRepository",
+      "daoClass": "in.novopay.authorization.datamodel.repository.CategoryRepository",
+      "moduleId": "authorization",
+      "queries": [
+        {
+          "id": "authorization-q-9",
+          "name": "getPermissionListByCategory",
+          "description": "via CategoryRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.CategoryRepository",
+          "sqlIdentifier": "getPermissionListByCategory",
+          "status": "healthy",
+          "sqlPreview": "select c.code as category_code, c.display_name as category_name, p.code as permission_code, p.display_name as permission_name from category c join permission p on c.id=p.category_id where c.is_deleted!=true;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=60.07..1100.49 rows=866 width=66) (actual time=35.952..35.996 rows=1 loops=1)\n  Join Filter: (c.id = p.category_id)\n  ->  Seq Scan on permission p  (cost=40.00..953.55 rows=866 width=54) (actual time=1.599..2.091 rows=866 loops=1)\n  ->  Index Scan using category_pkey on category c  (cost=20.07..146.91 rows=2 width=28) (actual time=0.997..0.999 rows=1 loops=1)\n        Index Cond: (id = ANY (ARRAY[p.category_id, $1, $2, ..., $1023]))\n        Storage Filter: (NOT is_deleted)\nPlanning Time: 9.556 ms\nExecution Time: 36.331 ms\nPeak Memory Usage: 1295 kB"
+        }
+      ]
+    },
+    {
+      "id": "corporaterolerepository-35fdcb",
+      "name": "CorporateRoleRepository",
+      "daoClass": "in.novopay.authorization.datamodel.repository.CorporateRoleRepository",
+      "moduleId": "authorization",
+      "queries": [
+        {
+          "id": "authorization-q-47",
+          "name": "findOneById",
+          "description": "via CorporateRoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.CorporateRoleRepository",
+          "sqlIdentifier": "findOneById",
+          "status": "healthy",
+          "sqlPreview": "select * from corporate__role__mapping where id=?1;",
+          "explainPlan": "Index Scan using corporate__role__mapping_pkey on corporate__role__mapping  (cost=20.02..21.21 rows=1 width=24) (actual time=0.700..0.703 rows=1 loops=1)\n  Index Cond: (id = 1)\nPlanning Time: 0.121 ms\nExecution Time: 0.799 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-48",
+          "name": "findOneByCorporateId",
+          "description": "via CorporateRoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.CorporateRoleRepository",
+          "sqlIdentifier": "findOneByCorporateId",
+          "status": "healthy",
+          "sqlPreview": "select * from corporate__role__mapping where corporate_id=?1;",
+          "explainPlan": "Index Scan using corporate__role__mapping_corporate_id_role_id_key on corporate__role__mapping  (cost=40.04..68.53 rows=1 width=24) (actual time=1.222..1.226 rows=1 loops=1)\n  Index Cond: (corporate_id = 2)\nPlanning Time: 0.095 ms\nExecution Time: 1.303 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-49",
+          "name": "findOneByCorporateIdAndRoleId",
+          "description": "via CorporateRoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.CorporateRoleRepository",
+          "sqlIdentifier": "findOneByCorporateIdAndRoleId",
+          "status": "healthy",
+          "sqlPreview": "select * from corporate__role__mapping where corporate_id=?1 and role_id=?2;",
+          "explainPlan": "Index Scan using corporate__role__mapping_corporate_id_role_id_key on corporate__role__mapping  (cost=40.04..68.48 rows=1 width=24) (actual time=1.445..1.449 rows=1 loops=1)\n  Index Cond: ((corporate_id = 2) AND (role_id = 1))\nPlanning Time: 0.113 ms\nExecution Time: 1.536 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-50",
+          "name": "findOneByRoleId",
+          "description": "via CorporateRoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.CorporateRoleRepository",
+          "sqlIdentifier": "findOneByRoleId",
+          "status": "healthy",
+          "sqlPreview": "select * from corporate__role__mapping where role_id=?1;",
+          "explainPlan": "Index Scan using corporate__role__mapping_corporate_id_role_id_key on corporate__role__mapping  (cost=40.04..68.43 rows=1 width=24) (actual time=1.259..1.263 rows=1 loops=1)\n  Index Cond: (role_id = 1)\nPlanning Time: 0.078 ms\nExecution Time: 1.342 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "permissionrepository-4c4e23",
+      "name": "PermissionRepository",
+      "daoClass": "in.novopay.authorization.datamodel.repository.PermissionRepository",
+      "moduleId": "authorization",
+      "queries": [
+        {
+          "id": "authorization-q-1",
+          "name": "getIdListByCodeList",
+          "description": "via PermissionRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.PermissionRepository",
+          "sqlIdentifier": "getIdListByCodeList",
+          "status": "healthy",
+          "sqlPreview": "SELECT id FROM permission WHERE code IN (?1);",
+          "explainPlan": "Index Scan using permission_code_key on permission  (cost=40.13..69.25 rows=3 width=8) (actual time=1.470..1.475 rows=3 loops=1)\n  Index Cond: ((code)::text = ANY ('{HOLIDAY-MGMT-VIEW,MFI_CNTR_UPDT_APPR,WORK-DAY-MGMT-VIEW}'::text[]))\nPlanning Time: 1.418 ms\nExecution Time: 1.576 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-2",
+          "name": "getAllPermissionCodesForCorporate",
+          "description": "via PermissionRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.PermissionRepository",
+          "sqlIdentifier": "getAllPermissionCodesForCorporate",
+          "status": "healthy",
+          "sqlPreview": "SELECT p.code permisssion_code FROM corporate__role__mapping cr JOIN role__permission__mapping rp ON cr.role_id = rp.role_id JOIN permission p on p.id = rp.permission_id WHERE cr.corporate_id = ?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=84.31..683.78 rows=38 width=18) (actual time=8.748..9.940 rows=757 loops=1)\n  Join Filter: (rp.permission_id = p.id)\n  ->  YB Batched Nested Loop Join  (cost=40.53..50.93 rows=38 width=8) (actual time=2.103..3.252 rows=757 loops=1)\n        Join Filter: (cr.role_id = rp.role_id)\n        ->  Index Only Scan using corporate__role__mapping_corporate_id_role_id_key on corporate__role__mapping cr  (cost=20.01..24.24 rows=1 width=8) (actual time=0.768..0.770 rows=1 loops=1)\n              Index Cond: (corporate_id = 2)\n              Heap Fetches: 0\n        ->  Index Only Scan using role__permission__mapping_role_id_permission_id_key on role__permission__mapping rp  (cost=20.52..26.68 rows=38 width=16) (actual time=1.237..1.658 rows=757 loops=1)\n              Index Cond: (role_id = ANY (ARRAY[cr.role_id, $1, $2, ..., $1023]))\n              Heap Fetches: 0\n  ->  Index Scan using permission_pkey on permission p  (cost=43.79..221.50 rows=866 width=26) (actual time=4.910..5.384 rows=757 loops=1)\n        Index Cond: (id = ANY (ARRAY[rp.permission_id, $1025, $1026, ..., $2047]))\nPlanning Time: 18.434 ms\nExecution Time: 10.551 ms\nPeak Memory Usage: 1212 kB"
+        },
+        {
+          "id": "authorization-q-3",
+          "name": "getAllPermissionsList",
+          "description": "via PermissionRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.PermissionRepository",
+          "sqlIdentifier": "getAllPermissionsList",
+          "status": "healthy",
+          "sqlPreview": "SELECT e.code epic_code, e.display_name epic_display_name, f.code feature_code, f.display_name feature_display_name, u.code user_story_code, u.display_name user_story_display_name, p.code permisssion_code, p.display_name permission_display_name FROM epic e JOIN feature f on e.id = f.epic_id JOIN user_story u on f.id = u.feature_id JOIN user_story__permission__mapping upm on u.id = upm.user_story_id JOIN permission p on p.id = upm.permission_id;",
+          "explainPlan": "Hash Join  (cost=1208.80..2133.99 rows=839 width=131) (actual time=9.136..9.948 rows=839 loops=1)\n  Hash Cond: (p.id = upm.permission_id)\n  ->  Seq Scan on permission p  (cost=40.00..953.55 rows=866 width=54) (actual time=1.478..1.812 rows=866 loops=1)\n  ->  Hash  (cost=1158.31..1158.31 rows=839 width=93) (actual time=7.640..7.640 rows=839 loops=1)\n        Buckets: 1024  Batches: 1  Memory Usage: 114kB\n        ->  Hash Join  (cost=1100.68..1158.31 rows=839 width=93) (actual time=6.263..7.196 rows=839 loops=1)\n              Hash Cond: (upm.user_story_id = u.id)\n              ->  Index Only Scan using uk_user_story_id_permission_id on user_story__permission__mapping upm  (cost=31.52..77.61 rows=839 width=16) (actual time=1.081..1.498 rows=839 loops=1)\n                    Heap Fetches: 0\n              ->  Hash  (cost=1067.00..1067.00 rows=173 width=93) (actual time=5.166..5.166 rows=173 loops=1)\n                    Buckets: 1024  Batches: 1  Memory Usage: 30kB\n                    ->  YB Batched Nested Loop Join  (cost=106.88..1067.00 rows=173 width=93) (actual time=4.712..5.047 rows=173 loops=1)\n                          Join Filter: (f.id = u.feature_id)\n                          ->  YB Batched Nested Loop Join  (cost=61.08..945.34 rows=98 width=61) (actual time=1.611..1.707 rows=98 loops=1)\n                                Join Filter: (e.id = f.epic_id)\n                                ->  Seq Scan on feature f  (cost=40.00..871.07 rows=98 width=49) (actual time=0.616..0.670 rows=98 loops=1)\n                                ->  Index Scan using epic_pkey on epic e  (cost=21.08..37.52 rows=30 width=28) (actual time=0.763..0.788 rows=29 loops=1)\n                                      Index Cond: (id = ANY (ARRAY[f.epic_id, $1, $2, ..., $1023]))\n                          ->  Index Scan using user_story_feature_id on user_story u  (cost=45.81..121.46 rows=173 width=48) (actual time=2.850..2.989 rows=173 loops=1)\n                                Index Cond: (feature_id = ANY (ARRAY[f.id, $1025, $1026, ..., $2047]))\nPlanning Time: 57.583 ms\nExecution Time: 10.634 ms\nPeak Memory Usage: 1564 kB"
+        },
+        {
+          "id": "authorization-q-4",
+          "name": "getAllPermissionsListForUser",
+          "description": "via PermissionRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.PermissionRepository",
+          "sqlIdentifier": "getAllPermissionsListForUser",
+          "status": "healthy",
+          "sqlPreview": "SELECT e.code epic_code, e.display_name epic_display_name, f.code feature_code, f.display_name feature_display_name, u.code user_story_code, u.display_name user_story_display_name, p.code permisssion_code, p.display_name permission_display_name FROM user__role__mapping ur JOIN role__permission__mapping rp ON ur.role_id = rp.role_id JOIN permission p on p.id = rp.permission_id JOIN user_story__permission__mapping upm on upm.permission_id = p.id JOIN user_story u on upm.user_story_id = u.id JOIN feature f on f.id = u.feature_id JOIN epic e on e.id = f.epic_id WHERE ur.user_id = ?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=244.45..1984.61 rows=169 width=131) (actual time=9.162..9.178 rows=12 loops=1)\n  Join Filter: (f.epic_id = e.id)\n  ->  YB Batched Nested Loop Join  (cost=223.38..1883.72 rows=169 width=119) (actual time=8.462..8.483 rows=12 loops=1)\n        Join Filter: (u.feature_id = f.id)\n        ->  YB Batched Nested Loop Join  (cost=198.22..1622.43 rows=169 width=86) (actual time=7.782..7.804 rows=12 loops=1)\n              Join Filter: (upm.user_story_id = u.id)\n              ->  Hash Join  (cost=169.24..1088.87 rows=169 width=54) (actual time=6.355..7.035 rows=12 loops=1)\n                    Hash Cond: (p.id = rp.permission_id)\n                    ->  Seq Scan on permission p  (cost=40.00..953.55 rows=866 width=54) (actual time=1.533..1.957 rows=866 loops=1)\n                    ->  Hash  (cost=127.07..127.07 rows=174 width=24) (actual time=4.718..4.719 rows=12 loops=1)\n                          Buckets: 1024  Batches: 1  Memory Usage: 9kB\n                          ->  YB Batched Nested Loop Join  (cost=72.05..127.07 rows=174 width=24) (actual time=4.650..4.700 rows=12 loops=1)\n                                Join Filter: (rp.permission_id = upm.permission_id)\n                                ->  Index Only Scan using uk_user_story_id_permission_id on user_story__permission__mapping upm  (cost=31.52..77.61 rows=839 width=16) (actual time=1.184..1.598 rows=839 loops=1)\n                                      Heap Fetches: 0\n                                ->  YB Batched Nested Loop Join  (cost=40.53..49.44 rows=1 width=8) (actual time=2.517..2.545 rows=12 loops=1)\n                                      Join Filter: (ur.role_id = rp.role_id)\n                                      ->  Index Only Scan using user__role__mapping_user_id_role_id_key on user__role__mapping ur  (cost=20.01..24.30 rows=1 width=8) (actual time=0.708..0.710 rows=1 loops=1)\n                                            Index Cond: (user_id = 11815)\n                                            Heap Fetches: 0\n                                      ->  Index Only Scan using role__permission__mapping_role_id_permission_id_key on role__permission__mapping rp  (cost=20.52..25.15 rows=38 width=16) (actual time=1.706..1.716 rows=12 loops=1)\n                                            Index Cond: ((role_id = ANY (ARRAY[ur.role_id, $1, $2, ..., $1023])) AND (permission_id = ANY (ARRAY[upm.permission_id, $1025, $1026, ..., $2047])))\n                                            Heap Fetches: 0\n              ->  Index Scan using user_story_pkey on user_story u  (cost=28.98..168.10 rows=173 width=48) (actual time=0.639..0.647 rows=5 loops=1)\n                    Index Cond: (id = ANY (ARRAY[upm.user_story_id, $2049, $2050, ..., $3071]))\n        ->  Index Scan using feature_pkey on feature f  (cost=25.16..54.26 rows=98 width=49) (actual time=0.553..0.558 rows=4 loops=1)\n              Index Cond: (id = ANY (ARRAY[u.feature_id, $3073, $3074, ..., $4095]))\n  ->  Index Scan using epic_pkey on epic e  (cost=21.08..37.52 rows=30 width=28) (actual time=0.576..0.579 rows=2 loops=1)\n        Index Cond: (id = ANY (ARRAY[f.epic_id, $4097, $4098, ..., $5119]))\nPlanning Time: 6.816 ms\nExecution Time: 10.434 ms\nPeak Memory Usage: 2840 kB"
+        },
+        {
+          "id": "authorization-q-5",
+          "name": "getAllPermissionsListForCorporate",
+          "description": "via PermissionRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.PermissionRepository",
+          "sqlIdentifier": "getAllPermissionsListForCorporate",
+          "status": "healthy",
+          "sqlPreview": "SELECT e.code epic_code, e.display_name epic_display_name, f.code feature_code, f.display_name feature_display_name, u.code user_story_code, u.display_name user_story_display_name, p.code permisssion_code, p.display_name permission_display_name FROM corporate__role__mapping cr JOIN role__permission__mapping rp ON cr.role_id = rp.role_id JOIN permission p on p.id = rp.permission_id JOIN user_story__permission__mapping upm on upm.permission_id = p.id JOIN user_story u on upm.user_story_id = u.id JOIN feature f on f.id = u.feature_id JOIN epic e on e.id = f.epic_id WHERE cr.corporate_id = ?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=213.99..1137.35 rows=37 width=131) (actual time=21.550..22.047 rows=757 loops=1)\n  Join Filter: (f.epic_id = e.id)\n  ->  YB Batched Nested Loop Join  (cost=192.91..1085.96 rows=37 width=119) (actual time=19.026..19.703 rows=757 loops=1)\n        Join Filter: (u.feature_id = f.id)\n        ->  YB Batched Nested Loop Join  (cost=167.75..986.37 rows=37 width=86) (actual time=15.943..16.769 rows=757 loops=1)\n              Join Filter: (upm.user_story_id = u.id)\n              ->  YB Batched Nested Loop Join  (cost=138.78..738.25 rows=37 width=54) (actual time=12.301..13.630 rows=757 loops=1)\n                    Join Filter: (rp.permission_id = p.id)\n                    ->  YB Batched Nested Loop Join  (cost=72.05..127.01 rows=38 width=24) (actual time=5.467..7.280 rows=757 loops=1)\n                          Join Filter: (rp.permission_id = upm.permission_id)\n                          ->  Index Only Scan using uk_user_story_id_permission_id on user_story__permission__mapping upm  (cost=31.52..77.61 rows=839 width=16) (actual time=1.102..1.593 rows=839 loops=1)\n                                Heap Fetches: 0\n                          ->  YB Batched Nested Loop Join  (cost=40.53..49.39 rows=1 width=8) (actual time=3.255..4.320 rows=757 loops=1)\n                                Join Filter: (cr.role_id = rp.role_id)\n                                ->  Index Only Scan using corporate__role__mapping_corporate_id_role_id_key on corporate__role__mapping cr  (cost=20.01..24.24 rows=1 width=8) (actual time=0.535..0.537 rows=1 loops=1)\n                                      Index Cond: (corporate_id = 2)\n                                      Heap Fetches: 0\n                                ->  Index Only Scan using role__permission__mapping_role_id_permission_id_key on role__permission__mapping rp  (cost=20.52..25.15 rows=38 width=16) (actual time=2.614..3.016 rows=757 loops=1)\n                                      Index Cond: ((role_id = ANY (ARRAY[cr.role_id, $1, $2, ..., $1023])) AND (permission_id = ANY (ARRAY[upm.permission_id, $1025, $1026, ..., $2047])))\n                                      Heap Fetches: 0\n                    ->  Index Scan using permission_pkey on permission p  (cost=66.73..212.71 rows=839 width=54) (actual time=4.432..4.991 rows=757 loops=1)\n                          Index Cond: (id = ANY (ARRAY[upm.permission_id, $2049, $2050, ..., $3071]))\n              ->  Index Scan using user_story_pkey on user_story u  (cost=28.98..168.10 rows=173 width=48) (actual time=1.637..1.820 rows=158 loops=1)\n                    Index Cond: (id = ANY (ARRAY[upm.user_story_id, $3073, $3074, ..., $4095]))\n        ->  Index Scan using feature_pkey on feature f  (cost=25.16..54.26 rows=98 width=49) (actual time=1.345..1.449 rows=94 loops=1)\n              Index Cond: (id = ANY (ARRAY[u.feature_id, $4097, $4098, ..., $5119]))\n  ->  Index Scan using epic_pkey on epic e  (cost=21.08..37.52 rows=30 width=28) (actual time=0.889..0.914 rows=28 loops=1)\n        Index Cond: (id = ANY (ARRAY[f.epic_id, $5121, $5122, ..., $6143]))\nPlanning Time: 5.572 ms\nExecution Time: 23.274 ms\nPeak Memory Usage: 4385 kB"
+        },
+        {
+          "id": "authorization-q-6",
+          "name": "getPermissionCodeByIds",
+          "description": "via PermissionRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.PermissionRepository",
+          "sqlIdentifier": "getPermissionCodeByIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT p.code as permission_code FROM permission p WHERE id IN (?1);",
+          "explainPlan": "Index Scan using permission_pkey on permission p  (cost=20.06..21.65 rows=3 width=18) (actual time=0.679..0.682 rows=3 loops=1)\n  Index Cond: (id = ANY ('{212,2081,389}'::bigint[]))\nPlanning Time: 1.863 ms\nExecution Time: 0.779 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-7",
+          "name": "getPermissionsCodeListForUserId",
+          "description": "via PermissionRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.PermissionRepository",
+          "sqlIdentifier": "getPermissionsCodeListForUserId",
+          "status": "healthy",
+          "sqlPreview": "select p.code as permission_code, p.display_name as permission_name from user__role__mapping ur left join role__permission__mapping rpm on rpm.role_id=ur.role_id left join permission p on p.id=rpm.permission_id where user_id=?1 and 1=1;",
+          "explainPlan": "YB Batched Nested Loop Left Join  (cost=108.76..296.93 rows=174 width=46) (actual time=1.998..2.030 rows=12 loops=1)\n  Join Filter: (p.id = rpm.permission_id)\n  ->  YB Batched Nested Loop Left Join  (cost=40.53..50.98 rows=174 width=8) (actual time=1.244..1.272 rows=12 loops=1)\n        Join Filter: (rpm.role_id = ur.role_id)\n        ->  Index Only Scan using user__role__mapping_user_id_role_id_key on user__role__mapping ur  (cost=20.01..24.30 rows=1 width=8) (actual time=0.627..0.628 rows=1 loops=1)\n              Index Cond: (user_id = 11815)\n              Heap Fetches: 0\n        ->  Index Only Scan using role__permission__mapping_role_id_permission_id_key on role__permission__mapping rpm  (cost=20.52..26.68 rows=38 width=16) (actual time=0.544..0.551 rows=12 loops=1)\n              Index Cond: (role_id = ANY (ARRAY[ur.role_id, $1, $2, ..., $1023]))\n              Heap Fetches: 0\n  ->  Index Scan using permission_pkey on permission p  (cost=68.23..245.95 rows=866 width=54) (actual time=0.654..0.664 rows=12 loops=1)\n        Index Cond: (id = ANY (ARRAY[rpm.permission_id, $1025, $1026, ..., $2047]))\nPlanning Time: 1.274 ms\nExecution Time: 2.454 ms\nPeak Memory Usage: 920 kB"
+        },
+        {
+          "id": "authorization-q-8",
+          "name": "getPermissionListFromUserId",
+          "description": "via PermissionRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.PermissionRepository",
+          "sqlIdentifier": "getPermissionListFromUserId",
+          "status": "healthy",
+          "sqlPreview": "select p.code as permission_code, p.display_name as permission_name from mfi_authorization.user__role__mapping ur left join mfi_authorization.role__permission__mapping rpm on rpm.role_id=ur.role_id left join mfi_authorization.permission p on p.id=rpm.permission_id where user_id=?1;",
+          "explainPlan": "YB Batched Nested Loop Left Join  (cost=108.76..296.93 rows=174 width=46) (actual time=2.228..2.266 rows=12 loops=1)\n  Join Filter: (p.id = rpm.permission_id)\n  ->  YB Batched Nested Loop Left Join  (cost=40.53..50.98 rows=174 width=8) (actual time=1.446..1.478 rows=12 loops=1)\n        Join Filter: (rpm.role_id = ur.role_id)\n        ->  Index Only Scan using user__role__mapping_user_id_role_id_key on user__role__mapping ur  (cost=20.01..24.30 rows=1 width=8) (actual time=0.788..0.790 rows=1 loops=1)\n              Index Cond: (user_id = 11815)\n              Heap Fetches: 0\n        ->  Index Only Scan using role__permission__mapping_role_id_permission_id_key on role__permission__mapping rpm  (cost=20.52..26.68 rows=38 width=16) (actual time=0.583..0.592 rows=12 loops=1)\n              Index Cond: (role_id = ANY (ARRAY[ur.role_id, $1, $2, ..., $1023]))\n              Heap Fetches: 0\n  ->  Index Scan using permission_pkey on permission p  (cost=68.23..245.95 rows=866 width=54) (actual time=0.673..0.686 rows=12 loops=1)\n        Index Cond: (id = ANY (ARRAY[rpm.permission_id, $1025, $1026, ..., $2047]))\nPlanning Time: 1.214 ms\nExecution Time: 2.636 ms\nPeak Memory Usage: 920 kB"
+        }
+      ]
+    },
+    {
+      "id": "rolepermissionmappingrepository-37da63",
+      "name": "RolePermissionMappingRepository",
+      "daoClass": "in.novopay.authorization.datamodel.repository.RolePermissionMappingRepository",
+      "moduleId": "authorization",
+      "queries": [
+        {
+          "id": "authorization-q-10",
+          "name": "getPermissionIdsFromRoleId",
+          "description": "via RolePermissionMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RolePermissionMappingRepository",
+          "sqlIdentifier": "getPermissionIdsFromRoleId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM role__permission__mapping WHERE role_id = ?1;",
+          "explainPlan": "Index Scan using role__permission__mapping_role_id_permission_id_key on role__permission__mapping  (cost=40.28..71.59 rows=7 width=24) (actual time=1.207..1.210 rows=2 loops=1)\n  Index Cond: (role_id = 2194)\nPlanning Time: 0.092 ms\nExecution Time: 1.289 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "rolerepository-b8436e",
+      "name": "RoleRepository",
+      "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+      "moduleId": "authorization",
+      "queries": [
+        {
+          "id": "authorization-q-11",
+          "name": "findOneById",
+          "description": "via RoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+          "sqlIdentifier": "findOneById",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM role WHERE id = ?1 AND is_deleted != true;",
+          "explainPlan": "Index Scan using role_pkey on role  (cost=20.17..21.40 rows=1 width=129) (actual time=0.623..0.623 rows=0 loops=1)\n  Index Cond: (id = 2194)\n  Storage Filter: (NOT is_deleted)\nPlanning Time: 0.109 ms\nExecution Time: 0.702 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-12",
+          "name": "getPermissionsByRoleId",
+          "description": "via RoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+          "sqlIdentifier": "getPermissionsByRoleId",
+          "status": "healthy",
+          "sqlPreview": "SELECT p.code permission_code FROM role__permission__mapping rpm JOIN permission p ON p.id = rpm.permission_id WHERE rpm.role_id = ?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=40.24..49.29 rows=7 width=18) (actual time=1.355..1.365 rows=2 loops=1)\n  Join Filter: (rpm.permission_id = p.id)\n  ->  Index Only Scan using role__permission__mapping_role_id_permission_id_key on role__permission__mapping rpm  (cost=20.05..26.21 rows=7 width=8) (actual time=0.651..0.654 rows=2 loops=1)\n        Index Cond: (role_id = 2194)\n        Heap Fetches: 0\n  ->  Index Scan using permission_pkey on permission p  (cost=20.19..22.46 rows=7 width=26) (actual time=0.625..0.628 rows=2 loops=1)\n        Index Cond: (id = ANY (ARRAY[rpm.permission_id, $1, $2, ..., $1023]))\nPlanning Time: 0.799 ms\nExecution Time: 1.595 ms\nPeak Memory Usage: 532 kB"
+        },
+        {
+          "id": "authorization-q-13",
+          "name": "findOneByCode",
+          "description": "via RoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+          "sqlIdentifier": "findOneByCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM role WHERE code = ?1 AND is_deleted != true;",
+          "explainPlan": "Seq Scan on role  (cost=40.00..875.02 rows=1 width=129) (actual time=1.101..1.101 rows=0 loops=1)\n  Storage Filter: ((NOT is_deleted) AND ((code)::text = 'RBHC1'::text))\nPlanning Time: 0.093 ms\nExecution Time: 1.182 ms\nPeak Memory Usage: 15 kB"
+        },
+        {
+          "id": "authorization-q-14",
+          "name": "getChildRoles",
+          "description": "via RoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+          "sqlIdentifier": "getChildRoles",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM role WHERE parent_id = ?1 AND is_deleted != true;",
+          "explainPlan": "Index Scan using role_parent_id on role  (cost=40.07..68.81 rows=1 width=129) (actual time=1.341..1.341 rows=0 loops=1)\n  Index Cond: (parent_id = 22)\n  Storage Filter: (NOT is_deleted)\nPlanning Time: 0.184 ms\nExecution Time: 1.432 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-15",
+          "name": "getRoleDetailsByRoleIds",
+          "description": "via RoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+          "sqlIdentifier": "getRoleDetailsByRoleIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM role WHERE id IN (?1) AND is_deleted = FALSE;",
+          "explainPlan": "Index Scan using role_pkey on role  (cost=20.33..21.90 rows=2 width=129) (actual time=0.659..0.661 rows=1 loops=1)\n  Index Cond: (id = ANY ('{2194,7092,22}'::bigint[]))\n  Storage Filter: (NOT is_deleted)\nPlanning Time: 0.128 ms\nExecution Time: 0.747 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-16",
+          "name": "getRoleCodeForUser",
+          "description": "via RoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+          "sqlIdentifier": "getRoleCodeForUser",
+          "status": "healthy",
+          "sqlPreview": "SELECT r.* FROM role r JOIN user__role__mapping urm ON r.id = urm.role_id WHERE urm.user_id = ?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=40.17..45.70 rows=1 width=129) (actual time=1.415..1.423 rows=1 loops=1)\n  Join Filter: (r.id = urm.role_id)\n  ->  Index Only Scan using user__role__mapping_user_id_role_id_key on user__role__mapping urm  (cost=20.01..24.30 rows=1 width=8) (actual time=0.688..0.690 rows=1 loops=1)\n        Index Cond: (user_id = 11815)\n        Heap Fetches: 0\n  ->  Index Scan using role_pkey on role r  (cost=20.17..21.40 rows=1 width=129) (actual time=0.616..0.619 rows=1 loops=1)\n        Index Cond: (id = ANY (ARRAY[urm.role_id, $1, $2, ..., $1023]))\nPlanning Time: 1.839 ms\nExecution Time: 1.713 ms\nPeak Memory Usage: 533 kB"
+        },
+        {
+          "id": "authorization-q-17",
+          "name": "getPermissionsByRoleCode",
+          "description": "via RoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+          "sqlIdentifier": "getPermissionsByRoleCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT p.code FROM role r JOIN role__permission__mapping rpm ON rpm.role_id = r.id JOIN permission p ON rpm.permission_id = p.id WHERE r.code = ?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=104.31..1532.86 rows=38 width=18) (actual time=2.315..2.324 rows=2 loops=1)\n  Join Filter: (rpm.permission_id = p.id)\n  ->  YB Batched Nested Loop Join  (cost=60.52..900.01 rows=38 width=8) (actual time=1.617..1.625 rows=2 loops=1)\n        Join Filter: (r.id = rpm.role_id)\n        ->  Seq Scan on role r  (cost=40.00..873.32 rows=1 width=8) (actual time=0.960..0.961 rows=1 loops=1)\n              Storage Filter: ((code)::text = 'RBHC1'::text)\n        ->  Index Only Scan using role__permission__mapping_role_id_permission_id_key on role__permission__mapping rpm  (cost=20.52..26.68 rows=38 width=16) (actual time=0.580..0.583 rows=2 loops=1)\n              Index Cond: (role_id = ANY (ARRAY[r.id, $1, $2, ..., $1023]))\n              Heap Fetches: 0\n  ->  Index Scan using permission_pkey on permission p  (cost=43.79..221.50 rows=866 width=26) (actual time=0.620..0.623 rows=2 loops=1)\n        Index Cond: (id = ANY (ARRAY[rpm.permission_id, $1025, $1026, ..., $2047]))\nPlanning Time: 1.376 ms\nExecution Time: 2.705 ms\nPeak Memory Usage: 920 kB"
+        },
+        {
+          "id": "authorization-q-18",
+          "name": "getChildRolesByParentRoleCode",
+          "description": "via RoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+          "sqlIdentifier": "getChildRolesByParentRoleCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM role where parent_id in (select id from role where code = ?1 and is_deleted = false) AND is_deleted =false;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=60.01..940.77 rows=1 width=129) (actual time=3.372..3.372 rows=0 loops=1)\n  Join Filter: (role.parent_id = role_1.id)\n  ->  Seq Scan on role  (cost=40.00..896.36 rows=141 width=129) (actual time=1.180..1.334 rows=141 loops=1)\n        Storage Filter: (NOT is_deleted)\n  ->  Index Scan using role_pkey on role role_1  (cost=20.01..44.38 rows=1 width=8) (actual time=0.768..0.768 rows=0 loops=1)\n        Index Cond: (id = ANY (ARRAY[role.parent_id, $1, $2, ..., $1023]))\n        Storage Filter: ((NOT is_deleted) AND ((code)::text = 'RBHC1'::text))\nPlanning Time: 0.876 ms\nExecution Time: 3.610 ms\nPeak Memory Usage: 619 kB"
+        },
+        {
+          "id": "authorization-q-19",
+          "name": "getAllAdminRoles",
+          "description": "via RoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+          "sqlIdentifier": "getAllAdminRoles",
+          "status": "healthy",
+          "sqlPreview": "SELECT code FROM role where is_admin = true AND is_deleted =false;",
+          "explainPlan": "Seq Scan on role  (cost=40.00..875.23 rows=65 width=9) (actual time=0.846..0.860 rows=51 loops=1)\n  Storage Filter: (is_admin AND (NOT is_deleted))\nPlanning Time: 0.066 ms\nExecution Time: 0.955 ms\nPeak Memory Usage: 15 kB"
+        },
+        {
+          "id": "authorization-q-20",
+          "name": "getRoleCountByIds",
+          "description": "via RoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+          "sqlIdentifier": "getRoleCountByIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(1) FROM role WHERE id IN ?1 AND is_deleted = false AND status = 'ACTIVE';",
+          "explainPlan": "Finalize Aggregate  (cost=21.58..21.59 rows=1 width=8) (actual time=0.697..0.698 rows=1 loops=1)\n  ->  Index Scan using role_pkey on role  (cost=20.01..21.57 rows=2 width=0) (actual time=0.688..0.690 rows=1 loops=1)\n        Index Cond: (id = ANY ('{2194,7092,22}'::bigint[]))\n        Storage Filter: ((NOT is_deleted) AND ((status)::text = 'ACTIVE'::text))\n        Partial Aggregate: true\nPlanning Time: 0.147 ms\nExecution Time: 0.816 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "authorization-q-21",
+          "name": "getRoleNamesForRoleCodes",
+          "description": "via RoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+          "sqlIdentifier": "getRoleNamesForRoleCodes",
+          "status": "healthy",
+          "sqlPreview": "SELECT code AS role_code, display_name AS role_name, is_deleted FROM role WHERE code IN ?1;",
+          "explainPlan": "Seq Scan on role  (cost=40.00..873.67 rows=3 width=26) (actual time=0.967..0.970 rows=3 loops=1)\n  Storage Filter: ((code)::text = ANY ('{RBHC1,CSPM,RBH1}'::text[]))\nPlanning Time: 0.079 ms\nExecution Time: 1.045 ms\nPeak Memory Usage: 15 kB"
+        },
+        {
+          "id": "authorization-q-22",
+          "name": "getAllRoleNames",
+          "description": "via RoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+          "sqlIdentifier": "getAllRoleNames",
+          "status": "healthy",
+          "sqlPreview": "SELECT code AS role_code, display_name AS role_name, is_deleted FROM role;",
+          "explainPlan": "Seq Scan on role  (cost=40.00..878.30 rows=205 width=26) (actual time=0.788..0.858 rows=205 loops=1)\nPlanning Time: 0.047 ms\nExecution Time: 0.973 ms\nPeak Memory Usage: 0 kB"
+        },
+        {
+          "id": "authorization-q-23",
+          "name": "getRoleCodesForFeatureAndEpic",
+          "description": "via RoleRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.RoleRepository",
+          "sqlIdentifier": "getRoleCodesForFeatureAndEpic",
+          "status": "healthy",
+          "sqlPreview": "select distinct r.code from epic e inner join feature f on f.epic_id = e.id and e.code in ?1 inner join user_story us on us.feature_id = f.id and f.code in ?2 inner join user_story__permission__mapping uspm on uspm.user_story_id = us.id inner join \"permission\" p on p.id = uspm.permission_id inner join role__permission__mapping rpm on p.id = rpm.permission_id inner join \"role\" r on r.id = rpm.role_id and r.is_deleted = false;",
+          "explainPlan": "Unique  (cost=1430.74..1431.05 rows=61 width=9) (actual time=161.738..161.970 rows=47 loops=1)\n  ->  Sort  (cost=1430.74..1430.90 rows=61 width=9) (actual time=161.737..161.773 rows=585 loops=1)\n        Sort Key: r.code\n        Sort Method: quicksort  Memory: 52kB\n        ->  YB Batched Nested Loop Join  (cost=203.50..1428.93 rows=61 width=9) (actual time=160.994..161.371 rows=585 loops=1)\n              Join Filter: (rpm.role_id = r.id)\n              ->  Nested Loop  (cost=180.60..1126.43 rows=89 width=8) (actual time=6.893..157.933 rows=711 loops=1)\n                    ->  Nested Loop  (cost=140.26..421.22 rows=10 width=16) (actual time=4.963..54.594 rows=88 loops=1)\n                          ->  Nested Loop  (cost=120.26..208.62 rows=10 width=8) (actual time=4.288..5.188 rows=88 loops=1)\n                                ->  Nested Loop  (cost=100.19..159.40 rows=2 width=8) (actual time=3.370..3.386 rows=2 loops=1)\n                                      ->  YB Batched Nested Loop Join  (cost=60.12..90.73 rows=1 width=8) (actual time=2.163..2.172 rows=1 loops=1)\n                                            Join Filter: (e.id = f.epic_id)\n                                            ->  Index Scan using feature_code_key on feature f  (cost=40.11..69.19 rows=3 width=16) (actual time=1.363..1.369 rows=3 loops=1)\n                                                  Index Cond: ((code)::text = ANY ('{AGNT-NFIN-TXNS,SUP-IND-COLL-DSBRD,DASHBOARDS-RPTS}'::text[]))\n                                            ->  Index Scan using epic_pkey on epic e  (cost=20.01..21.53 rows=1 width=8) (actual time=0.693..0.695 rows=1 loops=1)\n                                                  Index Cond: (id = ANY (ARRAY[f.epic_id, $1, $2, ..., $1023]))\n                                                  Storage Filter: ((code)::text = ANY ('{SYST,DASHBOARDS-RPTS,PROD}'::text[]))\n                                      ->  Index Scan using user_story_feature_id on user_story us  (cost=40.07..68.65 rows=2 width=16) (actual time=1.202..1.208 rows=2 loops=1)\n                                            Index Cond: (feature_id = f.id)\n                                ->  Index Only Scan using uk_user_story_id_permission_id on user_story__permission__mapping uspm  (cost=20.07..24.56 rows=5 width=16) (actual time=0.731..0.852 rows=44 loops=2)\n                                      Index Cond: (user_story_id = us.id)\n                                      Heap Fetches: 0\n                          ->  Index Scan using permission_pkey on permission p  (cost=20.01..21.25 rows=1 width=8) (actual time=0.539..0.539 rows=1 loops=88)\n                                Index Cond: (id = uspm.permission_id)\n                    ->  Index Scan using role__permission__mapping_permission_id on role__permission__mapping rpm  (cost=40.34..70.42 rows=10 width=16) (actual time=1.138..1.145 rows=8 loops=88)\n                          Index Cond: (permission_id = p.id)\n              ->  Index Scan using role_pkey on role r  (cost=22.90..193.23 rows=141 width=17) (actual time=1.392..1.439 rows=47 loops=1)\n                    Index Cond: (id = ANY (ARRAY[rpm.role_id, $1029, $1030, ..., $2051]))\n                    Storage Filter: (NOT is_deleted)\nPlanning Time: 4.913 ms\nExecution Time: 162.514 ms\nPeak Memory Usage: 1431 kB"
+        }
+      ]
+    },
+    {
+      "id": "usecaserepository-064c03",
+      "name": "UsecaseRepository",
+      "daoClass": "in.novopay.authorization.datamodel.repository.UsecaseRepository",
+      "moduleId": "authorization",
+      "queries": [
+        {
+          "id": "authorization-q-39",
+          "name": "getUsecaseEntity",
+          "description": "via UsecaseRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UsecaseRepository",
+          "sqlIdentifier": "getUsecaseEntity",
+          "status": "healthy",
+          "sqlPreview": "SELECT p1.code approval_permission_code, p2.code required_permission_code, u.maker_checker_enabled maker_checker_enabled, us.code user_story_code FROM usecase u LEFT JOIN permission p1 ON p1.id = u.approval_permission_id JOIN permission p2 ON p2.id = u.required_permission_id JOIN user_story us ON us.id = u.user_story_id WHERE u.code = ?1;",
+          "explainPlan": "Nested Loop  (cost=100.12..132.41 rows=1 width=49) (actual time=2.878..2.892 rows=1 loops=1)\n  ->  Nested Loop  (cost=80.10..111.15 rows=1 width=45) (actual time=2.215..2.229 rows=1 loops=1)\n        ->  YB Batched Nested Loop Left Join  (cost=60.07..89.87 rows=1 width=35) (actual time=1.583..1.596 rows=1 loops=1)\n              Join Filter: (p1.id = u.approval_permission_id)\n              ->  Index Scan using usecase_code_key on usecase u  (cost=40.04..68.60 rows=1 width=25) (actual time=1.472..1.476 rows=1 loops=1)\n                    Index Cond: ((code)::text = 'BASE-RATE-UC008'::text)\n              ->  Index Scan using permission_pkey on permission p1  (cost=20.03..21.27 rows=1 width=26) (actual time=0.023..0.023 rows=0 loops=1)\n                    Index Cond: (id = ANY (ARRAY[u.approval_permission_id, $1, $2, ..., $1023]))\n        ->  Index Scan using permission_pkey on permission p2  (cost=20.03..21.27 rows=1 width=26) (actual time=0.629..0.629 rows=1 loops=1)\n              Index Cond: (id = u.required_permission_id)\n  ->  Index Scan using user_story_pkey on user_story us  (cost=20.02..21.25 rows=1 width=20) (actual time=0.657..0.657 rows=1 loops=1)\n        Index Cond: (id = u.user_story_id)\nPlanning Time: 2.420 ms\nExecution Time: 3.203 ms\nPeak Memory Usage: 516 kB"
+        },
+        {
+          "id": "authorization-q-40",
+          "name": "getUsercaseByUserIdAndCode",
+          "description": "via UsecaseRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UsecaseRepository",
+          "sqlIdentifier": "getUsercaseByUserIdAndCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT u.* FROM user__role__mapping urm JOIN role__permission__mapping rpm ON rpm.role_id = urm.role_id JOIN usecase u ON u.required_permission_id = rpm.permission_id WHERE urm.user_id = ?1 AND u.code = ?2;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=80.06..117.23 rows=1 width=78) (actual time=2.882..2.882 rows=0 loops=1)\n  Join Filter: (rpm.permission_id = u.required_permission_id)\n  ->  Index Scan using usecase_code_key on usecase u  (cost=40.04..68.66 rows=1 width=78) (actual time=1.394..1.398 rows=1 loops=1)\n        Index Cond: ((code)::text = 'BASE-RATE-UC008'::text)\n  ->  YB Batched Nested Loop Join  (cost=40.02..48.57 rows=1 width=8) (actual time=1.410..1.410 rows=0 loops=1)\n        Join Filter: (urm.role_id = rpm.role_id)\n        ->  Index Only Scan using user__role__mapping_user_id_role_id_key on user__role__mapping urm  (cost=20.01..24.30 rows=1 width=8) (actual time=0.700..0.702 rows=1 loops=1)\n              Index Cond: (user_id = 11815)\n              Heap Fetches: 0\n        ->  Index Only Scan using role__permission__mapping_role_id_permission_id_key on role__permission__mapping rpm  (cost=20.01..24.28 rows=1 width=16) (actual time=0.596..0.596 rows=0 loops=1)\n              Index Cond: ((role_id = ANY (ARRAY[urm.role_id, $1, $2, ..., $1023])) AND (permission_id = ANY (ARRAY[u.required_permission_id, $1025, $1026, ..., $2047])))\n              Heap Fetches: 0\nPlanning Time: 2.317 ms\nExecution Time: 3.365 ms\nPeak Memory Usage: 880 kB"
+        },
+        {
+          "id": "authorization-q-41",
+          "name": "getUsercaseForApprovalPermission",
+          "description": "via UsecaseRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UsecaseRepository",
+          "sqlIdentifier": "getUsercaseForApprovalPermission",
+          "status": "healthy",
+          "sqlPreview": "SELECT u.* FROM user__role__mapping urm JOIN role__permission__mapping rpm ON rpm.role_id = urm.role_id JOIN usecase u ON u.approval_permission_id = rpm.permission_id WHERE urm.user_id = ?1 AND u.code = ?2;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=80.06..117.23 rows=1 width=78) (actual time=2.391..2.391 rows=0 loops=1)\n  Join Filter: (rpm.permission_id = u.approval_permission_id)\n  ->  Index Scan using usecase_code_key on usecase u  (cost=40.04..68.66 rows=1 width=78) (actual time=1.507..1.511 rows=1 loops=1)\n        Index Cond: ((code)::text = 'BASE-RATE-UC008'::text)\n  ->  YB Batched Nested Loop Join  (cost=40.02..48.57 rows=1 width=8) (actual time=0.816..0.816 rows=0 loops=1)\n        Join Filter: (urm.role_id = rpm.role_id)\n        ->  Index Only Scan using user__role__mapping_user_id_role_id_key on user__role__mapping urm  (cost=20.01..24.30 rows=1 width=8) (actual time=0.634..0.636 rows=1 loops=1)\n              Index Cond: (user_id = 11815)\n              Heap Fetches: 0\n        ->  Index Only Scan using role__permission__mapping_role_id_permission_id_key on role__permission__mapping rpm  (cost=20.01..24.28 rows=1 width=16) (actual time=0.045..0.046 rows=0 loops=1)\n              Index Cond: ((role_id = ANY (ARRAY[urm.role_id, $1, $2, ..., $1023])) AND (permission_id = ANY (ARRAY[u.approval_permission_id, $1025, $1026, ..., $2047])))\n              Heap Fetches: 0\nPlanning Time: 2.321 ms\nExecution Time: 2.841 ms\nPeak Memory Usage: 879 kB"
+        },
+        {
+          "id": "authorization-q-42",
+          "name": "getUserCaseByPermissionIdsAndUserStoryId",
+          "description": "via UsecaseRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UsecaseRepository",
+          "sqlIdentifier": "getUserCaseByPermissionIdsAndUserStoryId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM usecase WHERE (required_permission_id IN (?1) OR approval_permission_id IN (?1)) AND user_story_id=?2;",
+          "explainPlan": "Index Scan using usecase_user_story_id on usecase  (cost=40.23..69.92 rows=1 width=78) (actual time=1.519..1.519 rows=0 loops=1)\n  Index Cond: (user_story_id = 22)\n  Storage Filter: ((required_permission_id = ANY ('{212,2081,389}'::bigint[])) OR (approval_permission_id = ANY ('{212,389,38}'::bigint[])))\nPlanning Time: 0.490 ms\nExecution Time: 1.626 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-43",
+          "name": "getUserCaseByPermissionIdsAndUserStoryIds",
+          "description": "via UsecaseRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UsecaseRepository",
+          "sqlIdentifier": "getUserCaseByPermissionIdsAndUserStoryIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM usecase WHERE (required_permission_id IN (?1) OR approval_permission_id IN (?1)) AND user_story_id IN (?2);",
+          "explainPlan": "Index Scan using usecase_user_story_id on usecase  (cost=40.70..73.09 rows=1 width=78) (actual time=1.574..1.574 rows=0 loops=1)\n  Index Cond: (user_story_id = ANY ('{22,22,22}'::bigint[]))\n  Storage Filter: ((required_permission_id = ANY ('{212,2081,389}'::bigint[])) OR (approval_permission_id = ANY ('{212,389,38}'::bigint[])))\nPlanning Time: 0.538 ms\nExecution Time: 1.664 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-44",
+          "name": "getUserCaseListByPermissionIdsAndUserStoryIds",
+          "description": "via UsecaseRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UsecaseRepository",
+          "sqlIdentifier": "getUserCaseListByPermissionIdsAndUserStoryIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT code FROM usecase WHERE (required_permission_id IN (?1) OR approval_permission_id IN (?1)) AND user_story_id IN (?2);",
+          "explainPlan": "Index Scan using usecase_user_story_id on usecase  (cost=40.70..73.04 rows=1 width=17) (actual time=1.445..1.446 rows=0 loops=1)\n  Index Cond: (user_story_id = ANY ('{22,22,22}'::bigint[]))\n  Storage Filter: ((required_permission_id = ANY ('{212,2081,389}'::bigint[])) OR (approval_permission_id = ANY ('{212,389,38}'::bigint[])))\nPlanning Time: 0.619 ms\nExecution Time: 1.572 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "userrolemappingrepository-a0d609",
+      "name": "UserRoleMappingRepository",
+      "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+      "moduleId": "authorization",
+      "queries": [
+        {
+          "id": "authorization-q-24",
+          "name": "findOneById",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "findOneById",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM user__role__mapping WHERE id = ?1;",
+          "explainPlan": "Index Scan using user__role__mapping_pkey on user__role__mapping  (cost=20.02..21.26 rows=1 width=24) (actual time=0.917..0.921 rows=1 loops=1)\n  Index Cond: (id = 212)\nPlanning Time: 0.113 ms\nExecution Time: 1.009 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-25",
+          "name": "findAllByRoleId",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "findAllByRoleId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM user__role__mapping WHERE role_id = ?1 offset ?2 limit ?3;",
+          "explainPlan": "Limit  (cost=68.59..97.14 rows=1 width=24) (actual time=1.302..1.302 rows=0 loops=1)\n  ->  Index Scan using user__role__mapping_role_id on user__role__mapping  (cost=40.03..68.59 rows=1 width=24) (actual time=1.296..1.300 rows=1 loops=1)\n        Index Cond: (role_id = 7092)\nPlanning Time: 0.110 ms\nExecution Time: 1.374 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-26",
+          "name": "findAllByRoleId",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "findAllByRoleId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM user__role__mapping WHERE role_id = ?1 AND user_id IN (?2) offset ?3 limit ?4;",
+          "explainPlan": "Limit  (cost=68.60..97.16 rows=1 width=24) (actual time=1.529..1.529 rows=0 loops=1)\n  ->  Index Scan using user__role__mapping_role_id on user__role__mapping  (cost=40.03..68.60 rows=1 width=24) (actual time=1.527..1.527 rows=0 loops=1)\n        Index Cond: (role_id = 7092)\n        Storage Filter: (user_id = ANY ('{11815,23915,33815}'::bigint[]))\nPlanning Time: 0.188 ms\nExecution Time: 1.637 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-27",
+          "name": "findAllByRoleId",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "findAllByRoleId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM user__role__mapping WHERE role_id = ?1;",
+          "explainPlan": "Index Scan using user__role__mapping_role_id on user__role__mapping  (cost=40.03..68.59 rows=1 width=24) (actual time=1.389..1.393 rows=1 loops=1)\n  Index Cond: (role_id = 7092)\nPlanning Time: 0.099 ms\nExecution Time: 1.475 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-28",
+          "name": "findOneByUserIdAndRoleId",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "findOneByUserIdAndRoleId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM user__role__mapping WHERE user_id = ?1 AND role_id = ?2;",
+          "explainPlan": "Index Scan using user__role__mapping_user_id_role_id_key on user__role__mapping  (cost=40.04..68.59 rows=1 width=24) (actual time=0.674..0.674 rows=0 loops=1)\n  Index Cond: ((user_id = 11815) AND (role_id = 7092))\nPlanning Time: 0.174 ms\nExecution Time: 0.757 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-29",
+          "name": "findOneByRoleId",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "findOneByRoleId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM user__role__mapping WHERE role_id = ?1;",
+          "explainPlan": "Index Scan using user__role__mapping_role_id on user__role__mapping  (cost=40.03..68.59 rows=1 width=24) (actual time=1.224..1.227 rows=1 loops=1)\n  Index Cond: (role_id = 7092)\nPlanning Time: 0.088 ms\nExecution Time: 1.321 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-30",
+          "name": "findOptionalOneByUserId",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "findOptionalOneByUserId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM user__role__mapping WHERE user_id = ?1;",
+          "explainPlan": "Index Scan using user__role__mapping_user_id_role_id_key on user__role__mapping  (cost=40.04..68.64 rows=1 width=24) (actual time=1.175..1.178 rows=1 loops=1)\n  Index Cond: (user_id = 11815)\nPlanning Time: 0.106 ms\nExecution Time: 1.251 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-31",
+          "name": "findAllInUserList",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "findAllInUserList",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM user__role__mapping WHERE user_id IN ?1;",
+          "explainPlan": "Index Scan using user__role__mapping_user_id_role_id_key on user__role__mapping  (cost=40.12..69.43 rows=3 width=24) (actual time=1.314..1.318 rows=3 loops=1)\n  Index Cond: (user_id = ANY ('{11815,23915,33815}'::bigint[]))\nPlanning Time: 0.093 ms\nExecution Time: 1.396 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-32",
+          "name": "findCountByRoleId",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "findCountByRoleId",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(*) FROM user__role__mapping WHERE role_id = ?1 AND user_id IN (?2);",
+          "explainPlan": "Finalize Aggregate  (cost=24.60..24.61 rows=1 width=8) (actual time=0.725..0.726 rows=1 loops=1)\n  ->  Index Only Scan using user__role__mapping_user_id_role_id_key on user__role__mapping  (cost=20.01..24.60 rows=1 width=0) (actual time=0.720..0.720 rows=0 loops=1)\n        Index Cond: ((user_id = ANY ('{11815,23915,33815}'::bigint[])) AND (role_id = 7092))\n        Heap Fetches: 0\n        Partial Aggregate: true\nPlanning Time: 0.232 ms\nExecution Time: 0.878 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "authorization-q-33",
+          "name": "findCountByRoleId",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "findCountByRoleId",
+          "status": "healthy",
+          "sqlPreview": "SELECT count(*) FROM user__role__mapping WHERE role_id = ?1;",
+          "explainPlan": "Finalize Aggregate  (cost=24.25..24.26 rows=1 width=8) (actual time=0.719..0.719 rows=1 loops=1)\n  ->  Index Only Scan using user__role__mapping_role_id on user__role__mapping  (cost=20.01..24.25 rows=1 width=0) (actual time=0.710..0.712 rows=1 loops=1)\n        Index Cond: (role_id = 7092)\n        Heap Fetches: 0\n        Partial Aggregate: true\nPlanning Time: 0.127 ms\nExecution Time: 0.819 ms\nPeak Memory Usage: 25 kB"
+        },
+        {
+          "id": "authorization-q-34",
+          "name": "getUserRolesByUserIdList",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "getUserRolesByUserIdList",
+          "status": "healthy",
+          "sqlPreview": "SELECT r.code, urm.user_id, r.status FROM user__role__mapping urm JOIN role r ON urm.role_id = r.id WHERE urm.user_id IN ?1 and r.id in ?2;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=40.11..46.26 rows=1 width=24) (actual time=1.491..1.491 rows=0 loops=1)\n  Join Filter: (urm.role_id = r.id)\n  ->  Index Scan using role_pkey on role r  (cost=20.10..21.66 rows=3 width=24) (actual time=0.732..0.738 rows=3 loops=1)\n        Index Cond: (id = ANY ('{2194,7092,22}'::bigint[]))\n  ->  Index Only Scan using user__role__mapping_user_id_role_id_key on user__role__mapping urm  (cost=20.01..24.60 rows=1 width=16) (actual time=0.651..0.651 rows=0 loops=1)\n        Index Cond: ((role_id = ANY (ARRAY[r.id, $1, $2, ..., $1023])) AND (user_id = ANY ('{11815,23915,33815}'::bigint[])))\n        Heap Fetches: 0\nPlanning Time: 1.105 ms\nExecution Time: 1.761 ms\nPeak Memory Usage: 535 kB"
+        },
+        {
+          "id": "authorization-q-35",
+          "name": "getUserRolesByUserIdList",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "getUserRolesByUserIdList",
+          "status": "healthy",
+          "sqlPreview": "SELECT r.code, urm.user_id, r.status FROM user__role__mapping urm JOIN role r ON urm.role_id = r.id WHERE urm.user_id IN ?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=40.14..46.55 rows=3 width=24) (actual time=1.736..1.749 rows=3 loops=1)\n  Join Filter: (urm.role_id = r.id)\n  ->  Index Only Scan using user__role__mapping_user_id_role_id_key on user__role__mapping urm  (cost=20.04..24.77 rows=3 width=16) (actual time=0.978..0.981 rows=3 loops=1)\n        Index Cond: (user_id = ANY ('{11815,23915,33815}'::bigint[]))\n        Heap Fetches: 0\n  ->  Index Scan using role_pkey on role r  (cost=20.10..21.66 rows=3 width=24) (actual time=0.657..0.662 rows=3 loops=1)\n        Index Cond: (id = ANY (ARRAY[urm.role_id, $1, $2, ..., $1023]))\nPlanning Time: 0.804 ms\nExecution Time: 1.982 ms\nPeak Memory Usage: 541 kB"
+        },
+        {
+          "id": "authorization-q-36",
+          "name": "findAllByRoleIds",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "findAllByRoleIds",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM user__role__mapping WHERE role_id IN ?1;",
+          "explainPlan": "Index Scan using user__role__mapping_role_id on user__role__mapping  (cost=40.27..70.22 rows=8 width=24) (actual time=1.565..1.575 rows=8 loops=1)\n  Index Cond: (role_id = ANY ('{7092,5192,2693}'::bigint[]))\nPlanning Time: 0.176 ms\nExecution Time: 1.699 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-37",
+          "name": "findUserIdsByRoleCode",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "findUserIdsByRoleCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT r.id as role_id,r.code as role_code,urm.user_id as user_id FROM user__role__mapping urm join role r on r.id = urm.role_id WHERE r.code =?1;",
+          "explainPlan": "YB Batched Nested Loop Join  (cost=49.35..200.85 rows=3 width=25) (actual time=3.915..3.915 rows=0 loops=1)\n  Join Filter: (urm.role_id = r.id)\n  ->  Index Only Scan using user__role__mapping_user_id_role_id_key on user__role__mapping urm  (cost=29.32..67.42 rows=679 width=16) (actual time=1.423..1.763 rows=683 loops=1)\n        Heap Fetches: 0\n  ->  Index Scan using role_pkey on role r  (cost=20.02..133.32 rows=1 width=17) (actual time=1.422..1.422 rows=0 loops=1)\n        Index Cond: (id = ANY (ARRAY[urm.role_id, $1, $2, ..., $1023]))\n        Storage Filter: ((code)::text = 'RBHC1'::text)\nPlanning Time: 0.672 ms\nExecution Time: 4.153 ms\nPeak Memory Usage: 594 kB"
+        },
+        {
+          "id": "authorization-q-38",
+          "name": "findOneByUserId",
+          "description": "via UserRoleMappingRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserRoleMappingRepository",
+          "sqlIdentifier": "findOneByUserId",
+          "status": "healthy",
+          "sqlPreview": "SELECT * FROM user__role__mapping WHERE user_id = ?1;",
+          "explainPlan": "Index Scan using user__role__mapping_user_id_role_id_key on user__role__mapping  (cost=40.04..68.64 rows=1 width=24) (actual time=1.432..1.436 rows=1 loops=1)\n  Index Cond: (user_id = 11815)\nPlanning Time: 0.095 ms\nExecution Time: 1.528 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    },
+    {
+      "id": "userstoryrepository-7f4844",
+      "name": "UserStoryRepository",
+      "daoClass": "in.novopay.authorization.datamodel.repository.UserStoryRepository",
+      "moduleId": "authorization",
+      "queries": [
+        {
+          "id": "authorization-q-45",
+          "name": "getUserStoryByCode",
+          "description": "via UserStoryRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserStoryRepository",
+          "sqlIdentifier": "getUserStoryByCode",
+          "status": "healthy",
+          "sqlPreview": "SELECT * from user_story WHERE code=?1;",
+          "explainPlan": "Index Scan using user_story_code_key on user_story  (cost=40.04..68.63 rows=1 width=81) (actual time=1.555..1.559 rows=1 loops=1)\n  Index Cond: ((code)::text = 'RULE-GRP-CNFG'::text)\nPlanning Time: 0.099 ms\nExecution Time: 1.659 ms\nPeak Memory Usage: 8 kB"
+        },
+        {
+          "id": "authorization-q-46",
+          "name": "getUserStoryByCodeList",
+          "description": "via UserStoryRepository",
+          "daoClass": "in.novopay.authorization.datamodel.repository.UserStoryRepository",
+          "sqlIdentifier": "getUserStoryByCodeList",
+          "status": "healthy",
+          "sqlPreview": "SELECT id from user_story WHERE code IN ?1;",
+          "explainPlan": "Index Scan using user_story_code_key on user_story  (cost=40.11..69.18 rows=3 width=8) (actual time=1.374..1.380 rows=3 loops=1)\n  Index Cond: ((code)::text = ANY ('{RULE-GRP-CNFG,SUP-IND-COLL-DSBRD,LOAN-WOFF}'::text[]))\nPlanning Time: 0.111 ms\nExecution Time: 1.463 ms\nPeak Memory Usage: 8 kB"
+        }
+      ]
+    }
+  ]
+}
