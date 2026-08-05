@@ -1,6 +1,4 @@
 import { Component, computed, inject } from '@angular/core';
-
-const ORDER_KEY = 'reports-dashboard:categories';
 import { RouterLink } from '@angular/router';
 import { ReportingDataService } from '../../services/reporting-data.service';
 import { StatCard } from '../../components/stat-card/stat-card';
@@ -10,13 +8,16 @@ import { categoryStyle } from '../../utils/category-style';
 import { UiStateService } from '../../services/ui-state.service';
 import { OrderService } from '../../services/order.service';
 import { DragReorderDirective } from '../../directives/drag-reorder.directive';
+import { FlipGroupDirective } from '../../directives/flip-group.directive';
 import { applyOrder, reorderIds } from '../../utils/apply-order';
 import type { ReportingCategory } from '../../types/reporting.types';
+
+const ORDER_KEY = 'reports-dashboard:categories';
 
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [RouterLink, StatCard, Icon, ReportTabs, DragReorderDirective],
+  imports: [RouterLink, StatCard, Icon, ReportTabs, DragReorderDirective, FlipGroupDirective],
   template: `
     <div class="flex flex-col gap-6">
       <div class="flex items-start justify-between gap-4 animate-fade-in-down">
@@ -60,12 +61,13 @@ import type { ReportingCategory } from '../../types/reporting.types';
 
         <div class="flex flex-col gap-3">
           <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">Categories</h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" appFlipGroup>
             @for (category of orderedCategories(); track category.id; let i = $index) {
               <a
                 [routerLink]="['/category', category.id]"
+                [attr.data-flip-key]="category.id"
                 [appDragReorder]="i"
-                (reordered)="onReorder($event)"
+                (hoverReorder)="onReorder($event)"
                 class="group relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm p-5 flex flex-col gap-3 transition-all hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] animate-fade-in-up"
                 [style.animation-delay.ms]="i * 50"
               >

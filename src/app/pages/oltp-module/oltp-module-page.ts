@@ -8,13 +8,14 @@ import { OltpDataService } from '../../services/oltp-data.service';
 import { SearchService } from '../../services/search.service';
 import { OrderService } from '../../services/order.service';
 import { DragReorderDirective } from '../../directives/drag-reorder.directive';
+import { FlipGroupDirective } from '../../directives/flip-group.directive';
 import type { OltpDaoGroup } from '../../types/reporting.types';
 import { applyOrder, reorderIds } from '../../utils/apply-order';
 
 @Component({
   selector: 'app-oltp-module-page',
   standalone: true,
-  imports: [Icon, GroupCard, DragReorderDirective],
+  imports: [Icon, GroupCard, DragReorderDirective, FlipGroupDirective],
   template: `
     @if (moduleSummary(); as mod) {
       <div class="flex flex-col gap-4">
@@ -58,13 +59,14 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
             }
           </div>
         } @else {
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" appFlipGroup>
             @for (group of filteredGroups(); track group.id; let i = $index) {
               <div
                 class="animate-fade-in-up"
                 [style.animation-delay.ms]="(i % 15) * 20"
+                [attr.data-flip-key]="group.id"
                 [appDragReorder]="i"
-                (reordered)="onReorder($event)"
+                (hoverReorder)="onReorder($event)"
               >
                 <app-group-card
                   [name]="group.name"

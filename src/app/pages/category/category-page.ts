@@ -9,6 +9,7 @@ import { SearchService } from '../../services/search.service';
 import { UiStateService } from '../../services/ui-state.service';
 import { OrderService } from '../../services/order.service';
 import { DragReorderDirective } from '../../directives/drag-reorder.directive';
+import { FlipGroupDirective } from '../../directives/flip-group.directive';
 import type { ReportingJob } from '../../types/reporting.types';
 import { categoryStyle } from '../../utils/category-style';
 import { applyOrder, reorderIds } from '../../utils/apply-order';
@@ -16,7 +17,7 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
 @Component({
   selector: 'app-category-page',
   standalone: true,
-  imports: [Icon, GroupCard, DragReorderDirective],
+  imports: [Icon, GroupCard, DragReorderDirective, FlipGroupDirective],
   template: `
     @if (category(); as cat) {
       <div class="flex flex-col gap-4">
@@ -53,13 +54,14 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
           </button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" appFlipGroup>
           @for (job of filteredJobs(); track job.id; let i = $index) {
             <div
               class="animate-fade-in-up transition-shadow"
               [style.animation-delay.ms]="(i % 12) * 30"
+              [attr.data-flip-key]="job.id"
               [appDragReorder]="i"
-              (reordered)="onReorder(cat.id, $event)"
+              (hoverReorder)="onReorder(cat.id, $event)"
             >
               <app-group-card
                 [name]="job.name"
