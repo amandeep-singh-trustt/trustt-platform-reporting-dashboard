@@ -11,6 +11,7 @@ import { DragReorderDirective } from '../../directives/drag-reorder.directive';
 import { FlipGroupDirective } from '../../directives/flip-group.directive';
 import type { OltpDaoGroup } from '../../types/reporting.types';
 import { applyOrder, reorderIds } from '../../utils/apply-order';
+import { downloadQueriesCsv } from '../../utils/export-csv';
 
 @Component({
   selector: 'app-oltp-module-page',
@@ -19,14 +20,23 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
   template: `
     @if (moduleSummary(); as mod) {
       <div class="flex flex-col gap-4">
-        <div class="flex items-center gap-3 animate-fade-in-down">
-          <span class="flex items-center justify-center size-11 rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400">
-            <app-icon name="database" [size]="20" />
-          </span>
-          <div>
-            <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">{{ mod.name }}</h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400">{{ mod.daoGroupCount }} DAO classes &middot; {{ mod.queryCount }} queries</p>
+        <div class="flex items-start justify-between gap-3 animate-fade-in-down">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center justify-center size-11 rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400">
+              <app-icon name="database" [size]="20" />
+            </span>
+            <div>
+              <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">{{ mod.name }}</h1>
+              <p class="text-sm text-slate-500 dark:text-slate-400">{{ mod.daoGroupCount }} DAO classes &middot; {{ mod.queryCount }} queries</p>
+            </div>
           </div>
+          <button
+            type="button"
+            (click)="exportCsv(mod.id, mod.name)"
+            class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+          >
+            <app-icon name="download" [size]="14" /> Export CSV
+          </button>
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
@@ -49,6 +59,14 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
           >
             <app-icon name="arrow-up-down" [size]="14" />
             {{ sortAsc() ? 'A–Z' : 'Z–A' }}
+          </button>
+          <button
+            type="button"
+            (click)="expandAll.set(!expandAll())"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+          >
+            <app-icon [name]="expandAll() ? 'chevron-down' : 'chevron-right'" [size]="14" />
+            {{ expandAll() ? 'Collapse all' : 'Expand all' }}
           </button>
         </div>
 
@@ -75,6 +93,7 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
                   [pseudoJobId]="group.id"
                   [pseudoCategoryId]="moduleId()"
                   [pseudoCategoryName]="mod.name"
+                  [autoExpand]="expandAll() || hasActiveFilter()"
                 />
               </div>
             } @empty {
@@ -109,6 +128,11 @@ export class OltpModulePage {
 
   readonly nameFilter = signal('');
   readonly sortAsc = signal(true);
+  readonly expandAll = signal(false);
+
+  readonly hasActiveFilter = computed(
+    () => this.nameFilter().trim().length > 0 || this.search.term().trim().length > 0,
+  );
 
   toggleSort(): void {
     this.sortAsc.update((v) => !v);
@@ -146,6 +170,21 @@ export class OltpModulePage {
   onReorder(event: { from: number; to: number }): void {
     const ids = this.filteredGroups().map((g) => g.id);
     this.order.setOrder(this.orderKey(), reorderIds(ids, event.from, event.to));
+  }
+
+  exportCsv(moduleId: string, moduleName: string): void {
+    const rows = this.oltp.daoGroups(moduleId).flatMap((group) =>
+      group.queries.map((q) => ({
+        group: moduleName,
+        repo: group.name,
+        queryName: q.name,
+        sqlIdentifier: q.sqlIdentifier,
+        sql: q.sqlPreview,
+        status: q.status,
+        explainPlan: q.explainPlan ?? '',
+      })),
+    );
+    downloadQueriesCsv(`${moduleId}-queries.csv`, 'Service', 'Repository', rows);
   }
 
   constructor() {

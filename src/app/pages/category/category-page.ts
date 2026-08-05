@@ -13,6 +13,7 @@ import { FlipGroupDirective } from '../../directives/flip-group.directive';
 import type { ReportingJob } from '../../types/reporting.types';
 import { categoryStyle } from '../../utils/category-style';
 import { applyOrder, reorderIds } from '../../utils/apply-order';
+import { downloadQueriesCsv } from '../../utils/export-csv';
 
 @Component({
   selector: 'app-category-page',
@@ -21,14 +22,23 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
   template: `
     @if (category(); as cat) {
       <div class="flex flex-col gap-4">
-        <div class="flex items-center gap-3 animate-fade-in-down">
-          <span class="flex items-center justify-center size-11 rounded-xl" [class]="style(cat.id).badge">
-            <app-icon [name]="style(cat.id).icon" [size]="20" />
-          </span>
-          <div>
-            <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">{{ cat.name }}</h1>
-            <p class="text-sm text-slate-500 dark:text-slate-400">{{ cat.jobs.length }} reporting jobs</p>
+        <div class="flex items-start justify-between gap-3 animate-fade-in-down">
+          <div class="flex items-center gap-3">
+            <span class="flex items-center justify-center size-11 rounded-xl" [class]="style(cat.id).badge">
+              <app-icon [name]="style(cat.id).icon" [size]="20" />
+            </span>
+            <div>
+              <h1 class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">{{ cat.name }}</h1>
+              <p class="text-sm text-slate-500 dark:text-slate-400">{{ cat.jobs.length }} reporting jobs</p>
+            </div>
           </div>
+          <button
+            type="button"
+            (click)="exportCsv(cat.id, cat.name, cat.jobs)"
+            class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+          >
+            <app-icon name="download" [size]="14" /> Export CSV
+          </button>
         </div>
 
         <div class="flex flex-wrap items-center gap-3">
@@ -52,6 +62,14 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
             <app-icon name="arrow-up-down" [size]="14" />
             {{ sortAsc() ? 'A–Z' : 'Z–A' }}
           </button>
+          <button
+            type="button"
+            (click)="expandAll.set(!expandAll())"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+          >
+            <app-icon [name]="expandAll() ? 'chevron-down' : 'chevron-right'" [size]="14" />
+            {{ expandAll() ? 'Collapse all' : 'Expand all' }}
+          </button>
         </div>
 
         <div class="flex flex-col gap-3" appFlipGroup>
@@ -72,6 +90,7 @@ import { applyOrder, reorderIds } from '../../utils/apply-order';
                 [pseudoJobId]="job.id"
                 [pseudoCategoryId]="cat.id"
                 [pseudoCategoryName]="cat.name"
+                [autoExpand]="expandAll() || hasActiveFilter()"
                 (rename)="ui.openRenameJob(job)"
                 (move)="ui.openMoveJob(job)"
                 (addQuery)="ui.openAddQuery(job)"
@@ -110,6 +129,11 @@ export class CategoryPage {
 
   readonly jobNameFilter = signal('');
   readonly sortAsc = signal(true);
+  readonly expandAll = signal(false);
+
+  readonly hasActiveFilter = computed(
+    () => this.jobNameFilter().trim().length > 0 || this.search.term().trim().length > 0,
+  );
 
   toggleSort(): void {
     this.sortAsc.update((v) => !v);
@@ -149,5 +173,20 @@ export class CategoryPage {
   onReorder(categoryId: string, event: { from: number; to: number }): void {
     const ids = this.filteredJobs().map((j) => j.id);
     this.order.setOrder(this.orderKey(categoryId), reorderIds(ids, event.from, event.to));
+  }
+
+  exportCsv(categoryId: string, categoryName: string, jobs: ReportingJob[]): void {
+    const rows = jobs.flatMap((job) =>
+      job.queries.map((q) => ({
+        group: categoryName,
+        repo: job.name,
+        queryName: q.name,
+        sqlIdentifier: q.sqlIdentifier,
+        sql: q.sqlPreview,
+        status: q.status,
+        explainPlan: q.explainPlan ?? '',
+      })),
+    );
+    downloadQueriesCsv(`${categoryId}-queries.csv`, 'Category', 'Job', rows);
   }
 }

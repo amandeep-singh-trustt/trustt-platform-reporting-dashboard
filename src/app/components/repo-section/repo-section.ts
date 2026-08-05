@@ -1,4 +1,4 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { Icon } from '../icon/icon';
 import { QueryDetails } from '../query-details/query-details';
 import { UiStateService } from '../../services/ui-state.service';
@@ -163,12 +163,21 @@ export class RepoSection {
   readonly pseudoJobId = input<string>('');
   readonly pseudoCategoryId = input<string>('');
   readonly pseudoCategoryName = input<string>('');
+  // driven by the page: true while a filter/search term is active (auto-reveal matches) or
+  // "Expand all" is toggled on. Transitions sync `expanded`; a manual click in between still works.
+  readonly autoExpand = input(false);
 
   readonly rename = output<void>();
   readonly move = output<void>();
   readonly addQuery = output<void>();
 
   readonly expanded = signal(false);
+
+  constructor() {
+    effect(() => {
+      this.expanded.set(this.autoExpand());
+    });
+  }
 
   toggle(): void {
     this.expanded.update((v) => !v);
