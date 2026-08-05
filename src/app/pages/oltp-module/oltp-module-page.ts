@@ -5,6 +5,7 @@ import { map } from 'rxjs';
 import { Icon } from '../../components/icon/icon';
 import { GroupCard } from '../../components/group-card/group-card';
 import { OltpDataService } from '../../services/oltp-data.service';
+import { SearchService } from '../../services/search.service';
 import type { OltpDaoGroup } from '../../types/reporting.types';
 
 @Component({
@@ -84,6 +85,7 @@ import type { OltpDaoGroup } from '../../types/reporting.types';
 export class OltpModulePage {
   private readonly route = inject(ActivatedRoute);
   protected readonly oltp = inject(OltpDataService);
+  private readonly search = inject(SearchService);
 
   readonly moduleId = toSignal(
     this.route.paramMap.pipe(map((params) => params.get('moduleId') ?? '')),
@@ -101,10 +103,23 @@ export class OltpModulePage {
 
   readonly filteredGroups = computed<OltpDaoGroup[]>(() => {
     const groups = this.oltp.daoGroups(this.moduleId());
-    const term = this.nameFilter().trim().toLowerCase();
-    const filtered = term
-      ? groups.filter((g) => g.name.toLowerCase().includes(term) || g.daoClass.toLowerCase().includes(term))
-      : groups;
+    const nameFilter = this.nameFilter().trim().toLowerCase();
+    const globalTerm = this.search.term().trim().toLowerCase();
+
+    const filtered = groups.filter((g) => {
+      if (nameFilter && !g.name.toLowerCase().includes(nameFilter) && !g.daoClass.toLowerCase().includes(nameFilter)) {
+        return false;
+      }
+      if (globalTerm) {
+        const groupMatches = g.name.toLowerCase().includes(globalTerm) || g.daoClass.toLowerCase().includes(globalTerm);
+        const queryMatches = g.queries.some((q) => q.name.toLowerCase().includes(globalTerm));
+        if (!groupMatches && !queryMatches) {
+          return false;
+        }
+      }
+      return true;
+    });
+
     const sorted = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
     return this.sortAsc() ? sorted : sorted.reverse();
   });
