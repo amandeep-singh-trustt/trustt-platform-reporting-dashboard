@@ -27,6 +27,23 @@ function slugify(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
+// "report" = the actual data-producing query; "support" = batch-range count /
+// pagination-provider / chunk-fetch plumbing that rides alongside it under the same job.
+const SUPPORT_SQL_RE = /^\s*SELECT\s+COUNT\(/i;
+// case-sensitive: camelCase methods always capitalize a standalone "Count" segment
+// (batchGetCountFor..., getBatchCount...) — a case-insensitive match would also hit
+// "Account"/"Accounts" (contains "ccount"), which is not plumbing.
+const SUPPORT_METHOD_COUNT_RE = /Count/;
+const SUPPORT_METHOD_OTHER_RE = /SqlPagingQueryProviderFactoryBean|^constructor|ByChunk$|PagingQueryProvider/i;
+
+function queryRoleFor(sql, methodName) {
+  const method = methodName || '';
+  if (SUPPORT_SQL_RE.test(sql || '')) return 'support';
+  if (SUPPORT_METHOD_COUNT_RE.test(method)) return 'support';
+  if (SUPPORT_METHOD_OTHER_RE.test(method)) return 'support';
+  return 'report';
+}
+
 const explainByIndex = loadExplainByIndex(EXPLAIN_PATH);
 const reviewByKey = loadReviewByKey(REVIEW_PATH);
 
@@ -76,6 +93,7 @@ for (const [jobNameRaw, dao, method, sql] of rows) {
     sqlIdentifier: methodName,
     status,
     sqlPreview: (sql || '').trim(),
+    queryRole: queryRoleFor(sql, methodName),
   };
   if (explainPlan) query.explainPlan = explainPlan;
   if (reviewReason) query.reviewReason = reviewReason;
@@ -93,6 +111,10 @@ for (const cat of CATEGORY_RULES.concat([DEFAULT_CATEGORY])) {
 const totalJobs = categories.reduce((n, c) => n + c.jobs.length, 0);
 const totalQueries = categories.reduce((n, c) => n + c.jobs.reduce((m, j) => m + j.queries.length, 0), 0);
 const explainedCount = explainByIndex.size;
+const reportQueryCount = categories.reduce(
+  (n, c) => n + c.jobs.reduce((m, j) => m + j.queries.filter((q) => q.queryRole === 'report').length, 0),
+  0,
+);
 
 const output = {
   generatedAt: '2026-08-04T00:00:00Z',
@@ -105,5 +127,6 @@ fs.writeFileSync(OUT_PATH, JSON.stringify(output, null, 2));
 fs.writeFileSync(DB_OBJECT_DEFS_OUT_PATH, JSON.stringify(dbObjectDefs, null, 2));
 console.log(
   `wrote ${OUT_PATH}: ${categories.length} categories, ${totalJobs} jobs, ${totalQueries} queries, ` +
-    `${explainedCount} with explain plans, ${reviewByKey.size} needs-review, ${dbObjectNames.length} db object definitions`,
+    `${explainedCount} with explain plans, ${reviewByKey.size} needs-review, ${dbObjectNames.length} db object definitions, ` +
+    `${reportQueryCount} report / ${totalQueries - reportQueryCount} support queries`,
 );

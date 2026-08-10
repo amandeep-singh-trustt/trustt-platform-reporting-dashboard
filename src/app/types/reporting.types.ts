@@ -1,4 +1,5 @@
 export type QueryStatus = 'unverified' | 'healthy' | 'needs-review' | 'slow';
+export type QueryRole = 'report' | 'support';
 
 export interface SqlQuery {
   id: string;
@@ -11,6 +12,9 @@ export interface SqlQuery {
   explainPlan?: string;
   reviewReason?: string;
   dbObjectRefs?: string[];
+  // Reports/Job tab only (gen-mock-data.js) — the actual report-producing query vs
+  // batch-count/pagination plumbing riding alongside it under the same job. Absent on OLTP queries.
+  queryRole?: QueryRole;
 }
 
 export type DbObjectKind = 'view' | 'table';

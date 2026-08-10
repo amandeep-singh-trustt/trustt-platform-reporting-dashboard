@@ -10,7 +10,7 @@ import { UiStateService } from '../../services/ui-state.service';
 import { OrderService } from '../../services/order.service';
 import { DragReorderDirective } from '../../directives/drag-reorder.directive';
 import { FlipGroupDirective } from '../../directives/flip-group.directive';
-import type { ReportingJob } from '../../types/reporting.types';
+import type { ReportingJob, SqlQuery } from '../../types/reporting.types';
 import { categoryStyle } from '../../utils/category-style';
 import { applyOrder, reorderIds } from '../../utils/apply-order';
 import { downloadQueriesCsv } from '../../utils/export-csv';
@@ -70,6 +70,18 @@ import { downloadQueriesCsv } from '../../utils/export-csv';
             <app-icon [name]="expandAll() ? 'chevron-down' : 'chevron-right'" [size]="14" />
             {{ expandAll() ? 'Collapse all' : 'Expand all' }}
           </button>
+          <button
+            type="button"
+            (click)="reportsOnly.set(!reportsOnly())"
+            [title]="reportsOnly() ? 'Hiding count/pagination plumbing queries' : 'Showing every captured query'"
+            class="inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm transition-colors"
+            [class]="reportsOnly()
+              ? 'border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400'
+              : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:border-slate-300 dark:hover:border-slate-700'"
+          >
+            <app-icon name="filter" [size]="14" />
+            {{ reportsOnly() ? 'Reports only' : 'All queries' }}
+          </button>
         </div>
 
         <div class="flex flex-col gap-3" appFlipGroup>
@@ -83,7 +95,7 @@ import { downloadQueriesCsv } from '../../utils/export-csv';
             >
               <app-repo-section
                 [name]="job.name"
-                [queries]="job.queries"
+                [queries]="displayedQueries(job)"
                 [canRename]="true"
                 [canMove]="true"
                 [canAddQuery]="true"
@@ -130,6 +142,7 @@ export class CategoryPage {
   readonly jobNameFilter = signal('');
   readonly sortAsc = signal(true);
   readonly expandAll = signal(false);
+  readonly reportsOnly = signal(true);
 
   readonly hasActiveFilter = computed(
     () => this.jobNameFilter().trim().length > 0 || this.search.term().trim().length > 0,
@@ -169,6 +182,10 @@ export class CategoryPage {
     const result = this.sortAsc() ? sorted : sorted.reverse();
     return cat ? applyOrder(result, (j) => j.id, this.order.getOrder(this.orderKey(cat.id))) : result;
   });
+
+  displayedQueries(job: ReportingJob): SqlQuery[] {
+    return this.reportsOnly() ? job.queries.filter((q) => q.queryRole !== 'support') : job.queries;
+  }
 
   onReorder(categoryId: string, event: { from: number; to: number }): void {
     const ids = this.filteredJobs().map((j) => j.id);
