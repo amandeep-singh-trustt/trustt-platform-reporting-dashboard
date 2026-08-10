@@ -220,5 +220,83 @@
     "kind": "table",
     "sourceFile": "sli/reporting/sql/product/V000025__create_table_repayment_schedule_report.sql",
     "definition": "CREATE TABLE wl_repayment_schedule_ind_staging (\n\tid bigserial,\n\taccount_id bigint,\n\tloan_agreement_number varchar(24) NOT NULL,\n\tucic varchar(50),\n\tcustomer varchar(452),\n\ttenure integer NOT NULL,\n\ttotal_instl integer NOT NULL,\n\tcurrency varchar(20) NOT NULL,\n\tproduct_name varchar(16) NOT NULL,\n\tamount_financed decimal(20,6) NOT NULL,\n\tfrequency varchar(32),\n\tcreated_on_date timestamp without time zone,\n\tPRIMARY KEY (id)\n) ;"
+  },
+  "ed_base_staging_table": {
+    "name": "ed_base_staging_table",
+    "kind": "table",
+    "sourceFile": "sli/reporting/sql/product/V000048__create_ed_base_staging_table.sql",
+    "definition": "CREATE TABLE ed_base_staging_table (\n    id bigserial,\n    branch_name varchar(64) NULL,\n    branch_code varchar(64) NULL,\n    state varchar(64) NULL,\n    so_name varchar(64) NULL,\n    so_code varchar(64) NULL,\n    rm_name varchar(64) NULL,\n    rm_code varchar(64) NULL,\n    ch_name varchar(64) NULL,\n    ch_code varchar(64) NULL,\n    cir_head_name varchar(64) NULL,\n    cir_head_code varchar(64) NULL,\n    rbh_name varchar(64) NULL,\n    rbh_code varchar(64) NULL,\n    zh_name varchar(64) NULL,\n    zh_code varchar(64) NULL,\n    product_code varchar(64) NULL,\n    product_name varchar(64) NULL,\n    npa_stage varchar(64) NULL,\n    account_number varchar(64) NULL,\n    customer_id varchar(64),\n    customer_name varchar(64) NULL,\n    group_id varchar(64),\n    group_name varchar(64) NULL,\n    casa_account_number varchar(64) NULL,\n    FC_balance decimal(20,6) NULL,\n    bom_emi decimal(20,6) NULL,\n    bom_total_emi_due decimal(20,6) NULL,\n    bom_cbc decimal(20,6) NULL,\n    bom_lpp decimal(20,6) NULL,\n    bom_other_charges decimal(20,6) NULL,\n    bom_pos decimal(20,6) NULL,\n    bom_dpd int NULL,\n    bom_risk_dpd int NULL,\n    amt_fin decimal(20,6) NULL,\n    disbursal_date date null,\n    tenure int,\n    instlnum int NULL,\n    due_date date null,\n    demand decimal(20,6) NULL,\n    total_demand decimal(20,6) NULL,\n    current_day_emi decimal(20,6) NULL,\n    current_day_emi_due decimal(20,6) NULL,\n    current_day_cbc decimal(20,6) NULL,\n    current_day_lpp decimal(20,6) NULL,\n    current_day_other_charges decimal(20,6) NULL,\n    current_day_pos decimal(20,6) NULL,\n    current_day_dpd bigint NULL,\n    current_day_risk_dpd int NULL,\n    status varchar(64) NULL,\n    no_of_emi_to_recover int,\n    last_payment_date date null,\n    last_payment_amount decimal(20,6) NULL,\n    mode_of_transaction varchar(64) NULL,\n    total_recovery decimal(20,6) NULL,\n    mtd_recovery decimal(20,6) NULL,\n    no_of_bounce int,\n    promo_code varchar(64) NULL,\n    loan_cycle int NULL,\n    rtr_tagging varchar(64) NULL,\n    stp_tagging varchar(64) NULL,\n    created_on date null,\n    PRIMARY KEY (id)\n);"
+  },
+  "base_group_pos_staging_table": {
+    "name": "base_group_pos_staging_table",
+    "kind": "table",
+    "sourceFile": "sli/reporting/sql/product/V000186__grp_pos_staging_table_update.sql",
+    "definition": "CREATE TABLE mfi_reporting.base_group_pos_staging_table (\n\tid bigserial NOT NULL,\n\tbranch_name varchar(64) NULL,\n\tbranch_code varchar(64) NULL,\n\tstate varchar(64) NULL,\n\tso_name varchar(64) NULL,\n\tso_code varchar(64) NULL,\n\trm_name varchar(64) NULL,\n\trm_code varchar(64) NULL,\n\tch_name varchar(64) NULL,\n\tch_code varchar(64) NULL,\n\tcir_head_name varchar(64) NULL,\n\tcir_head_code varchar(64) NULL,\n\trbh_name varchar(64) NULL,\n\trbh_code varchar(64) NULL,\n\tzh_name varchar(64) NULL,\n\tzh_code varchar(64) NULL,\n\tproduct_code varchar(64) NULL,\n\tproduct_name varchar(64) NULL,\n\tnpa_stage varchar(64) NULL,\n\tgroup_id varchar(64) NULL,\n\tgroup_name varchar(64) NULL,\n\tcasa_account_number varchar(64) NULL,\n\tfc_balance bigint NULL,\n\teom_emi bigint NULL,\n\teom_total_emi_due decimal(20,6) NULL,\n\teom_cbc bigint NULL,\n\teom_lpp bigint NULL,\n\teom_other_charges decimal(20,6) NULL,\n\teom_pos bigint NULL,\n\teom_dpd int NULL,\n\tamt_fin decimal(20,6) NULL,\n\tdisbursal_date date NULL,\n\ttenure int NULL,\n\tinstl_num int4 NULL,\n\tno_of_members int4 NULL,\n\tdue_date date NULL,\n\tgroup_emi bigint NULL,\n\ttotal_demand bigint NULL,\n\tlast_payment_date date NULL,\n\tlast_payment_amount decimal(20,6) NULL,\n\ttotal_recovery bigint NULL,\n\tmonth_recovery bigint NULL,\n\tpromo_code varchar(64) NULL,\n\tloan_cycle int4 NULL,\n\trtr_tagging varchar(64) NULL,\n\tstp_tagging varchar(64) NULL,\n\tcreated_on date NULL\n);"
+  },
+  "base_group_pos_report": {
+    "name": "base_group_pos_report",
+    "kind": "table",
+    "sourceFile": null,
+    "definition": null
+  },
+  "base_cdd_otr_staging_table": {
+    "name": "base_cdd_otr_staging_table",
+    "kind": "table",
+    "sourceFile": "sli/reporting/sql/product/V000455__cdd_ot_staging_table.sql",
+    "definition": "CREATE TABLE base_cdd_otr_staging_table (\n    id BIGSERIAL PRIMARY KEY,\n    branch_name VARCHAR(255),\n    branch_code VARCHAR(255),\n    state VARCHAR(255),\n    so_name VARCHAR(255),\n    so_code VARCHAR(255),\n    rm_name VARCHAR(255),\n    rm_code VARCHAR(255),\n    ch_name VARCHAR(255),\n    ch_code VARCHAR(255),\n    cir_head_name VARCHAR(255),\n    cir_head_code VARCHAR(255),\n    rbh_name VARCHAR(255),\n    rbh_code VARCHAR(255),\n    zh_code VARCHAR(255),\n    zh_name VARCHAR(255),\n    product_code VARCHAR(255),\n    product_name VARCHAR(255),\n    npa_stage VARCHAR(255),\n    group_id BIGINT,\n    group_name VARCHAR(255),\n    casa_account_number VARCHAR(255),\n    fc_balance DECIMAL(20,6),\n    bom_emi DECIMAL(20,6),\n    bom_pos DECIMAL(20,6),\n    bom_dpd INTEGER,\n    amt_fin DECIMAL(20,6),\n    current_day_dpd DECIMAL(20,6),\n    current_day_pos DECIMAL(20,6),\n    current_day_total_emi_due DECIMAL(20,6),\n    disbursal_date timestamp without time zone,\n    tenure INTEGER,\n    instlnum INTEGER,\n    due_date TIMESTAMP,\n    group_emi DECIMAL(20,6),\n    no_of_members BIGINT,\n    total_demand DECIMAL(20,6),\n    last_payment_date TIMESTAMP without time zone,\n    last_payment_amount DECIMAL(20,6),\n    mode_of_transaction VARCHAR(255),\n\tsi_status_previous_month_minus_one varchar(255) NULL,\n\tsi_status_previous_month_minus_two varchar(255) NULL,\n\tsi_status_previous_month_minus_three varchar(255) NULL,\n    no_of_bounce BIGINT,\n    promo_code VARCHAR(255),\n    loan_cycle INTEGER,\n    amount_credited DECIMAL(20,6),\n    cdd_status VARCHAR(255),\n    created_on timestamp without time zone NULL\n);"
+  },
+  "base_cdd_otr": {
+    "name": "base_cdd_otr",
+    "kind": "table",
+    "sourceFile": null,
+    "definition": null
+  },
+  "base_oneplus_staging_table": {
+    "name": "base_oneplus_staging_table",
+    "kind": "table",
+    "sourceFile": "sli/reporting/sql/product/V000132__one_plus_staging_table_creation.sql",
+    "definition": "CREATE TABLE base_oneplus_staging_table (\n  id bigserial,\n  branch_name varchar(64) NULL,\n  branch_code varchar(64) NULL,\n  state varchar(64) NULL,\n  so_name varchar(64) NULL,\n  so_code varchar(64) NULL,\n  rm_name varchar(64) NULL,\n  rm_code varchar(64) NULL,\n  ch_name varchar(64) NULL,\n  ch_code varchar(64) NULL,\n  cir_head_name varchar(64) NULL,\n  cir_head_code varchar(64) NULL,\n  rbh_name varchar(64) NULL,\n  rbh_code varchar(64) NULL,\n  zh_name varchar(64) NULL,\n  zh_code varchar(64) NULL,\n  product_code varchar(64) NULL,\n  product_name varchar(64) NULL,\n  npa_stage varchar(64) NULL,\n  account_number varchar(64) NULL,\n  customer_id varchar(64),\n  customer_name varchar(64) NULL,\n  group_id varchar(64),\n  group_name varchar(64) NULL,\n  casa_account_number varchar(64) NULL,\n  fc_balance decimal(20,6) NULL,\n  amt_fin decimal(20,6) NULL,\n  disbursal_date date null,\n  tenure int,\n  due_date date null,\n  demand decimal(20,6) NULL,\n  current_day_emi decimal(20,6) NULL,\n  current_day_emi_due decimal(20,6) NULL,\n  current_day_cbc decimal(20,6) NULL,\n  current_day_lpp decimal(20,6) NULL,\n  current_day_other_charges decimal(20,6) NULL,\n  current_day_pos decimal(20,6) NULL,\n  current_day_dpd bigint NULL,\n  current_day_risk_dpd int NULL,\n  last_payment_date date null,\n  last_payment_amount decimal(20,6) NULL,\n  mode_of_transaction varchar(64) NULL,\n  total_recovery decimal(20,6) NULL,\n  mtd_recovery decimal(20,6) NULL,\n  no_of_bounce int,\n  promo_code varchar(64) NULL,\n  loan_cycle int NULL,\n  rtr_tagging varchar(64) NULL,\n  stp_tagging varchar(64) NULL, \n  created_on date null,\n  PRIMARY KEY (id)\n);"
+  },
+  "base_ind_demand_list_staging": {
+    "name": "base_ind_demand_list_staging",
+    "kind": "table",
+    "sourceFile": "sli/reporting/sql/product/V000066__cretae_table_grp_demand_list_script.sql",
+    "definition": "CREATE TABLE base_ind_demand_list_staging (\n\tid BIGSERIAL PRIMARY KEY,\n\tbranch_name varchar(255) NULL,\n\tbranch_code varchar(255) NULL,\n\tstate varchar(255) NULL,\n\tso_name varchar(255) NULL,\n\tso_code varchar(255) NULL,\n\trm_name varchar(255) NULL,\n\trm_code varchar(255) NULL,\n\tch_name varchar(255) NULL,\n\tch_code varchar(255) NULL,\n\tcir_head_name varchar(255) NULL,\n\tcir_head_code varchar(255) NULL,\n\trbh_name varchar(255) NULL,\n\trbh_code varchar(255) NULL,\n\tzh_name varchar(255) NULL,\n\tzh_code varchar(255) NULL,\n\tproduct_code varchar(255) NULL,\n\tproduct_name varchar(255) NULL,\n\tnpa_stage varchar(255) NULL,\n\taccount_no varchar(255) NULL,\n\tcustomer_id varchar(255) NULL,\n\tcustomer_name varchar(255) NULL,\n\tgroup_id varchar(255) NULL,\n\tgroup_name varchar(255) NULL,\n\tcasa_account_no varchar(255) NULL,\n\tfc_balance numeric(20, 6) NULL,\n\tbom_emi numeric(20, 6) NULL,\n\tbom_total_emi_due numeric(20, 6) NULL,\n\tbom_cbc numeric(20, 6) NULL,\n\tbom_lpp numeric(20, 6) NULL,\n\tbom_other_charges numeric(20, 6) NULL,\n\tbom_pos numeric(20, 6) NULL,\n\tbom_dpd numeric(20, 6) NULL,\n\tbom_risk_dpd numeric(20, 6) NULL,\n\tamt_fin numeric(20, 6) NULL,\n\tdisbursal_date timestamp NULL,\n\ttenure int4 NULL,\n\tinstalment_no int4 NULL,\n\tdue_date timestamp NULL,\n\tgroup_emi numeric(20, 6) NULL,\n\tno_of_members int4 NULL,\n\tdemand numeric(20, 6) NULL,\n\tgroup_demand numeric(20, 6) NULL,\n\ttotal_demand numeric(20, 6) NULL,\n\tcur_day_emi numeric(20, 6) NULL,\n\tcur_day_total_emi_due numeric(20, 6) NULL,\n\tcur_day_cbc numeric(20, 6) NULL,\n\tcur_day_lpp numeric(20, 6) NULL,\n\tcur_day_other_charges numeric(20, 6) NULL,\n\tcur_day_pos numeric(20, 6) NULL,\n\tcur_day_dpd numeric(20, 6) NULL,\n\tcur_day_risk_dpd numeric(20, 6) NULL,\n\tlast_payment_date timestamp NULL,\n\tlast_payment_amt numeric(20, 6) NULL,\n\tamt_credited_post_si_date numeric(20, 6) NULL,\n\tmode_of_trans varchar(255) NULL,\n\ttotal_recovery numeric(20, 6) NULL,\n\tmtd_recovery numeric(20, 6) NULL,\n\tcur_month_si_status varchar(255) NULL,\n\tcur_month_minus_one_si_status varchar(255) NULL,\n\tcur_month_minus_two_si_status varchar(255) NULL,\n\tcur_month_minus_three_si_status varchar(255) NULL,\n\tno_of_bounce int4 NULL,\n\tpromo_code varchar(255) NULL,\n\tloan_cycle int4 NULL,\n\tpurpose varchar(255) NULL,\n\trtr_or_nrtr varchar(255) NULL,\n\tstp_or_nstp varchar(255) NULL,\n\tdis_account_no varchar(255) NULL,\n\tdis_account_bank varchar(255) NULL,\n\trepay_account_no varchar(255) NULL,\n\trepay_account_bank varchar(255) NULL,\n\tcreated_date timestamp NULL,\n\treport_ref_no int8 NULL\n);"
+  },
+  "base_group_level_demand_list_staging": {
+    "name": "base_group_level_demand_list_staging",
+    "kind": "table",
+    "sourceFile": "sli/reporting/sql/product/V000161__alter_script_changed_group_id_to_varchar.sql",
+    "definition": "CREATE TABLE base_group_level_demand_list_staging (\n    id BIGSERIAL PRIMARY KEY,\n    branch_name VARCHAR(255),\n    branch_code VARCHAR(255),\n    state VARCHAR(255),\n    so_name VARCHAR(255),\n    so_code VARCHAR(255),\n    rm_name VARCHAR(255),\n    rm_code VARCHAR(255),\n    ch_name VARCHAR(255),\n    ch_code VARCHAR(255),\n    cir_head_name VARCHAR(255),\n    cir_head_code VARCHAR(255),\n    rbh_name VARCHAR(255),\n    rbh_code VARCHAR(255),\n    zh_code VARCHAR(255),\n    zh_name VARCHAR(255),\n    product_code VARCHAR(255),\n    product_name VARCHAR(255),\n    npa_stage VARCHAR(255),\n    group_id VARCHAR(255),\n    group_name VARCHAR(255),\n    casa_account_no VARCHAR(255),\n    fc_balance DECIMAL(20,6),\n    bom_pos DECIMAL(20,6),\n    bom_dpd INTEGER,\n    amt_financed DECIMAL(20,6),\n    disbursal_date TIMESTAMP,\n    tenure INTEGER,\n    install_no INTEGER,\n    due_date TIMESTAMP,\n    group_emi DECIMAL(20,6),\n    no_of_members BIGINT,\n    total_demand DECIMAL(20,6),\n    last_repayment_date TIMESTAMP,\n    last_payment_amt DECIMAL(20,6),\n    mode_of_txn VARCHAR(255),\n    cur_month_si_status varchar(255) NULL,\n\tcur_month_minus_one_si_status varchar(255) NULL,\n\tcur_month_minus_two_si_status varchar(255) NULL,\n\tcur_month_minus_three_si_status varchar(255) NULL,\n    no_of_bounce BIGINT,\n    promo_code VARCHAR(255),\n    loan_cycle INTEGER,\n    rtr_ntr VARCHAR(255),\n    stp_nstp VARCHAR(255),\n    created_date timestamp NULL,\n\treport_ref_no int8 NULL\n);"
+  },
+  "base_dpd_x_bucket_staging_table": {
+    "name": "base_dpd_x_bucket_staging_table",
+    "kind": "table",
+    "sourceFile": "sli/reporting/sql/product/V000046__dpd_bucket_staging_table.sql",
+    "definition": "CREATE TABLE base_dpd_x_bucket_staging_table (\n  id bigserial,\n  branch_name varchar(64) NULL,\n  branch_code varchar(64) NULL,\n  state varchar(64) NULL,\n  so_name varchar(64) NULL,\n  so_code varchar(64) NULL,\n  rm_name varchar(64) NULL,\n  rm_code varchar(64) NULL,\n  ch_name varchar(64) NULL,\n  ch_code varchar(64) NULL,\n  cir_head_name varchar(64) NULL,\n  cir_head_code varchar(64) NULL,\n  rbh_name varchar(64) NULL,\n  rbh_code varchar(64) NULL,\n  zh_name varchar(64) NULL,\n  zh_code varchar(64) NULL,\n  product_code varchar(64) NULL,\n  product_name varchar(64) NULL,\n  npa_stage varchar(64) NULL,\n  account_number varchar(64) NULL,\n  customer_id varchar(64),\n  customer_name varchar(64) NULL,\n  group_id varchar(64),\n  group_name varchar(64) NULL,\n  casa_account_number varchar(64) NULL,\n  FC_balance decimal(20,6) NULL,\n  bom_emi decimal(20,6) NULL,\n  bom_total_emi_due decimal(20,6) NULL,\n  bom_cbc decimal(20,6) NULL,\n  bom_lpp decimal(20,6) NULL,\n  bom_other_charges decimal(20,6) NULL,\n  bom_pos decimal(20,6) NULL,\n  bom_dpd int NULL,\n  bom_risk_dpd int NULL,\n  amt_fin decimal(20,6) NULL,\n  disbursal_date date null,\n  tenure int,\n  instlnum varchar(64) NULL,\n  due_date date null,\n  demand decimal(20,6) NULL,\n  total_demand decimal(20,6) NULL,\n  current_day_emi decimal(20,6) NULL,\n  current_day_emi_due decimal(20,6) NULL,\n  current_day_cbc decimal(20,6) NULL,\n  current_day_lpp decimal(20,6) NULL,\n  current_day_other_charges decimal(20,6) NULL,\n  current_day_pos decimal(20,6) NULL,\n  current_day_dpd bigint NULL,\n  current_day_risk_dpd int NULL,\n  status varchar(64) NULL,\n  no_of_emi_to_recover int,\n  last_payment_date date null,\n  last_payment_amount decimal(20,6) NULL,\n  mode_of_transaction varchar(64) NULL,\n  total_recovery decimal(20,6) NULL,\n  mtd_recovery decimal(20,6) NULL,\n  no_of_bounce int,\n  promo_code varchar(64) NULL,\n  loan_cycle int NULL,\n  rtr_tagging varchar(64) NULL,\n  stp_tagging varchar(64) NULL,\n  bucket_tagging varchar(64) NULL,\n  created_on date null,\n  PRIMARY KEY (id)\n);"
+  },
+  "base_dpd_x_bucket": {
+    "name": "base_dpd_x_bucket",
+    "kind": "table",
+    "sourceFile": null,
+    "definition": null
+  },
+  "login_base_data_customer": {
+    "name": "login_base_data_customer",
+    "kind": "table",
+    "sourceFile": null,
+    "definition": null
+  },
+  "uam_login_logout_report": {
+    "name": "uam_login_logout_report",
+    "kind": "table",
+    "sourceFile": null,
+    "definition": null
+  },
+  "uam_population_report": {
+    "name": "uam_population_report",
+    "kind": "table",
+    "sourceFile": null,
+    "definition": null
   }
 }

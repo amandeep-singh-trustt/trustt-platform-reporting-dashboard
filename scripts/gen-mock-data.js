@@ -12,7 +12,7 @@ const OUT_PATH = path.join(__dirname, '..', 'public', 'assets', 'mock-data.json'
 const DB_OBJECT_DEFS_OUT_PATH = path.join(__dirname, '..', 'public', 'assets', 'db-object-definitions.json');
 
 const CATEGORY_RULES = [
-  { key: 'eod-bod', name: 'EOD/BOD Reports', match: /\b(ALM|GL BALANCE|GL TRANSACTIONS|trial balance|Audit Monthly|End to End Tat)\b/i },
+  { key: 'eod-bod', name: 'EOD/BOD Reports', match: /\b(ALM|GL BALANCE|GL TRANSACTIONS|trial balance|Audit Monthly|End to End Tat|ED Base|CDD OTR|DPD Bucket|One Plus|Demand List|Group Level POS|SI OTR)\b/i },
   { key: 'daytime', name: 'Day Time Reports', match: /\b(Credit Productivity|CIC|HHI|Login Base|Village Details|SO Base|SO PLP|State Vtc)\b/i },
   { key: 'bank-recon', name: 'Bank Requirement/Reconciliation', match: /\b(NEFT|Cheque Bounce|Posidex|Reconcil|SI Presentation|Enach|Rbi Adf|Sec NPA|SRS)\b/i },
 ];
