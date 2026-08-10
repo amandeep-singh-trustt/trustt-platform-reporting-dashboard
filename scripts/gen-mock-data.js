@@ -43,10 +43,22 @@ const SUPPORT_SQL_RE = /^\s*SELECT\s+COUNT\(/i;
 // also hit "Account"/"Accounts" (contains "ccount"), which is not plumbing.
 const SUPPORT_METHOD_COUNT_RE = /Count/;
 
+// Second signal: a single-key point lookup (WHERE <id/ref/file column> = ?1 or = :name) that
+// enriches ONE record already being assembled by a report in progress — not a report on its
+// own. Confirmed by reading real examples: Enach Presentation Report Path's 15 "report" rows
+// were ALL findXxxByAccountId/findXxxByAccNo-style single-account lookups; RBI ADF's
+// findAllByRefNumber variants are alternate resend-by-batch-ref lookups duplicating the same
+// entity's primary chunked extract. Equality only (not IN/BETWEEN/>=) — bulk range/list
+// conditions on the same columns (e.g. "id BETWEEN :minValue AND :maxValue") stay 'report'.
+const POINT_LOOKUP_COL_RE =
+  /\b(account_id|loan_account_id|customer_id|cust_acc_no|account_number|loan_agreement_number|entity_id|ref_no|ref_number|report_ref_no|report_ref_number|report_code|inbound_file_name|outbound_file_name|file_category|file_type)\s*=\s*[?:]/i;
+
 function queryRoleFor(sql, methodName) {
   const method = methodName || '';
-  if (SUPPORT_SQL_RE.test(sql || '')) return 'support';
+  const query = sql || '';
+  if (SUPPORT_SQL_RE.test(query)) return 'support';
   if (SUPPORT_METHOD_COUNT_RE.test(method)) return 'support';
+  if (POINT_LOOKUP_COL_RE.test(query)) return 'support';
   return 'report';
 }
 
