@@ -27,20 +27,26 @@ function slugify(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
 
-// "report" = the actual data-producing query; "support" = batch-range count /
-// pagination-provider / chunk-fetch plumbing that rides alongside it under the same job.
+// "report" = the actual data-producing query; "support" = a pure batch-range sizing
+// query (count/min/max used only to carve the job into chunks — never itself report output).
+//
+// Everything routed through a SqlPagingQueryProviderFactoryBean / "constructor(...)" /
+// "*ByChunk" method is STILL a real report query — chunked pagination (SELECT * FROM
+// <table/view> WHERE id BETWEEN ...) is how these reports fetch their rows, confirmed by
+// reading the actual SQL for every such row in cleaned/reporting-reports.csv (e.g. APY Base
+// NET Data's "constructor (querySelectClause/queryFromClause/queryWhereClause)" resolves to
+// "SELECT * FROM apy_base_net_data_report WHERE id >= :minValue AND id <= :maxValue" — that
+// IS the report). Do not add method-name patterns for these back in.
 const SUPPORT_SQL_RE = /^\s*SELECT\s+COUNT\(/i;
 // case-sensitive: camelCase methods always capitalize a standalone "Count" segment
-// (batchGetCountFor..., getBatchCount...) — a case-insensitive match would also hit
-// "Account"/"Accounts" (contains "ccount"), which is not plumbing.
+// (batchGetCountFor..., getBatchCount..., getLoanAppCount) — a case-insensitive match would
+// also hit "Account"/"Accounts" (contains "ccount"), which is not plumbing.
 const SUPPORT_METHOD_COUNT_RE = /Count/;
-const SUPPORT_METHOD_OTHER_RE = /SqlPagingQueryProviderFactoryBean|^constructor|ByChunk$|PagingQueryProvider/i;
 
 function queryRoleFor(sql, methodName) {
   const method = methodName || '';
   if (SUPPORT_SQL_RE.test(sql || '')) return 'support';
   if (SUPPORT_METHOD_COUNT_RE.test(method)) return 'support';
-  if (SUPPORT_METHOD_OTHER_RE.test(method)) return 'support';
   return 'report';
 }
 
