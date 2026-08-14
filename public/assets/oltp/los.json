@@ -6448,7 +6448,7 @@
           "daoClass": "in.novopay.los.repository.GroupTaskDetailsRepository",
           "sqlIdentifier": "findBetCompletedTaskByGroupId",
           "status": "healthy",
-          "sqlPreview": "SELECT * FROM group__task_details WHERE group_id = ?1 and is_deleted = false AND task_status='COMPLETED' AND task_sub_type='CONDUCT_BET';",
+          "sqlPreview": "SELECT * FROM group__task_details WHERE group_id = ?1 and is_deleted = false AND task_status='COMPLETED' AND task_sub_type='CONDUCT_BET' ORDER BY id DESC LIMIT 1;",
           "explainPlan": "Index Scan using group__task_details_group_id on group__task_details  (cost=40.64..72.77 rows=2 width=101) (actual time=1.492..1.495 rows=1 loops=1)\n  Index Cond: (group_id = 409198)\n  Storage Filter: ((NOT is_deleted) AND ((task_status)::text = 'COMPLETED'::text) AND ((task_sub_type)::text = 'CONDUCT_BET'::text))\nPlanning Time: 0.137 ms\nExecution Time: 1.567 ms\nPeak Memory Usage: 8 kB"
         },
         {

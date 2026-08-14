@@ -3382,7 +3382,7 @@
           "daoClass": "in.novopay.accounting.loan.billing.dao.LoanAccountBillingDetailsRepository",
           "sqlIdentifier": "findByLoanInstallmentDetailsId",
           "status": "healthy",
-          "sqlPreview": "SELECT * FROM loan_account_billing_details WHERE loan_installment_details_id = ?1;",
+          "sqlPreview": "SELECT * FROM loan_account_billing_details WHERE loan_installment_details_id = ?1 ORDER BY id DESC LIMIT 1;",
           "explainPlan": "Limit  (cost=68.75..68.75 rows=1 width=127) (actual time=1.487..1.488 rows=1 loops=1)\n  ->  Sort  (cost=68.75..68.75 rows=1 width=127) (actual time=1.486..1.486 rows=1 loops=1)\n        Sort Key: value_date DESC\n        Sort Method: quicksort  Memory: 25kB\n        ->  Index Scan using loan_disbursement_transaction_loan_account_id on loan_disbursement_transaction  (cost=40.03..68.74 rows=1 width=127) (actual time=1.472..1.476 rows=1 loops=1)\n              Index Cond: (loan_account_id = 19660)\nPlanning Time: 0.127 ms\nExecution Time: 1.577 ms\nPeak Memory Usage: 52 kB"
         }
       ]
