@@ -3,7 +3,16 @@ import { Icon } from '../icon/icon';
 import { QueryDetails } from '../query-details/query-details';
 import { UiStateService } from '../../services/ui-state.service';
 import { EditsService } from '../../services/edits.service';
-import type { QueryStatus, SqlQuery } from '../../types/reporting.types';
+import type { QueryStatus, ReportApproach, SqlQuery } from '../../types/reporting.types';
+
+const APPROACH_BADGE: Record<ReportApproach, string> = {
+  chunk: 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-400',
+  cursor: 'bg-cyan-100 dark:bg-cyan-900/40 text-cyan-700 dark:text-cyan-400',
+};
+const APPROACH_LABEL: Record<ReportApproach, string> = {
+  chunk: 'Chunking based',
+  cursor: 'Cursor based',
+};
 
 const STATUS_BADGE: Record<QueryStatus, string> = {
   unverified: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300',
@@ -41,6 +50,11 @@ const STATUS_DOT: Record<QueryStatus, string> = {
               <span class="shrink-0 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-500 dark:text-slate-400">
                 {{ queries().length }} {{ queries().length === 1 ? 'query' : 'queries' }}
               </span>
+              @if (approach()) {
+                <span class="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium" [class]="approachClasses()">
+                  {{ approachLabel() }}
+                </span>
+              }
             </div>
             @if (subtitle()) {
               <div class="truncate font-mono text-[11px] text-slate-400 dark:text-slate-500">{{ subtitle() }}</div>
@@ -163,6 +177,7 @@ export class RepoSection {
   readonly pseudoJobId = input<string>('');
   readonly pseudoCategoryId = input<string>('');
   readonly pseudoCategoryName = input<string>('');
+  readonly approach = input<ReportApproach | null | undefined>(null);
   // driven by the page: true while a filter/search term is active (auto-reveal matches) or
   // "Expand all" is toggled on. Transitions sync `expanded`; a manual click in between still works.
   readonly autoExpand = input(false);
@@ -197,6 +212,16 @@ export class RepoSection {
 
   statusDot(status: QueryStatus): string {
     return STATUS_DOT[status];
+  }
+
+  approachClasses(): string {
+    const a = this.approach();
+    return a ? APPROACH_BADGE[a] : '';
+  }
+
+  approachLabel(): string {
+    const a = this.approach();
+    return a ? APPROACH_LABEL[a] : '';
   }
 
   onDelete(query: SqlQuery): void {

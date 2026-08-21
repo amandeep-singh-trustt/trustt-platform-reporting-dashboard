@@ -82,6 +82,15 @@ import { downloadQueriesCsv } from '../../utils/export-csv';
             <app-icon name="filter" [size]="14" />
             {{ reportsOnly() ? 'Reports only' : 'All queries' }}
           </button>
+          <select
+            [value]="approachFilter()"
+            (change)="approachFilter.set($any($event.target).value)"
+            class="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-3 py-1.5 text-sm text-slate-500 dark:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+          >
+            <option value="all">All approaches</option>
+            <option value="chunk">Chunking based</option>
+            <option value="cursor">Cursor based</option>
+          </select>
         </div>
 
         <div class="flex flex-col gap-3" appFlipGroup>
@@ -96,6 +105,7 @@ import { downloadQueriesCsv } from '../../utils/export-csv';
               <app-repo-section
                 [name]="job.name"
                 [queries]="displayedQueries(job)"
+                [approach]="job.approach"
                 [canRename]="true"
                 [canMove]="true"
                 [canAddQuery]="true"
@@ -143,9 +153,13 @@ export class CategoryPage {
   readonly sortAsc = signal(true);
   readonly expandAll = signal(false);
   readonly reportsOnly = signal(true);
+  readonly approachFilter = signal<'all' | 'chunk' | 'cursor'>('all');
 
   readonly hasActiveFilter = computed(
-    () => this.jobNameFilter().trim().length > 0 || this.search.term().trim().length > 0,
+    () =>
+      this.jobNameFilter().trim().length > 0 ||
+      this.search.term().trim().length > 0 ||
+      this.approachFilter() !== 'all',
   );
 
   toggleSort(): void {
@@ -164,7 +178,11 @@ export class CategoryPage {
     const nameFilter = this.jobNameFilter().trim().toLowerCase();
     const globalTerm = this.search.term().trim().toLowerCase();
 
+    const approach = this.approachFilter();
     const filtered = jobs.filter((job) => {
+      if (approach !== 'all' && job.approach !== approach) {
+        return false;
+      }
       if (nameFilter && !job.name.toLowerCase().includes(nameFilter)) {
         return false;
       }

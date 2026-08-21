@@ -27,11 +27,17 @@ export interface DbObjectDefinition {
   explainPlan?: string;
 }
 
+export type ReportApproach = 'chunk' | 'cursor';
+
 export interface ReportingJob {
   id: string;
   name: string;
   categoryId: string;
   queries: SqlQuery[];
+  // Reports/Job tab only — Spring Batch step architecture, verified against source (gen-mock-data.js
+  // JOB_APPROACH): 'chunk' = reader/processor/writer into a staging table + a tasklet dumps it to file;
+  // 'cursor' = a single tasklet streams the query cursor straight to the output file. Absent on OLTP queries.
+  approach?: ReportApproach | null;
 }
 
 export type CategoryId = 'eod-bod' | 'daytime' | 'on-demand' | 'bank-recon' | string;

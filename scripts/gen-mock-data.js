@@ -23,6 +23,73 @@ function categoryFor(jobName) {
   return DEFAULT_CATEGORY;
 }
 
+// Verified 2026-08-14 against trustt-platform-reporting@upstream/mfi_release_v3.4.2.5 (git worktree,
+// removed after this run) — per job, whether its Spring Batch job wires a CustomStepBuilder/
+// CustomCommonStepBuilder chunk step (reader -> processor -> writer into a staging table, then a
+// tasklet dumps the staging table to file) or only a CustomTaskletBuilder tasklet step (single
+// Tasklet streams the query cursor straight to the output file, no staging table, no chunk step).
+const JOB_APPROACH = {
+  'ALM Active Report Path': 'cursor',
+  'ALM Closed Report Path': 'chunk',
+  'APY Base NET Data - Location': 'chunk',
+  'Admin Activity Report Path': 'chunk',
+  'Audit Monthly Report Base Path': 'cursor',
+  'Base Demand List Report': 'chunk',
+  'CDD OTR Report': 'chunk',
+  'CIC Group Level Report Path': 'chunk',
+  'CIC Member Level Report Path': 'chunk',
+  'CSC VLE Data - Location': 'chunk',
+  'Collection Efficiency Report': 'cursor',
+  'Credit Productivity Report Path': 'chunk',
+  'Credit Raw Dump - Location': 'cursor',
+  'Credit Reports - Location': 'cursor',
+  'Customer Raw Dump - Location': 'chunk',
+  'DPD Bucket Report': 'cursor',
+  'ED Base Report': 'chunk',
+  'Edit Bet Report File Path': 'chunk',
+  'Enach Presentation Report Path': 'cursor',
+  'End to End Tat Reports - Location': 'cursor',
+  'Group Level Demand List Report': 'chunk',
+  'Group Level POS Report': 'chunk',
+  'Group Raw Dump - Location': 'chunk',
+  'HHI Report File Path': 'cursor',
+  'IS NP GL BALANCE Report Path': 'cursor',
+  'IS NP GL TRANSACTIONS Report Path': 'cursor',
+  'Login Base Group Data - Location': 'chunk',
+  'Login Base Group Dump - Location': 'chunk',
+  'NEFT Transaction Summary Server Path': 'cursor',
+  'NP Cheque Bounce Report Outbound File Path': 'chunk',
+  'OPS DUMP Data - Location': 'chunk',
+  'One Plus Report': 'chunk',
+  'Posidex Bad File Report Path': 'chunk',
+  'Posidex Good File Report Path': 'chunk',
+  'Posidex Outbound Daily Extract Path': 'chunk',
+  'Posidex Reject File Report Path': 'chunk',
+  'Posidex daily reverse handoff extract path': 'chunk',
+  'Rafta Report Path': 'chunk',
+  'Rbi Adf Extract Reports Path': 'chunk',
+  'Reject Reason Reports - Location': 'cursor',
+  'SI OTR Report': 'chunk',
+  'SI Presentation Report Path': 'chunk',
+  'SO Base Report Path': 'chunk',
+  'SO PLP Base Report Path': 'chunk',
+  'SRS Governance Report Path': 'cursor',
+  'SRS NP GL BALANCE Report Path': 'cursor',
+  'SRS NP GL TRANSACTIONS Report Path': 'cursor',
+  'Sec NPA Outbound Report Path': 'cursor',
+  'State Vtc Hierarchy Directory Path For The Offline': 'cursor',
+  'UAM Login/Logout report path': 'chunk',
+  'UAM Population report path': 'chunk',
+  'UAM Role Right report path': 'chunk',
+  'Village Details report path': 'chunk',
+  'Welcome Letter Report path': 'chunk',
+  'trial balance report Path': 'cursor',
+};
+
+function approachFor(jobName) {
+  return JOB_APPROACH[jobName] || null;
+}
+
 function slugify(s) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 }
@@ -90,7 +157,7 @@ for (const [jobNameRaw, dao, method, sql] of rows) {
 
   const jobId = `${cat.key}__${slugify(jobName)}`;
   if (!jobsByName.has(jobId)) {
-    const job = { id: jobId, name: jobName, categoryId: cat.key, queries: [] };
+    const job = { id: jobId, name: jobName, categoryId: cat.key, queries: [], approach: approachFor(jobName) };
     jobsByName.set(jobId, job);
     category.jobs.push(job);
   }
